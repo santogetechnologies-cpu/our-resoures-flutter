@@ -1,0 +1,789 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    >
+
+    <com.mapbox.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layoutDirection="ltr"
+        />
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        tools:ignore="RelativeOverlap"
+        android:layout_alignParentRight="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layoutDirection="rtl">
+
+
+    <ScrollView
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/wallpaper"
+        >
+
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:paddingBottom="70dp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="السياحة والآثار"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:textFontWeight="600"
+            android:layout_marginTop="30dp"
+
+            />
+
+        <Button
+            android:id="@+id/brief"
+            android:layout_width="match_parent"
+            android:text="مقدمة"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <Button
+            android:id="@+id/medina"
+            android:layout_width="match_parent"
+            android:text="منطقة المدينة المنورة"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/medina_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_below="@id/medina">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/feel"
+                android:text="جبل الفيل"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/dabos"
+                android:text="قوس مقرط الدبوس شمال العلا"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/gramel"
+                android:text="غراميل العلا"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/malsaa"
+                android:text="بركان جبل الملساء"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/baida"
+                android:text="بركان جبل البيضاء بحرة خيبر"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/qadar"
+                android:text="جبل القدر"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/arosa"
+                android:text='صخرة "العروسة"'
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/saleh"
+                android:text='مدائن صالح'
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/radwa"
+                android:text='جبل رضوى'
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+
+
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/riyadh"
+            android:layout_width="match_parent"
+            android:text="منطقة الرياض"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/riyadh_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_below="@id/riyadh">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/towaiq"
+                android:text="جبل طويق"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/ainhet"
+                android:text="دحول عين هيت"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/green"
+                android:text="كهف الطحالب الخضراء"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/snamh"
+                android:text="مائدة جبال سنامة بوادي الدواسر"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/tobad"
+                android:text="جبل التوباد"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/toqy"
+                android:text="وادي الطوقي"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/qasim"
+            android:layout_width="match_parent"
+            android:text="منطقة القصيم"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/qasim_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_below="@id/qasim">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/antra"
+                android:text="صخرة عنترة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/hourse"
+                android:text="جبل الحصان"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/asir"
+            android:layout_width="match_parent"
+            android:text="منطقة عسير"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/asir_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/hablah"
+                android:text="قرية الحبلة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/columns"
+                android:text="الأعمدة البازلتية"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/tanoma"
+                android:text="جبال تنومة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/kadmbl"
+                android:text="جزيرة كدمبل"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/saira"
+                android:text="جبل الصايرة ( الجيل الجليدي)"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/soda"
+                android:text="جبل السودة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/jorash"
+                android:text="مدينة جُرش"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/jazan"
+            android:layout_width="match_parent"
+            android:text="منطقة جازان"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+
+
+        <LinearLayout
+            android:id="@+id/jazan_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/khoba"
+                android:text="العيون الحارة بالخوبة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/lojb"
+                android:text="وادي لجب"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/farasan"
+                android:text="جزيرة فَرَسان"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/fifa"
+                android:text="جبال فيفا"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/tabuk"
+            android:layout_width="match_parent"
+            android:text="منطقة تبوك"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/tabuk_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/taima"
+                android:text="صخرة تيماء"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/desa"
+                android:text="وادي الديسة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/teran"
+                android:text="جزيرتا تيران وصنافير"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/galala"
+                android:text="جبل الغلالة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/lozah"
+                android:text="جبل اللوز"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/mekka"
+            android:layout_width="match_parent"
+            android:text="منطقة مكة المكرمة"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/mekka_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/taima2"
+                android:text="مقلع طمية"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/oud"
+                android:text="جزيرة أم العود "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/dokol"
+                android:text="جبال الدخول وحومل"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/hail"
+            android:layout_width="match_parent"
+            android:text="منطقة حائل"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/hail_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/shoifan"
+                android:text="كهف شعيفان ’’الشويمس’’"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/hailInscriptions"
+                android:text="النقوش الصخرية في حائل"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/east"
+            android:layout_width="match_parent"
+            android:text="المنطقة الشرقية"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/east_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/tarot"
+                android:text="جزيرة تاروت"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+            <Button
+                android:id="@+id/harqos"
+                android:text="جزيرة حرقوص"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/caves"
+                android:text="كهوف جبل القارة"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/ahsaa"
+                android:text="واحة الاحساء"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/joof"
+            android:layout_width="match_parent"
+            android:text="منطقة الجوف"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/joof_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Place your buttons or other expandable content here -->
+            <Button
+                android:id="@+id/kaf"
+                android:text="قرية كاف"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/najran"
+            android:layout_width="match_parent"
+            android:text="منطقة نجران"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:background="@drawable/main_menu_btn"
+            android:layout_height="70dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/najran_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/hema"
+                android:text="آبار حمى"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+            <Button
+                android:id="@+id/akdod"
+                android:text="الأُخدود"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sub_btn_menu"
+                android:layout_margin="5dp"
+                android:textSize="20sp"/>
+
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+    </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/icons_container"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="top"
+            android:orientation="vertical"
+            tools:ignore="RelativeOverlap">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:srcCompat="@drawable/home"
+                android:backgroundTint="#C17F4D2C"
+                android:contentDescription="TODO" />
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/reset_zoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:srcCompat="@drawable/zoom"
+                android:backgroundTint="#C17F4D2C"
+                android:contentDescription="reset the zoom of the map"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

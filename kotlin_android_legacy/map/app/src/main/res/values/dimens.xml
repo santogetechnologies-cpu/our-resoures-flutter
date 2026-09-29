@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="icon_earth">24dp</dimen>
+    <dimen name="icon_map">24dp</dimen>
+    <dimen name="icon_project">24dp</dimen>
+    <dimen name="icon_source">24dp</dimen>
+    <dimen name="icon_pump">24dp</dimen>
+    <dimen name="icon_tourism">24dp</dimen>
+    <dimen name="icon_oil">24dp</dimen>
+    <dimen name="icon_materials">24dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+</resources>

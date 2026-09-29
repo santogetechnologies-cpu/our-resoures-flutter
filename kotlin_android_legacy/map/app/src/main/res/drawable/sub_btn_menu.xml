@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Default State -->
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#77FFFFFF"/> <!-- Background color with opacity -->
+                    <corners android:radius="20dp"/> <!-- Border radius for background -->
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- Optionally, add states (pressed, focused) here if needed -->
+</selector>

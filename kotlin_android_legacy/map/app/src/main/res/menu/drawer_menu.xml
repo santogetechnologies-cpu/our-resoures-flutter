@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_region1"
+        android:title="منطقة المدينة المنورة"/>
+
+    <item
+        android:id="@+id/nav_region2"
+        android:title="منطقة الرياض"/>
+
+    <item
+        android:id="@+id/nav_region3"
+        android:title="منطقة القصيم"/>
+
+    <item
+        android:id="@+id/nav_region4"
+        android:title="منطقة عسير"/>
+
+    <item
+        android:id="@+id/nav_region5"
+        android:title="منطقة جازان"/>
+
+    <item
+        android:id="@+id/nav_region6"
+        android:title="منطقة تبوك"/>
+
+    <item
+        android:id="@+id/nav_region7"
+        android:title="منطقة مكة المكرمة"/>
+
+    <item
+        android:id="@+id/nav_region8"
+        android:title="منطقة حائل"/>
+
+    <item
+        android:id="@+id/nav_region9"
+        android:title="المنطقة الشرقية"/>
+
+    <item
+        android:id="@+id/nav_region10"
+        android:title="منطقة الجوف"/>
+
+</menu>
