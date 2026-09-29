@@ -1,8 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:excel/excel.dart' hide Border;
 import '../../core/constants/app_assets.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
@@ -39,60 +39,26 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
   List<Marker> _markers = [];
   bool _isLoading = false;
 
-  Future<void> _loadEarthquakeData(String excelFile, String iconAsset) async {
+  Future<void> _loadEarthquakeData(String dataFile, String iconAsset) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final ByteData data = await rootBundle.load('assets/earthquake/$excelFile');
-      final bytes = data.buffer.asUint8List();
-      final excel = Excel.decodeBytes(bytes);
-      final sheet = excel.tables[excel.tables.keys.first];
+      final jsonFile = dataFile.replaceAll('.xlsx', '.json');
+      final String jsonString = await rootBundle.loadString('assets/earthquake/$jsonFile');
+      final List<dynamic> rawList = jsonDecode(jsonString);
 
-      final List<EarthquakePoint> points = [];
-      if (sheet != null) {
-        for (int i = 1; i < sheet.maxRows; i++) {
-          final row = sheet.rows[i];
-          if (row.length < 4) continue;
-
-          final rawDate = row[0]?.value?.toString() ?? '';
-          final latVal = row[1]?.value;
-          final lonVal = row[2]?.value;
-          final magVal = row[3]?.value;
-
-          final double lat = double.tryParse(latVal?.toString() ?? '') ?? 0.0;
-          final double lon = double.tryParse(lonVal?.toString() ?? '') ?? 0.0;
-          final double mag = double.tryParse(magVal?.toString() ?? '') ?? 0.0;
-
-          if (lat != 0 && lon != 0) {
-            String dateFormatted = '';
-            String timeFormatted = '';
-
-            if (rawDate.contains('T')) {
-              final parts = rawDate.split('T');
-              dateFormatted = parts[0];
-              timeFormatted = parts.length > 1 ? parts[1].split('.')[0] : '';
-            } else if (rawDate.contains(' ')) {
-              final parts = rawDate.split(' ');
-              dateFormatted = parts[0];
-              timeFormatted = parts.length > 1 ? parts[1] : '';
-            } else {
-              dateFormatted = rawDate;
-              timeFormatted = '00:00:00';
-            }
-
-            points.add(EarthquakePoint(
-              latitude: lat,
-              longitude: lon,
-              magnitude: mag,
-              date: dateFormatted,
-              time: timeFormatted,
-              iconAsset: iconAsset,
-            ));
-          }
-        }
-      }
+      final List<EarthquakePoint> points = rawList.map((p) {
+        return EarthquakePoint(
+          latitude: (p['lat'] as num).toDouble(),
+          longitude: (p['lon'] as num).toDouble(),
+          magnitude: (p['mag'] as num).toDouble(),
+          date: p['date']?.toString() ?? '',
+          time: p['time']?.toString() ?? '',
+          iconAsset: iconAsset,
+        );
+      }).toList();
 
       final markers = points.map((p) {
         return Marker(
@@ -112,16 +78,20 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
         );
       }).toList();
 
-      setState(() {
-        _markers = markers;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _markers = markers;
+          _isLoading = false;
+        });
+      }
 
       if (points.isNotEmpty && _mapController != null) {
         _mapController!.move(const LatLng(24.694291, 47.189224), 4.3);
       }
     } catch (_) {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

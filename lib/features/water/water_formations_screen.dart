@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:excel/excel.dart' hide Border;
 import '../../core/constants/app_assets.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
@@ -185,56 +184,30 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
 
   Future<void> _loadDams() async {
     try {
-      final ByteData data = await rootBundle.load(AppAssets.damsXlsx);
-      final bytes = data.buffer.asUint8List();
-      final excel = Excel.decodeBytes(bytes);
-      final sheet = excel.tables[excel.tables.keys.first];
+      final String jsonString = await rootBundle.loadString(AppAssets.damsJson);
+      final List<dynamic> rawList = jsonDecode(jsonString);
 
-      final List<DamLocation> list = [];
-      if (sheet != null) {
-        for (int i = 1; i < sheet.maxRows; i++) {
-          final row = sheet.rows[i];
-          if (row.length < 11) continue;
+      final List<DamLocation> list = rawList.map((item) {
+        return DamLocation(
+          name: item['name']?.toString() ?? '',
+          gov: item['gov']?.toString() ?? '',
+          region: item['region']?.toString() ?? '',
+          type: item['type']?.toString() ?? '',
+          length: (item['length'] as num?)?.toDouble() ?? 0.0,
+          height: (item['height'] as num?)?.toDouble() ?? 0.0,
+          crestHeight: (item['crest'] as num?)?.toDouble() ?? 0.0,
+          capacity: (item['cap'] as num?)?.toDouble() ?? 0.0,
+          theDate: item['theDate']?.toString() ?? '',
+          latitude: (item['lat'] as num?)?.toDouble() ?? 0.0,
+          longitude: (item['lon'] as num?)?.toDouble() ?? 0.0,
+        );
+      }).toList();
 
-          final region = row[0]?.value?.toString() ?? '';
-          final gov = row[1]?.value?.toString() ?? '';
-          final name = row[2]?.value?.toString() ?? '';
-          final type = row[3]?.value?.toString() ?? '';
-          final lengthVal = row[4]?.value;
-          final heightVal = row[5]?.value;
-          final crestVal = row[6]?.value;
-          final capVal = row[7]?.value;
-          final dateVal = row[8]?.value?.toString() ?? '';
-          final latVal = row[9]?.value;
-          final lonVal = row[10]?.value;
-
-          final double lat = double.tryParse(latVal?.toString() ?? '') ?? 0.0;
-          final double lon = double.tryParse(lonVal?.toString() ?? '') ?? 0.0;
-          final double height = double.tryParse(heightVal?.toString() ?? '') ?? 0.0;
-          final double length = double.tryParse(lengthVal?.toString() ?? '') ?? 0.0;
-          final double crest = double.tryParse(crestVal?.toString() ?? '') ?? 0.0;
-          final double cap = double.tryParse(capVal?.toString() ?? '') ?? 0.0;
-
-          if (lat > 0 && lon > 0 && name.isNotEmpty) {
-            list.add(DamLocation(
-              name: name,
-              gov: gov,
-              region: region,
-              type: type,
-              length: length,
-              height: height,
-              crestHeight: crest,
-              capacity: cap,
-              theDate: dateVal,
-              latitude: lat,
-              longitude: lon,
-            ));
-          }
-        }
+      if (mounted) {
+        setState(() {
+          _dams = list;
+        });
       }
-      setState(() {
-        _dams = list;
-      });
     } catch (_) {}
   }
 

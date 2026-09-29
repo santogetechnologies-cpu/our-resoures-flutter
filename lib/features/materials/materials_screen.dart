@@ -1,8 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:excel/excel.dart' hide Border;
 import '../../core/constants/app_assets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
@@ -400,46 +400,30 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
   Future<void> _loadExcelData() async {
     setState(() => _isLoading = true);
     try {
-      final ByteData data = await rootBundle.load(AppAssets.materialsXlsx);
-      final bytes = data.buffer.asUint8List();
-      final excel = Excel.decodeBytes(bytes);
-      final sheet = excel.tables[excel.tables.keys.first];
+      final String jsonString = await rootBundle.loadString(AppAssets.materialsJson);
+      final List<dynamic> rawList = jsonDecode(jsonString);
 
-      final List<MaterialLocation> list = [];
-      if (sheet != null) {
-        for (int i = 1; i < sheet.maxRows; i++) {
-          final row = sheet.rows[i];
-          if (row.length < 5) continue;
+      final List<MaterialLocation> list = rawList.map((item) {
+        return MaterialLocation(
+          latitude: (item['lat'] as num).toDouble(),
+          longitude: (item['lon'] as num).toDouble(),
+          nameEn: item['nameEn']?.toString() ?? '',
+          nameAr: item['nameAr']?.toString() ?? '',
+          region: item['region']?.toString() ?? '',
+          locationName: item['loc']?.toString() ?? '',
+        );
+      }).toList();
 
-          final locationName = row[0]?.value?.toString() ?? '';
-          final region = row[1]?.value?.toString() ?? '';
-          final lonVal = row[2]?.value;
-          final latVal = row[3]?.value;
-          final nameEn = row[4]?.value?.toString().trim() ?? '';
-          final nameAr = row.length > 5 ? (row[5]?.value?.toString().trim() ?? '') : '';
-
-          final lon = double.tryParse(lonVal?.toString() ?? '');
-          final lat = double.tryParse(latVal?.toString() ?? '');
-
-          if (lon != null && lat != null && nameEn.isNotEmpty) {
-            list.add(MaterialLocation(
-              latitude: lat,
-              longitude: lon,
-              nameEn: nameEn,
-              nameAr: nameAr,
-              region: region,
-              locationName: locationName,
-            ));
-          }
-        }
+      if (mounted) {
+        setState(() {
+          _allLocations = list;
+          _isLoading = false;
+        });
       }
-
-      setState(() {
-        _allLocations = list;
-        _isLoading = false;
-      });
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

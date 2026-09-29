@@ -41,15 +41,17 @@ class AppAssets {
 
   // Datasets
   static const String materialsXlsx = 'assets/data/materials.xlsx';
+  static const String materialsJson = 'assets/data/materials.json';
   static const String damsXlsx = 'assets/data/dams.xlsx';
+  static const String damsJson = 'assets/data/dams.json';
   static const String tourismDataJson = 'assets/data/tourism_data.json';
 
-  // Earthquake data
-  static const String earthquakeHistorical = 'assets/earthquake/Histroical.xlsx';
-  static const String earthquake4to5 = 'assets/earthquake/4 to 5.xlsx';
-  static const String earthquake5to6 = 'assets/earthquake/5 to 6.xlsx';
-  static const String earthquake6to7 = 'assets/earthquake/6 to 7.xlsx';
-  static const String earthquake7andAbove = 'assets/earthquake/7 and above.xlsx';
+  // Earthquake data (using fast JSON)
+  static const String earthquakeHistorical = 'assets/earthquake/Histroical.json';
+  static const String earthquake4to5 = 'assets/earthquake/4 to 5.json';
+  static const String earthquake5to6 = 'assets/earthquake/5 to 6.json';
+  static const String earthquake6to7 = 'assets/earthquake/6 to 7.json';
+  static const String earthquake7andAbove = 'assets/earthquake/7 and above.json';
 
   // GeoJSON / Maps
   static const String valleysDir = 'assets/maps/valleys';
