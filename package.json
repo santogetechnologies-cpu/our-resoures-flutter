@@ -1,0 +1,9 @@
+{
+  "name": "our-resources-flutter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Our Resources Flutter Web Application",
+  "scripts": {
+    "build": "bash vercel-build.sh"
+  }
+}
