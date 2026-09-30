@@ -104,12 +104,12 @@ class _MapShellState extends State<MapShell> {
                   ],
                 ),
 
-                // Map Scale Bar (0 | 500 km | 1000 km dynamic scale bar)
+                // Map Scale Bar (0 | 500 km | 1000 km dynamic scale bar matching Mapbox native Android SDK)
                 MapScaleBar(
                   zoom: _currentZoom,
                   latitude: _currentLat,
-                  alignment: Alignment.bottomLeft,
-                  padding: const EdgeInsets.only(left: 18, bottom: 20),
+                  alignment: Alignment.topLeft,
+                  padding: const EdgeInsets.only(left: 16, top: 16),
                 ),
 
                 // Floating Action Buttons (Home + Reset Zoom) positioned immediately adjacent to the 350dp sidebar

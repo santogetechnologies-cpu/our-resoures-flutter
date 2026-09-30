@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-/// A dynamic GIS Map Scale Bar widget matching native Mapbox / GIS scale bars.
-/// Displays tick marks and distances (e.g., 0, 500 km, 1000 km at Saudi Arabia overview).
+/// Authentic native Mapbox / GIS Map Scale Bar widget matching Mapbox Android SDK 10.x.
+/// Renders distance labels (0, 500 km, 1000 km) directly above a high-contrast ruler bar
+/// with tick marks and transparent background.
 class MapScaleBar extends StatelessWidget {
   final double zoom;
   final double latitude;
@@ -13,8 +14,8 @@ class MapScaleBar extends StatelessWidget {
     super.key,
     required this.zoom,
     required this.latitude,
-    this.alignment = Alignment.bottomLeft,
-    this.padding = const EdgeInsets.only(left: 16, bottom: 24),
+    this.alignment = Alignment.topLeft,
+    this.padding = const EdgeInsets.only(left: 16, top: 16),
   });
 
   @override
@@ -22,8 +23,8 @@ class MapScaleBar extends StatelessWidget {
     // Ground resolution in meters per pixel for standard Web Mercator projection
     final metersPerPixel = (156543.03392 * cos(latitude * pi / 180.0)) / pow(2.0, zoom);
 
-    // Target width on screen between 110 and 190 logical pixels
-    const targetWidth = 140.0;
+    // Target width on screen around 140 - 220 logical pixels
+    const targetWidth = 160.0;
     final targetDistanceMeters = targetWidth * metersPerPixel;
 
     // Standard round distance steps (in meters)
@@ -56,9 +57,7 @@ class MapScaleBar extends StatelessWidget {
       }
     }
 
-    // At Saudi Arabia national overview (zoom ~4.5 - 5.5), chosenDistance is ~1,000,000 m (1000 km)
-    // with midpoint at 500 km, giving the iconic: 0 | 500 km | 1000 km
-    final calculatedPixelWidth = (chosenDistance / metersPerPixel).clamp(90.0, 240.0);
+    final calculatedPixelWidth = (chosenDistance / metersPerPixel).clamp(110.0, 260.0);
 
     String formatUnit(double distMeters) {
       if (distMeters >= 1000) {
@@ -78,112 +77,112 @@ class MapScaleBar extends StatelessWidget {
       alignment: alignment,
       child: Padding(
         padding: padding,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.68),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withOpacity(0.35), width: 1.2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Distance Labels (0, 500 km, 1000 km)
-              SizedBox(
-                width: calculatedPixelWidth,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      leftLabel,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'NotoKufi',
-                      ),
-                    ),
-                    Text(
-                      midLabel,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'NotoKufi',
-                      ),
-                    ),
-                    Text(
-                      rightLabel,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'NotoKufi',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 3),
-              // Segmented Scale Ruler Bar (alternating white/black with border and ticks)
-              SizedBox(
-                width: calculatedPixelWidth,
-                height: 7,
-                child: Stack(
-                  children: [
-                    // Base alternating bar
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: Colors.black, width: 0.8),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(2),
-                                bottomLeft: Radius.circular(2),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2C1810),
-                              border: Border.all(color: Colors.white, width: 0.8),
-                              borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(2),
-                                bottomRight: Radius.circular(2),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Center tick
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        width: 1.5,
-                        height: 7,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        child: SizedBox(
+          width: calculatedPixelWidth + 30,
+          height: 32,
+          child: CustomPaint(
+            painter: _MapboxScaleBarPainter(
+              barWidth: calculatedPixelWidth,
+              leftText: leftLabel,
+              midText: midLabel,
+              rightText: rightLabel,
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+class _MapboxScaleBarPainter extends CustomPainter {
+  final double barWidth;
+  final String leftText;
+  final String midText;
+  final String rightText;
+
+  _MapboxScaleBarPainter({
+    required this.barWidth,
+    required this.leftText,
+    required this.midText,
+    required this.rightText,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const textStyle = TextStyle(
+      color: Colors.black,
+      fontSize: 11.5,
+      fontWeight: FontWeight.bold,
+      fontFamily: 'NotoKufi',
+      shadows: [
+        Shadow(color: Colors.white, blurRadius: 3, offset: Offset(0, 0)),
+        Shadow(color: Colors.white, blurRadius: 3, offset: Offset(1, 1)),
+        Shadow(color: Colors.white, blurRadius: 3, offset: Offset(-1, -1)),
+        Shadow(color: Colors.white, blurRadius: 3, offset: Offset(1, -1)),
+        Shadow(color: Colors.white, blurRadius: 3, offset: Offset(-1, 1)),
+      ],
+    );
+
+    // Left text
+    final leftPainter = TextPainter(
+      text: TextSpan(text: leftText, style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    leftPainter.paint(canvas, Offset(0, 0));
+
+    // Mid text
+    final midPainter = TextPainter(
+      text: TextSpan(text: midText, style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    midPainter.paint(canvas, Offset((barWidth / 2) - (midPainter.width / 2), 0));
+
+    // Right text
+    final rightPainter = TextPainter(
+      text: TextSpan(text: rightText, style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    rightPainter.paint(canvas, Offset(barWidth - rightPainter.width, 0));
+
+    final lineY = leftPainter.height + 2;
+    const tickHeight = 6.0;
+
+    // Ruler path: |____|____|
+    final rulerPath = Path()
+      // Left tick
+      ..moveTo(0, lineY + tickHeight)
+      ..lineTo(0, lineY)
+      // Horizontal bar
+      ..lineTo(barWidth, lineY)
+      // Right tick
+      ..lineTo(barWidth, lineY + tickHeight)
+      // Mid tick
+      ..moveTo(barWidth / 2, lineY)
+      ..lineTo(barWidth / 2, lineY + tickHeight);
+
+    // Outer white stroke for maximum contrast over any satellite image or terrain
+    final whitePaint = Paint()
+      ..color = Colors.white.withOpacity(0.95)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.6
+      ..strokeCap = StrokeCap.square;
+
+    // Inner dark core
+    final blackPaint = Paint()
+      ..color = const Color(0xFF1B1B1B)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.square;
+
+    canvas.drawPath(rulerPath, whitePaint);
+    canvas.drawPath(rulerPath, blackPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _MapboxScaleBarPainter oldDelegate) {
+    return oldDelegate.barWidth != barWidth ||
+        oldDelegate.leftText != leftText ||
+        oldDelegate.midText != midText ||
+        oldDelegate.rightText != rightText;
   }
 }
