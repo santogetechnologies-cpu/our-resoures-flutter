@@ -272,4 +272,570 @@ class AboutDialogs {
       ),
     );
   }
+
+  static void showRemoteSensing(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final dialogWidth = size.width * 0.75;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          ),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: dialogWidth,
+            constraints: BoxConstraints(maxHeight: size.height * 0.9),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF6EE),
+              borderRadius: BorderRadius.circular(AppColors.borderRadius),
+              image: const DecorationImage(
+                image: AssetImage(AppAssets.infoback),
+                fit: BoxFit.cover,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.40),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'الاستشعار عن بعد ونظم المعلومات الجغرافية (Remote Sensing & GIS)',
+                        style: TextStyle(
+                          fontFamily: 'NotoKufi',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.solidBrown,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 22, color: AppColors.textDark),
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(color: AppColors.borderBrown, thickness: 1.5),
+                const SizedBox(height: 10),
+                const Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'تطبيقات الاستشعار عن بعد ونظم المعلومات الجغرافية في علوم الأرض:\n\n'
+                          '• معالجة الصور الفضائية وبيانات الأقمار الصناعية عالية الدقة لاستكشاف التراكيب الجيولوجية.\n'
+                          '• رصد التغيرات البيئية والطبوغرافية وتحديد مواقع التمعدنات والمسطحات المائية والأودية.\n'
+                          '• بناء قواعد البيانات الجغرافية والطبقات المكانية المتكاملة لدعم اتخاذ القرار والتخطيط التنموي المستدام وفق رؤية المملكة 2030.',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 18,
+                            height: 1.9,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBrown,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  ),
+                  child: const Text(
+                    'إغلاق',
+                    style: TextStyle(fontFamily: 'NotoKufi', fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static void showNaturalReserves(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final dialogWidth = size.width * 0.75;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          ),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: dialogWidth,
+            constraints: BoxConstraints(maxHeight: size.height * 0.9),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF6EE),
+              borderRadius: BorderRadius.circular(AppColors.borderRadius),
+              image: const DecorationImage(
+                image: AssetImage(AppAssets.infoback),
+                fit: BoxFit.cover,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.40),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'المحميات الطبيعية في المملكة العربية السعودية',
+                        style: TextStyle(
+                          fontFamily: 'NotoKufi',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.solidBrown,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 22, color: AppColors.textDark),
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(color: AppColors.borderBrown, thickness: 1.5),
+                const SizedBox(height: 10),
+                const Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'المحميات الملكية والطبيعية في المملكة:\n\n'
+                          '• محمية الإمام عبد العزيز بن محمد الملكية ومحمية الملك عبد العزيز الملكية.\n'
+                          '• محمية الوعول ومحمية عروق بني معارض ومحمية جزر فرسان البحرية.\n'
+                          '• محمية الأمير محمد بن سلمان ومحمية الملك سلمان بن عبد العزيز الملكية.\n\n'
+                          'تهدف هذه المحميات إلى صون التنوع الأحيائي، وحماية النظم البيئية والجيولوجية النادرة، وإعادة توطين الكائنات المهددة بالانقراض وتنشيط السياحة البيئية المستدامة.',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 18,
+                            height: 1.9,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBrown,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  ),
+                  child: const Text(
+                    'إغلاق',
+                    style: TextStyle(fontFamily: 'NotoKufi', fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static void showEncyclopedia(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final dialogWidth = size.width * 0.75;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          ),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: dialogWidth,
+            constraints: BoxConstraints(maxHeight: size.height * 0.9),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF6EE),
+              borderRadius: BorderRadius.circular(AppColors.borderRadius),
+              image: const DecorationImage(
+                image: AssetImage(AppAssets.infoback),
+                fit: BoxFit.cover,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.40),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'موسوعات وكتب علوم الأرض',
+                        style: TextStyle(
+                          fontFamily: 'NotoKufi',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.solidBrown,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 22, color: AppColors.textDark),
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(color: AppColors.borderBrown, thickness: 1.5),
+                const SizedBox(height: 10),
+                const Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'الموسوعات والمؤلفات العلمية المرجعية:\n\n'
+                          '• موسوعة العمري في علوم الأرض (سلسلة شاملة تضم أكثر من 30 مجلداً علمياً).\n'
+                          '• أطلس المعادن الصناعية والثروات المعدنية في المملكة العربية السعودية.\n'
+                          '• أطلس المياه والمصادر المائية الجوفية والسطحية.\n'
+                          '• دراسات وأبحاث الجمعية السعودية لعلوم الأرض وهيئة المساحة الجيولوجية السعودية.',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 18,
+                            height: 1.9,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBrown,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  ),
+                  child: const Text(
+                    'إغلاق',
+                    style: TextStyle(fontFamily: 'NotoKufi', fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static void showHazards(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final dialogWidth = size.width * 0.75;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          ),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: dialogWidth,
+            constraints: BoxConstraints(maxHeight: size.height * 0.9),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF6EE),
+              borderRadius: BorderRadius.circular(AppColors.borderRadius),
+              image: const DecorationImage(
+                image: AssetImage(AppAssets.infoback),
+                fit: BoxFit.cover,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.40),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'المخاطر الجيولوجية والبيئية',
+                        style: TextStyle(
+                          fontFamily: 'NotoKufi',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.solidBrown,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 22, color: AppColors.textDark),
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(color: AppColors.borderBrown, thickness: 1.5),
+                const SizedBox(height: 10),
+                const Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'رصد وتقييم المخاطر الجيولوجية والطبيعية في المملكة:\n\n'
+                          '• مخاطر الزلازل والنشاط البركاني في الحرات البركانية وسواحل البحر الأحمر.\n'
+                          '• الانهيارات الصخرية والانزلاقات الأرضية في المناطق الجبلية والمنحدرات.\n'
+                          '• مخاطر السيول الجارفة والفيضانات في مجاري الأودية والأحواض المائية.\n'
+                          '• زحف الرمال والكثبان الرملية وتأثيرها على البنية التحتية والمشاريع التنموية.\n'
+                          '• الهبوط الأرضي والتكهفات الكارستية في التكوينات الجيرية والجبسية.',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 18,
+                            height: 1.9,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBrown,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  ),
+                  child: const Text(
+                    'إغلاق',
+                    style: TextStyle(fontFamily: 'NotoKufi', fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static void showNaturalResources(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final dialogWidth = size.width * 0.75;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          ),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: dialogWidth,
+            constraints: BoxConstraints(maxHeight: size.height * 0.9),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF6EE),
+              borderRadius: BorderRadius.circular(AppColors.borderRadius),
+              image: const DecorationImage(
+                image: AssetImage(AppAssets.infoback),
+                fit: BoxFit.cover,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.40),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'المصادر والثروات الطبيعية',
+                        style: TextStyle(
+                          fontFamily: 'NotoKufi',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.solidBrown,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 22, color: AppColors.textDark),
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(color: AppColors.borderBrown, thickness: 1.5),
+                const SizedBox(height: 10),
+                const Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'تكامل الثروات والمصادر الطبيعية في المملكة:\n\n'
+                          '• الطاقة المتجددة (الطاقة الشمسية وطاقة الرياح والطاقة الحرارية الأرضية).\n'
+                          '• الموارد التعدينية والفلزية والصناعية الواعدة في الدرع العربي والغطاء الرسوبي.\n'
+                          '• الثروات المائية والأحواض الجوفية الاستراتيجية.\n'
+                          '• الموارد النفطية والغاز الطبيعي التقليدي وغير التقليدي.\n'
+                          '• المعالم السياحية والبيئية والمحميات الطبيعية المستدامة.',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 18,
+                            height: 1.9,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBrown,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  ),
+                  child: const Text(
+                    'إغلاق',
+                    style: TextStyle(fontFamily: 'NotoKufi', fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

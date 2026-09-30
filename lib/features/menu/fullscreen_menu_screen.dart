@@ -30,6 +30,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Container(
+      height: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.categoryBtnBg,
         borderRadius: BorderRadius.circular(AppColors.borderRadius),
@@ -48,7 +49,7 @@ class FullscreenMenuScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppColors.borderRadius),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             child: Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
@@ -57,7 +58,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textDark,
                   ),
@@ -90,9 +91,9 @@ class FullscreenMenuScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                 child: Column(
                   children: [
-                    // Top Header Bar matching fullscreen_list.xml
+                    // Top Header Bar
                     Container(
-                      height: 80,
+                      height: 75,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
                         color: AppColors.categoryBtnBg,
@@ -120,11 +121,11 @@ class FullscreenMenuScreen extends StatelessWidget {
                           // Center Title
                           const Expanded(
                             child: Text(
-                              'ثرواتنا من أرضنا',
+                              'علوم الأرض في خدمة الجميع',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontFamily: 'NotoKufi',
-                                fontSize: 34,
+                                fontSize: 32,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textBlack,
                               ),
@@ -143,12 +144,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
 
                     // Top "نبذة تعريفية" Button
                     Container(
                       width: 280,
-                      height: 52,
+                      height: 48,
                       decoration: BoxDecoration(
                         color: AppColors.categoryBtnBg,
                         borderRadius: BorderRadius.circular(AppColors.borderRadius),
@@ -171,7 +172,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                               'نبذة تعريفية',
                               style: TextStyle(
                                 fontFamily: 'NotoKufi',
-                                fontSize: 22,
+                                fontSize: 21,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textDark,
                               ),
@@ -183,90 +184,124 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                     const SizedBox(height: 12),
 
-                    // 2x3 Grid of Categories
+                    // 4x2 Grid of 8 Buttons in the exact order attached:
+                    // Row 1: Right = جيولوجية المملكة  | Left = الصخور والمعادن الإقتصادية
+                    // Row 2: Right = مصادر المياه      | Left = البترول والغاز
+                    // Row 3: Right = السياحة والآثار   | Left = قاعدة البيانات الزلزالية
+                    // Row 4: Right = المخاطر           | Left = مصادر طبيعية
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 24,
-                          mainAxisSpacing: 18,
-                          childAspectRatio: 3.2,
-                          physics: const NeverScrollableScrollPhysics(),
+                        child: Column(
                           children: [
-                            _buildCategoryButton(
-                              context: context,
-                              title: 'جيولوجية المملكة',
-                              onTap: () => _navigate(context, const GeologyScreen()),
+                            // Row 1
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  // Right column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'جيولوجية المملكة',
+                                      onTap: () => _navigate(context, const GeologyScreen()),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 22),
+                                  // Left column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'الصخور والمعادن الإقتصادية',
+                                      onTap: () => _navigate(context, const MaterialsScreen()),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            _buildCategoryButton(
-                              context: context,
-                              title: 'الصخور والمعادن الإقتصادية',
-                              onTap: () => _navigate(context, const MaterialsScreen()),
+                            const SizedBox(height: 12),
+
+                            // Row 2
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  // Right column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'مصادر المياه',
+                                      onTap: () => _navigate(context, const WaterFormationsScreen()),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 22),
+                                  // Left column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'البترول والغاز',
+                                      onTap: () => _navigate(context, const OilGasScreen()),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            _buildCategoryButton(
-                              context: context,
-                              title: 'مصادر المياه',
-                              onTap: () => _navigate(context, const WaterFormationsScreen()),
+                            const SizedBox(height: 12),
+
+                            // Row 3
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  // Right column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'السياحة والآثار',
+                                      onTap: () => _navigate(context, const TourismScreen()),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 22),
+                                  // Left column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'قاعدة البيانات الزلزالية',
+                                      onTap: () => _navigate(context, const EarthquakeScreen()),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            _buildCategoryButton(
-                              context: context,
-                              title: 'البترول والغاز',
-                              onTap: () => _navigate(context, const OilGasScreen()),
-                            ),
-                            _buildCategoryButton(
-                              context: context,
-                              title: 'السياحة والآثار',
-                              onTap: () => _navigate(context, const TourismScreen()),
-                            ),
-                            _buildCategoryButton(
-                              context: context,
-                              title: 'قاعدة البيانات الزلزالية',
-                              onTap: () => _navigate(context, const EarthquakeScreen()),
+                            const SizedBox(height: 12),
+
+                            // Row 4
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  // Right column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'المخاطر',
+                                      onTap: () => AboutDialogs.showHazards(context),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 22),
+                                  // Left column in RTL
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'مصادر طبيعية',
+                                      onTap: () => AboutDialogs.showNaturalResources(context),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 8),
-
-                    // Bottom "المصادر" Button
-                    Container(
-                      width: 260,
-                      height: 50,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.categoryBtnBg,
-                        borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                        border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.12),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                          onTap: () => AboutDialogs.showReferences(context),
-                          child: const Center(
-                            child: Text(
-                              'المصادر',
-                              style: TextStyle(
-                                fontFamily: 'NotoKufi',
-                                fontSize: 22,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textDark,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
