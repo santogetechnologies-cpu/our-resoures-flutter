@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
+import 'map_scale_bar.dart';
 
 class MapShell extends StatefulWidget {
   final String title;
@@ -40,10 +41,14 @@ class MapShell extends StatefulWidget {
 
 class _MapShellState extends State<MapShell> {
   late final MapController _mapController;
+  late double _currentZoom;
+  late double _currentLat;
 
   @override
   void initState() {
     super.initState();
+    _currentZoom = widget.initialZoom;
+    _currentLat = widget.initialCenter.latitude;
     _mapController = MapController();
     if (widget.onMapReady != null) {
       widget.onMapReady!(_mapController);
@@ -75,6 +80,14 @@ class _MapShellState extends State<MapShell> {
                     initialZoom: widget.initialZoom,
                     minZoom: 3.5,
                     maxZoom: 18.0,
+                    onPositionChanged: (position, hasGesture) {
+                      if (position.zoom != null && position.center != null) {
+                        setState(() {
+                          _currentZoom = position.zoom!;
+                          _currentLat = position.center!.latitude;
+                        });
+                      }
+                    },
                   ),
                   children: [
                     TileLayer(
@@ -89,6 +102,14 @@ class _MapShellState extends State<MapShell> {
                     if (widget.markers.isNotEmpty)
                       MarkerLayer(markers: widget.markers),
                   ],
+                ),
+
+                // Map Scale Bar (0 | 500 km | 1000 km dynamic scale bar)
+                MapScaleBar(
+                  zoom: _currentZoom,
+                  latitude: _currentLat,
+                  alignment: Alignment.bottomLeft,
+                  padding: const EdgeInsets.only(left: 18, bottom: 20),
                 ),
 
                 // Floating Action Buttons (Home + Reset Zoom) positioned immediately adjacent to the 350dp sidebar

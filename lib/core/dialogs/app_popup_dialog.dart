@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../constants/app_assets.dart';
 
 class AppPopupDialog extends StatelessWidget {
   final String title;
@@ -37,7 +38,8 @@ class AppPopupDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final dialogWidth = size.width * 0.55 > 450 ? size.width * 0.55 : 450.0;
+    final dialogWidth = size.width * 0.60 > 460 ? size.width * 0.60 : 460.0;
+    final hasTitle = title.trim().isNotEmpty;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -45,35 +47,54 @@ class AppPopupDialog extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppColors.borderRadius),
         ),
-        backgroundColor: Colors.white.withOpacity(0.96),
+        backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Container(
           width: dialogWidth,
-          constraints: BoxConstraints(maxHeight: size.height * 0.85),
-          padding: const EdgeInsets.all(16),
+          constraints: BoxConstraints(maxHeight: size.height * 0.88),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFAF6EE),
+            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+            image: const DecorationImage(
+              image: AssetImage(AppAssets.infoback),
+              fit: BoxFit.cover,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.40),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
+            border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+          ),
+          padding: const EdgeInsets.all(18),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Header with Title and Close Button
               Row(
                 children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontFamily: 'NotoKufi',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
+                  if (hasTitle)
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontFamily: 'NotoKufi',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textDark,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                    )
+                  else
+                    const Spacer(),
                   IconButton(
                     icon: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.2),
+                        color: Colors.grey.withOpacity(0.25),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.close, size: 20, color: AppColors.textDark),
@@ -82,8 +103,11 @@ class AppPopupDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const Divider(color: AppColors.borderBrown, thickness: 1),
-              const SizedBox(height: 8),
+              if (hasTitle) ...[
+                const SizedBox(height: 4),
+                const Divider(color: AppColors.borderBrown, thickness: 1.2),
+                const SizedBox(height: 8),
+              ],
 
               // Scrollable content
               Flexible(

@@ -35,15 +35,15 @@ class WaterInfographicDialog extends StatelessWidget {
             image: const DecorationImage(
               image: AssetImage(AppAssets.infoback),
               fit: BoxFit.cover,
-              opacity: 0.15,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.35),
+                color: Colors.black.withOpacity(0.40),
                 blurRadius: 18,
                 offset: const Offset(0, 6),
               ),
             ],
+            border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
           ),
           padding: const EdgeInsets.all(22),
           child: Column(
