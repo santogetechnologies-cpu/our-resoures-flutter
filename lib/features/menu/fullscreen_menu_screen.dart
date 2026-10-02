@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/dialogs/about_dialog.dart';
+import '../start/start_screen.dart';
 import '../geology/geology_screen.dart';
 import '../materials/materials_screen.dart';
 import '../water/water_formations_screen.dart';
@@ -32,21 +33,21 @@ class FullscreenMenuScreen extends StatelessWidget {
     return Container(
       height: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.categoryBtnBg,
-        borderRadius: BorderRadius.circular(AppColors.borderRadius),
-        border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+        color: const Color(0xFFE8ECEF).withOpacity(0.92),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.85), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.14),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          borderRadius: BorderRadius.circular(12),
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -58,9 +59,59 @@ class FullscreenMenuScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textBlack,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavButton({
+    required BuildContext context,
+    required String title,
+    required VoidCallback onTap,
+    double width = 190,
+    double height = 46,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8ECEF).withOpacity(0.92),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.85), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'NotoKufi',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textBlack,
                   ),
                 ),
               ),
@@ -79,7 +130,7 @@ class FullscreenMenuScreen extends StatelessWidget {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            // Background wallpaper5.jpg
+            // Background wallpaper
             Image.asset(
               AppAssets.wallpaper5,
               fit: BoxFit.cover,
@@ -88,117 +139,90 @@ class FullscreenMenuScreen extends StatelessWidget {
 
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
                 child: Column(
                   children: [
-                    // Top Header Bar
-                    Container(
-                      height: 75,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: AppColors.categoryBtnBg,
-                        borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                        border: Border.all(color: Colors.white.withOpacity(0.7), width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.12),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
+                    // Top Header Bar with Title & Subtitle + Logos
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       child: Row(
                         children: [
                           // Saudi Vision 2030 logo
                           Image.asset(
                             AppAssets.saudiVision,
-                            width: 90,
-                            height: 65,
+                            width: 85,
+                            height: 55,
                             fit: BoxFit.contain,
-                            errorBuilder: (c, e, s) => const SizedBox(width: 90),
+                            errorBuilder: (c, e, s) => const SizedBox(width: 85),
                           ),
 
-                          // Center Title
-                          const Expanded(
-                            child: Text(
-                              'علوم الأرض في خدمة الجميع',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: 'NotoKufi',
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textBlack,
-                              ),
+                          // Centered Title & Subtitle
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text(
+                                  'علوم الأرض في خدمة الجميع',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'NotoKufi',
+                                    fontSize: 27,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF8E1B1B),
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Our Wealth from Our Land',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'NotoKufi',
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFC02727),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
 
                           // KSU logo
                           Image.asset(
                             AppAssets.dLogo,
-                            width: 90,
-                            height: 65,
+                            width: 85,
+                            height: 55,
                             fit: BoxFit.contain,
-                            errorBuilder: (c, e, s) => const SizedBox(width: 90),
+                            errorBuilder: (c, e, s) => const SizedBox(width: 85),
                           ),
                         ],
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
 
-                    // Top "نبذة تعريفية" Button
-                    Container(
-                      width: 280,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.categoryBtnBg,
-                        borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                        border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.12),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                          onTap: () => AboutDialogs.showIntroduction(context),
-                          child: const Center(
-                            child: Text(
-                              'نبذة تعريفية',
-                              style: TextStyle(
-                                fontFamily: 'NotoKufi',
-                                fontSize: 21,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textDark,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // 4x2 Grid of 8 Buttons in the exact order attached:
-                    // Row 1: Right = جيولوجية المملكة  | Left = الصخور والمعادن الإقتصادية
-                    // Row 2: Right = مصادر المياه      | Left = البترول والغاز
-                    // Row 3: Right = السياحة والآثار   | Left = قاعدة البيانات الزلزالية
-                    // Row 4: Right = المخاطر           | Left = مصادر طبيعية
+                    // Main 2-Column Grid (5 Rows x 2 Columns)
+                    // In RTL:
+                    // Column 1 (Visual Right): الاستشعار عن بعد و GIS, الصخور والمعادن الإقتصادية, البترول والغاز, محمية طبيعية, زلزال
+                    // Column 2 (Visual Left): جيولوجية المملكة, مصادر المياه, السياحة و الآثار, الموسوعات و الكتب, بيئة
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
                           children: [
                             // Row 1
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right column in RTL
+                                  // Right in RTL: الاستشعار عن بعد و GIS
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'الاستشعار عن بعد و GIS',
+                                      onTap: () => AboutDialogs.showRemoteSensing(context),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 24),
+                                  // Left in RTL: جيولوجية المملكة
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -206,8 +230,16 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       onTap: () => _navigate(context, const GeologyScreen()),
                                     ),
                                   ),
-                                  const SizedBox(width: 22),
-                                  // Left column in RTL
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Row 2
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  // Right in RTL: الصخور والمعادن الإقتصادية
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -215,16 +247,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       onTap: () => _navigate(context, const MaterialsScreen()),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-
-                            // Row 2
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  // Right column in RTL
+                                  const SizedBox(width: 24),
+                                  // Left in RTL: مصادر المياه
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -232,8 +256,16 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       onTap: () => _navigate(context, const WaterFormationsScreen()),
                                     ),
                                   ),
-                                  const SizedBox(width: 22),
-                                  // Left column in RTL
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Row 3
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  // Right in RTL: البترول والغاز
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -241,56 +273,65 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       onTap: () => _navigate(context, const OilGasScreen()),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-
-                            // Row 3
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  // Right column in RTL
+                                  const SizedBox(width: 24),
+                                  // Left in RTL: السياحة و الآثار
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'السياحة والآثار',
+                                      title: 'السياحة و الآثار',
                                       onTap: () => _navigate(context, const TourismScreen()),
                                     ),
                                   ),
-                                  const SizedBox(width: 22),
-                                  // Left column in RTL
-                                  Expanded(
-                                    child: _buildCategoryButton(
-                                      context: context,
-                                      title: 'قاعدة البيانات الزلزالية',
-                                      onTap: () => _navigate(context, const EarthquakeScreen()),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 10),
 
                             // Row 4
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right column in RTL
+                                  // Right in RTL: محمية طبيعية
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'المخاطر',
-                                      onTap: () => AboutDialogs.showHazards(context),
+                                      title: 'محمية طبيعية',
+                                      onTap: () => AboutDialogs.showNaturalReserves(context),
                                     ),
                                   ),
-                                  const SizedBox(width: 22),
-                                  // Left column in RTL
+                                  const SizedBox(width: 24),
+                                  // Left in RTL: الموسوعات و الكتب
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'مصادر طبيعية',
-                                      onTap: () => AboutDialogs.showNaturalResources(context),
+                                      title: 'الموسوعات و الكتب',
+                                      onTap: () => AboutDialogs.showEncyclopedia(context),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Row 5
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  // Right in RTL: زلزال
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'زلزال',
+                                      onTap: () => _navigate(context, const EarthquakeScreen()),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 24),
+                                  // Left in RTL: بيئة
+                                  Expanded(
+                                    child: _buildCategoryButton(
+                                      context: context,
+                                      title: 'بيئة',
+                                      onTap: () => AboutDialogs.showHazards(context),
                                     ),
                                   ),
                                 ],
@@ -301,7 +342,40 @@ class FullscreenMenuScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
+
+                    // Bottom Navigation Row (3 Buttons):
+                    // In RTL: Right = المصادر | Center = نبذة تعريفية | Left = صفحة البداية
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildBottomNavButton(
+                          context: context,
+                          title: 'المصادر',
+                          onTap: () => AboutDialogs.showReferences(context),
+                        ),
+                        const SizedBox(width: 24),
+                        _buildBottomNavButton(
+                          context: context,
+                          title: 'نبذة تعريفية',
+                          onTap: () => AboutDialogs.showIntroduction(context),
+                        ),
+                        const SizedBox(width: 24),
+                        _buildBottomNavButton(
+                          context: context,
+                          title: 'صفحة البداية',
+                          onTap: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            } else {
+                              _navigate(context, const StartScreen());
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 6),
                   ],
                 ),
               ),
