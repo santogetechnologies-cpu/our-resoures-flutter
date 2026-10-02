@@ -481,42 +481,57 @@ class _TourismScreenState extends State<TourismScreen> {
       sidebarContent: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 70),
         child: Column(
-          children: _regionNames.map((regionName) {
-            final isExpanded = _expandedRegion == regionName;
-            final regionLandmarks = _landmarks.where((l) => l.region == regionName).toList();
+          children: [
+            // Button 1: Heritage sites (between مقدمة and منطقة المدينة المنورة)
+            CustomButton(
+              text: 'Heritage sites',
+              styleType: ButtonStyleType.mainMenu,
+              onPressed: () {},
+            ),
+            // Regions
+            ..._regionNames.map((regionName) {
+              final isExpanded = _expandedRegion == regionName;
+              final regionLandmarks = _landmarks.where((l) => l.region == regionName).toList();
 
-            return Column(
-              children: [
-                CustomButton(
-                  text: regionName,
-                  styleType: ButtonStyleType.mainMenu,
-                  onPressed: () {
-                    setState(() {
-                      if (_expandedRegion == regionName) {
-                        _expandedRegion = null;
-                      } else {
-                        _expandedRegion = regionName;
-                        if (regionLandmarks.isNotEmpty && _mapController != null) {
-                          _mapController!.move(
-                            LatLng(regionLandmarks.first.latitude, regionLandmarks.first.longitude),
-                            7.0,
-                          );
+              return Column(
+                children: [
+                  CustomButton(
+                    text: regionName,
+                    styleType: ButtonStyleType.mainMenu,
+                    onPressed: () {
+                      setState(() {
+                        if (_expandedRegion == regionName) {
+                          _expandedRegion = null;
+                        } else {
+                          _expandedRegion = regionName;
+                          if (regionLandmarks.isNotEmpty && _mapController != null) {
+                            _mapController!.move(
+                              LatLng(regionLandmarks.first.latitude, regionLandmarks.first.longitude),
+                              7.0,
+                            );
+                          }
                         }
-                      }
-                    });
-                  },
-                ),
-                if (isExpanded)
-                  ...regionLandmarks.map(
-                    (landmark) => CustomButton(
-                      text: landmark.title,
-                      styleType: ButtonStyleType.subMenu,
-                      onPressed: () => _showLandmark(landmark),
-                    ),
+                      });
+                    },
                   ),
-              ],
-            );
-          }).toList(),
+                  if (isExpanded)
+                    ...regionLandmarks.map(
+                      (landmark) => CustomButton(
+                        text: landmark.title,
+                        styleType: ButtonStyleType.subMenu,
+                        onPressed: () => _showLandmark(landmark),
+                      ),
+                    ),
+                ],
+              );
+            }).toList(),
+            // Button 2: Heritage villages (at the very end of the list)
+            CustomButton(
+              text: 'Heritage villages',
+              styleType: ButtonStyleType.mainMenu,
+              onPressed: () {},
+            ),
+          ],
         ),
       ),
     );

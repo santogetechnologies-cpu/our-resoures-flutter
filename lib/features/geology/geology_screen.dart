@@ -211,6 +211,7 @@ class _GeologyScreenState extends State<GeologyScreen> {
             _buildLayerButton('الرصيف العربي', _showArabianPlatform),
             _buildLayerButton('الحرات البركانية', _showHarrat),
             _buildLayerButton('السهول الساحلية', _showSwahel),
+            _buildLayerButton('Empty quarter', () {}),
           ],
         ),
       ),
