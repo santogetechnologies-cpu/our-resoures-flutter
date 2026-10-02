@@ -52,46 +52,71 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Background wallpaper2.jpg
+            // Background wallpaper
             Image.asset(
               AppAssets.wallpaper2,
               fit: BoxFit.cover,
               errorBuilder: (c, e, s) => Container(color: const Color(0xFFF7F4EF)),
             ),
 
-            // Top Logos (Vision 2030 on left, KSU on right) matching activity_start.xml (200x200 dp)
+            // Top Header: Vision 2030 on Left, Title in Center, KSU on Right
             SafeArea(
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Vision 2030 logo (200x200)
-                      Image.asset(
-                        AppAssets.saudiVision,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.contain,
-                        errorBuilder: (c, e, s) => const SizedBox(width: 200, height: 200),
-                      ),
-                      // King Saud University logo (200x200)
-                      Image.asset(
-                        AppAssets.dLogo,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.contain,
-                        errorBuilder: (c, e, s) => const SizedBox(width: 200, height: 200),
-                      ),
-                    ],
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Vision 2030 logo on Left
+                        Image.asset(
+                          AppAssets.saudiVision,
+                          width: 140,
+                          height: 95,
+                          fit: BoxFit.contain,
+                          errorBuilder: (c, e, s) => const SizedBox(width: 140),
+                        ),
+
+                        // Center Arabic Title: ثرواتنا من أرضنا
+                        const Expanded(
+                          child: Text(
+                            'ثرواتنا من أرضنا',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'NotoKufi',
+                              fontSize: 42,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF6B3A22),
+                              shadows: [
+                                Shadow(
+                                  color: Colors.white,
+                                  offset: Offset(0, 1),
+                                  blurRadius: 6,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // King Saud University logo on Right
+                        Image.asset(
+                          AppAssets.dLogo,
+                          width: 140,
+                          height: 95,
+                          fit: BoxFit.contain,
+                          errorBuilder: (c, e, s) => const SizedBox(width: 140),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
 
-            // Center interactive click target with pulse animation matching 150x150 dp
+            // Center interactive click target with pulse animation
             Center(
               child: ScaleTransition(
                 scale: _scaleAnimation,
@@ -104,12 +129,12 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                       padding: const EdgeInsets.all(16.0),
                       child: Image.asset(
                         AppAssets.click,
-                        width: 150,
-                        height: 150,
+                        width: 140,
+                        height: 140,
                         fit: BoxFit.contain,
                         errorBuilder: (c, e, s) => const Icon(
                           Icons.touch_app,
-                          size: 120,
+                          size: 110,
                           color: Color(0xFF7F4D2C),
                         ),
                       ),
