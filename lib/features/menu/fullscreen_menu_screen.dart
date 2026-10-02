@@ -8,7 +8,6 @@ import '../materials/materials_screen.dart';
 import '../water/water_formations_screen.dart';
 import '../oil_gas/oil_gas_screen.dart';
 import '../tourism/tourism_screen.dart';
-import '../earthquake/earthquake_screen.dart';
 
 class FullscreenMenuScreen extends StatelessWidget {
   const FullscreenMenuScreen({super.key});
@@ -213,16 +212,16 @@ class FullscreenMenuScreen extends StatelessWidget {
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: الاستشعار عن بعد و GIS
+                                  // Right in RTL: الاستشعار عن بعد و GIS (New button - button only)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'الاستشعار عن بعد و GIS',
-                                      onTap: () => AboutDialogs.showRemoteSensing(context),
+                                      onTap: () {},
                                     ),
                                   ),
                                   const SizedBox(width: 24),
-                                  // Left in RTL: جيولوجية المملكة
+                                  // Left in RTL: جيولوجية المملكة (Active screen)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -239,7 +238,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: الصخور والمعادن الإقتصادية
+                                  // Right in RTL: الصخور والمعادن الإقتصادية (Active screen)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -248,7 +247,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 24),
-                                  // Left in RTL: مصادر المياه
+                                  // Left in RTL: مصادر المياه (Active screen)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -265,7 +264,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: البترول والغاز
+                                  // Right in RTL: البترول والغاز (Active screen)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -274,7 +273,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 24),
-                                  // Left in RTL: السياحة و الآثار
+                                  // Left in RTL: السياحة و الآثار (Active screen)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
@@ -291,21 +290,21 @@ class FullscreenMenuScreen extends StatelessWidget {
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: محمية طبيعية
+                                  // Right in RTL: محمية طبيعية (New button - button only)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'محمية طبيعية',
-                                      onTap: () => AboutDialogs.showNaturalReserves(context),
+                                      onTap: () {},
                                     ),
                                   ),
                                   const SizedBox(width: 24),
-                                  // Left in RTL: الموسوعات و الكتب
+                                  // Left in RTL: الموسوعات و الكتب (New button - button only)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'الموسوعات و الكتب',
-                                      onTap: () => AboutDialogs.showEncyclopedia(context),
+                                      onTap: () {},
                                     ),
                                   ),
                                 ],
@@ -317,21 +316,21 @@ class FullscreenMenuScreen extends StatelessWidget {
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: زلزال
+                                  // Right in RTL: زلزال (New button - button only, no old seismic database content)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'زلزال',
-                                      onTap: () => _navigate(context, const EarthquakeScreen()),
+                                      onTap: () {},
                                     ),
                                   ),
                                   const SizedBox(width: 24),
-                                  // Left in RTL: بيئة
+                                  // Left in RTL: بيئة (New button - button only)
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'بيئة',
-                                      onTap: () => AboutDialogs.showHazards(context),
+                                      onTap: () {},
                                     ),
                                   ),
                                 ],
