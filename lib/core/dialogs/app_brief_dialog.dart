@@ -6,12 +6,16 @@ class AppBriefDialog extends StatelessWidget {
   final String title;
   final String description;
   final String? bannerAsset;
+  final String? bottomImageAsset;
+  final Widget? bottomWidget;
 
   const AppBriefDialog({
     super.key,
     required this.title,
     required this.description,
     this.bannerAsset,
+    this.bottomImageAsset,
+    this.bottomWidget,
   });
 
   static Future<void> show(
@@ -19,6 +23,8 @@ class AppBriefDialog extends StatelessWidget {
     required String title,
     required String description,
     String? bannerAsset,
+    String? bottomImageAsset,
+    Widget? bottomWidget,
   }) {
     return showDialog(
       context: context,
@@ -27,6 +33,50 @@ class AppBriefDialog extends StatelessWidget {
         title: title,
         description: description,
         bannerAsset: bannerAsset,
+        bottomImageAsset: bottomImageAsset,
+        bottomWidget: bottomWidget,
+      ),
+    );
+  }
+
+  void _showZoomableImage(BuildContext context, String imageAsset) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.black.withOpacity(0.92),
+        insetPadding: const EdgeInsets.all(12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 6.0,
+                child: Image.asset(
+                  imageAsset,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 12,
+              right: 12,
+              child: IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 24),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -102,6 +152,7 @@ class AppBriefDialog extends StatelessWidget {
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (bannerAsset != null) ...[
                         ClipRRect(
@@ -125,6 +176,43 @@ class AppBriefDialog extends StatelessWidget {
                           color: AppColors.textDark,
                         ),
                       ),
+                      if (bottomImageAsset != null) ...[
+                        const SizedBox(height: 20),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => _showZoomableImage(context, bottomImageAsset!),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: AppColors.borderBrown.withOpacity(0.5),
+                                    width: 1.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.12),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Image.asset(
+                                  bottomImageAsset!,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (ctx, err, stack) => const SizedBox.shrink(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      if (bottomWidget != null) ...[
+                        const SizedBox(height: 16),
+                        bottomWidget!,
+                      ],
                     ],
                   ),
                 ),
