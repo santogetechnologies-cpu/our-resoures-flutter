@@ -6,8 +6,8 @@ import '../start/start_screen.dart';
 import '../geology/geology_screen.dart';
 import '../materials/materials_screen.dart';
 import '../water/water_formations_screen.dart';
-import '../oil_gas/oil_gas_screen.dart';
 import '../tourism/tourism_screen.dart';
+import '../earthquake/earthquake_screen.dart';
 
 class FullscreenMenuScreen extends StatelessWidget {
   const FullscreenMenuScreen({super.key});
@@ -58,7 +58,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 22,
+                    fontSize: 21,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textDark,
                   ),
@@ -218,33 +218,44 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                     const SizedBox(height: 10),
 
-                    // Main 2-Column Grid (5 Rows x 2 Columns)
+                    // Main 2-Column Grid matching Client's 1-10 Reference Order
                     // In RTL:
-                    // Column 1 (Visual Right): الاستشعار عن بعد و GIS, الصخور والمعادن الإقتصادية, البترول والغاز, محمية طبيعية, زلزال
-                    // Column 2 (Visual Left): جيولوجية المملكة, مصادر المياه, السياحة و الآثار, الموسوعات و الكتب, بيئة
+                    // Column 1 (Visual Right - Odd: 1, 3, 5, 7, 9):
+                    // 1: الاستشعار عن بعد وال GIS
+                    // 3: مواقع المعادن الاقتصادية
+                    // 5: مصادر المياه والتحديات
+                    // 7: المحميات الطبيعية
+                    // 9: الموسوعات والكتب
+                    //
+                    // Column 2 (Visual Left - Even: 2, 4, 6, 8, 10):
+                    // 2: جيولوجية و جيومورفولوجية المملكة
+                    // 4: الطاقة المتجددة و تقنياتها
+                    // 6: المواقع الاثرية والقرى التراثية
+                    // 8: استراتيجية المخاطر الطبيعية
+                    // 10: قاعدة البيانات الزلزالية
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           children: [
-                            // Row 1
+                            // Row 1 (1 & 2)
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: الاستشعار عن بعد و GIS
+                                  // Right (1): الاستشعار عن بعد وال GIS
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'الاستشعار عن بعد و GIS',
+                                      title: 'الاستشعار عن بعد وال GIS',
                                       onTap: () {},
                                     ),
                                   ),
                                   const SizedBox(width: 22),
-                                  // Left in RTL: جيولوجية المملكة
+                                  // Left (2): جيولوجية و جيومورفولوجية المملكة
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'جيولوجية المملكة',
+                                      title: 'جيولوجية و جيومورفولوجية المملكة',
                                       onTap: () => _navigate(context, const GeologyScreen()),
                                     ),
                                   ),
@@ -253,25 +264,25 @@ class FullscreenMenuScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
 
-                            // Row 2
+                            // Row 2 (3 & 4)
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: الصخور والمعادن الإقتصادية
+                                  // Right (3): مواقع المعادن الاقتصادية
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'الصخور والمعادن الإقتصادية',
+                                      title: 'مواقع المعادن الاقتصادية',
                                       onTap: () => _navigate(context, const MaterialsScreen()),
                                     ),
                                   ),
                                   const SizedBox(width: 22),
-                                  // Left in RTL: مصادر المياه
+                                  // Left (4): الطاقة المتجددة و تقنياتها
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'مصادر المياه',
-                                      onTap: () => _navigate(context, const WaterFormationsScreen()),
+                                      title: 'الطاقة المتجددة و تقنياتها',
+                                      onTap: () {},
                                     ),
                                   ),
                                 ],
@@ -279,24 +290,24 @@ class FullscreenMenuScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
 
-                            // Row 3
+                            // Row 3 (5 & 6)
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: البترول والغاز
+                                  // Right (5): مصادر المياه والتحديات
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'البترول والغاز',
-                                      onTap: () => _navigate(context, const OilGasScreen()),
+                                      title: 'مصادر المياه والتحديات',
+                                      onTap: () => _navigate(context, const WaterFormationsScreen()),
                                     ),
                                   ),
                                   const SizedBox(width: 22),
-                                  // Left in RTL: السياحة و الآثار
+                                  // Left (6): المواقع الاثرية والقرى التراثية
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'السياحة و الآثار',
+                                      title: 'المواقع الاثرية والقرى التراثية',
                                       onTap: () => _navigate(context, const TourismScreen()),
                                     ),
                                   ),
@@ -305,25 +316,25 @@ class FullscreenMenuScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
 
-                            // Row 4
+                            // Row 4 (7 & 8)
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: محمية طبيعية
+                                  // Right (7): المحميات الطبيعية
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'محمية طبيعية',
+                                      title: 'المحميات الطبيعية',
                                       onTap: () {},
                                     ),
                                   ),
                                   const SizedBox(width: 22),
-                                  // Left in RTL: الموسوعات و الكتب
+                                  // Left (8): استراتيجية المخاطر الطبيعية
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'الموسوعات و الكتب',
-                                      onTap: () {},
+                                      title: 'استراتيجية المخاطر الطبيعية',
+                                      onTap: () => AboutDialogs.showHazards(context),
                                     ),
                                   ),
                                 ],
@@ -331,25 +342,25 @@ class FullscreenMenuScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
 
-                            // Row 5
+                            // Row 5 (9 & 10)
                             Expanded(
                               child: Row(
                                 children: [
-                                  // Right in RTL: زلزال
+                                  // Right (9): الموسوعات والكتب
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'زلزال',
+                                      title: 'الموسوعات والكتب',
                                       onTap: () {},
                                     ),
                                   ),
                                   const SizedBox(width: 22),
-                                  // Left in RTL: بيئة
+                                  // Left (10): قاعدة البيانات الزلزالية
                                   Expanded(
                                     child: _buildCategoryButton(
                                       context: context,
-                                      title: 'بيئة',
-                                      onTap: () {},
+                                      title: 'قاعدة البيانات الزلزالية',
+                                      onTap: () => _navigate(context, const EarthquakeScreen()),
                                     ),
                                   ),
                                 ],
