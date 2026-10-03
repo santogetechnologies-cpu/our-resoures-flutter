@@ -3,43 +3,67 @@
 window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
 window.mapboxGlobeMarkers = window.mapboxGlobeMarkers || {};
 
+// Standalone High-Resolution Satellite 3D Globe Style (No 401 auth errors)
+const ESRI_SATELLITE_GLOBE_STYLE = {
+  version: 8,
+  name: 'Satellite 3D Globe',
+  sources: {
+    'esri-world-imagery': {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256,
+      attribution: 'Esri, Maxar, Earthstar Geographics'
+    },
+    'esri-boundaries-labels': {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256
+    }
+  },
+  layers: [
+    {
+      id: 'esri-imagery-layer',
+      type: 'raster',
+      source: 'esri-world-imagery',
+      minzoom: 0,
+      maxzoom: 19
+    },
+    {
+      id: 'esri-labels-layer',
+      type: 'raster',
+      source: 'esri-boundaries-labels',
+      minzoom: 0,
+      maxzoom: 19,
+      paint: {
+        'raster-opacity': 0.85
+      }
+    }
+  ]
+};
+
 window.initMapboxGlobeWeb = function(viewId, initialLng, initialLat, initialZoom, initialStyleJson) {
   const container = document.getElementById(viewId);
   if (!container) return;
 
-  // Use public access token (pk.*) for Mapbox GL JS
+  // Use public access token format for Mapbox GL JS
   mapboxgl.accessToken = 'pk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
 
-  let mapStyle = 'mapbox://styles/mapbox/satellite-streets-v12';
-  if (initialStyleJson && typeof initialStyleJson === 'string' && initialStyleJson.trim().length > 10) {
-    try {
-      mapStyle = JSON.parse(initialStyleJson);
-    } catch(e) {
-      console.warn("Could not parse style JSON, using default satellite-streets-v12", e);
-    }
-  }
+  // Always use the reliable standalone satellite globe style by default to prevent 401s
+  let mapStyle = ESRI_SATELLITE_GLOBE_STYLE;
 
-  let map;
-  try {
-    map = new mapboxgl.Map({
-      container: viewId,
-      style: mapStyle,
-      center: [initialLng || 47.189224, initialLat || 24.694291],
-      zoom: initialZoom || 4.3,
-      projection: 'globe',
-      attributionControl: false
-    });
-  } catch(err) {
-    console.warn("Failed to init with primary style, falling back to satellite-streets-v12", err);
-    map = new mapboxgl.Map({
-      container: viewId,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
-      center: [initialLng || 47.189224, initialLat || 24.694291],
-      zoom: initialZoom || 4.3,
-      projection: 'globe',
-      attributionControl: false
-    });
-  }
+  const map = new mapboxgl.Map({
+    container: viewId,
+    style: mapStyle,
+    center: [initialLng || 47.189224, initialLat || 24.694291],
+    zoom: initialZoom || 4.3,
+    projection: 'globe',
+    attributionControl: false
+  });
 
   const applyAtmosphere = () => {
     try {
@@ -57,7 +81,10 @@ window.initMapboxGlobeWeb = function(viewId, initialLng, initialLat, initialZoom
 
   map.on('style.load', applyAtmosphere);
   map.on('error', (e) => {
-    console.warn("Mapbox GL event warning/error:", e);
+    // Ignore tile 401/404 warnings silently without crashing the 3D globe
+    if (e && e.error && e.error.status !== 401) {
+      console.warn("Mapbox GL event:", e);
+    }
   });
 
   window.mapboxGlobeInstances[viewId] = map;
@@ -66,7 +93,7 @@ window.initMapboxGlobeWeb = function(viewId, initialLng, initialLat, initialZoom
   // Spin globe slightly or handle resize
   setTimeout(() => {
     map.resize();
-  }, 300);
+  }, 200);
 
   return map;
 };
@@ -87,10 +114,15 @@ window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
   const map = window.mapboxGlobeInstances[viewId];
   if (map) {
     try {
-      const parsed = typeof styleJsonStr === 'string' ? JSON.parse(styleJsonStr) : styleJsonStr;
-      map.setStyle(parsed);
+      if (typeof styleJsonStr === 'string' && styleJsonStr.trim().length > 10) {
+        const parsed = JSON.parse(styleJsonStr);
+        // Only apply if it's a valid style
+        if (parsed && parsed.version) {
+          map.setStyle(parsed);
+        }
+      }
     } catch(e) {
-      console.error("Error setting map style:", e);
+      console.warn("Error setting custom map style, keeping base satellite globe:", e);
     }
   }
 };
