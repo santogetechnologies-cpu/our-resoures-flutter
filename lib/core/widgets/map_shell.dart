@@ -1,21 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:flutter/services.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
 import 'map_scale_bar.dart';
+
+class AppPointAnnotationClickListener extends OnPointAnnotationClickListener {
+  final void Function(PointAnnotation annotation) onClick;
+  AppPointAnnotationClickListener(this.onClick);
+
+  @override
+  void onPointAnnotationClick(PointAnnotation annotation) {
+    onClick(annotation);
+  }
+}
+
+class MapShellController {
+  MapboxMap? mapboxMap;
+  PointAnnotationManager? pointAnnotationManager;
+
+  Future<void> setStyleFromAsset(String assetPath) async {
+    if (mapboxMap == null) return;
+    try {
+      final styleJson = await rootBundle.loadString(assetPath);
+      await mapboxMap!.style.setStyleJSON(styleJson);
+      try {
+        await mapboxMap!.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
+      } catch (_) {}
+    } catch (e) {
+      debugPrint('Error loading style asset $assetPath: $e');
+    }
+  }
+
+  Future<void> flyTo({
+    required double latitude,
+    required double longitude,
+    double? zoom,
+    double? pitch,
+    double? bearing,
+  }) async {
+    if (mapboxMap == null) return;
+    await mapboxMap!.flyTo(
+      CameraOptions(
+        center: Point(coordinates: Position(longitude, latitude)),
+        zoom: zoom,
+        pitch: pitch,
+        bearing: bearing,
+      ),
+      MapAnimationOptions(duration: 1000),
+    );
+  }
+}
 
 class MapShell extends StatefulWidget {
   final String title;
   final VoidCallback? onBriefPressed;
   final String briefButtonText;
   final Widget sidebarContent;
-  final List<Marker> markers;
-  final List<Polyline> polylines;
-  final List<Polygon> polygons;
+  final String? initialStyleAsset;
   final bool isLoading;
-  final void Function(MapController)? onMapReady;
-  final LatLng initialCenter;
+  final void Function(MapShellController controller)? onMapCreated;
+  final double initialLatitude;
+  final double initialLongitude;
   final double initialZoom;
   final double sidebarWidth;
 
@@ -25,13 +71,12 @@ class MapShell extends StatefulWidget {
     this.onBriefPressed,
     this.briefButtonText = 'مقدمة',
     required this.sidebarContent,
-    this.markers = const [],
-    this.polylines = const [],
-    this.polygons = const [],
+    this.initialStyleAsset,
     this.isLoading = false,
-    this.onMapReady,
-    this.initialCenter = const LatLng(24.694291, 47.189224),
-    this.initialZoom = 5.0,
+    this.onMapCreated,
+    this.initialLatitude = 24.694291,
+    this.initialLongitude = 47.189224,
+    this.initialZoom = 4.3,
     this.sidebarWidth = 350,
   });
 
@@ -40,23 +85,55 @@ class MapShell extends StatefulWidget {
 }
 
 class _MapShellState extends State<MapShell> {
-  late final MapController _mapController;
-  late double _currentZoom;
-  late double _currentLat;
+  final MapShellController _shellController = MapShellController();
+  double _currentZoom = 4.3;
+  double _currentLat = 24.694291;
 
   @override
   void initState() {
     super.initState();
     _currentZoom = widget.initialZoom;
-    _currentLat = widget.initialCenter.latitude;
-    _mapController = MapController();
-    if (widget.onMapReady != null) {
-      widget.onMapReady!(_mapController);
+    _currentLat = widget.initialLatitude;
+  }
+
+  void _onMapCreated(MapboxMap mapboxMap) async {
+    _shellController.mapboxMap = mapboxMap;
+
+    // Load initial custom style from assets if provided, or default satellite-streets
+    if (widget.initialStyleAsset != null && widget.initialStyleAsset!.isNotEmpty) {
+      await _shellController.setStyleFromAsset(widget.initialStyleAsset!);
+    } else {
+      try {
+        await mapboxMap.style.setStyleURI(MapboxStyles.SATELLITE_STREETS);
+      } catch (_) {}
+    }
+
+    // Set globe projection explicitly to ensure 3D spherical globe is rendered
+    try {
+      await mapboxMap.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
+    } catch (_) {}
+
+    // Initialize point annotation manager for high-performance markers
+    try {
+      _shellController.pointAnnotationManager =
+          await mapboxMap.annotations.createPointAnnotationManager();
+    } catch (e) {
+      debugPrint('Error creating PointAnnotationManager: $e');
+    }
+
+    if (widget.onMapCreated != null) {
+      widget.onMapCreated!(_shellController);
     }
   }
 
   void _resetZoom() {
-    _mapController.move(widget.initialCenter, widget.initialZoom);
+    _shellController.flyTo(
+      latitude: widget.initialLatitude,
+      longitude: widget.initialLongitude,
+      zoom: widget.initialZoom,
+      pitch: 0.0,
+      bearing: 0.0,
+    );
   }
 
   @override
@@ -72,39 +149,34 @@ class _MapShellState extends State<MapShell> {
 
             return Stack(
               children: [
-                // Map
-                FlutterMap(
-                  mapController: _mapController,
-                  options: MapOptions(
-                    initialCenter: widget.initialCenter,
-                    initialZoom: widget.initialZoom,
-                    minZoom: 3.5,
-                    maxZoom: 18.0,
-                    onPositionChanged: (position, hasGesture) {
-                      if (position.zoom != null && position.center != null) {
-                        setState(() {
-                          _currentZoom = position.zoom!;
-                          _currentLat = position.center!.latitude;
-                        });
-                      }
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                      userAgentPackageName: 'com.example.flutter_app',
-                      maxZoom: 19,
+                // 3D Globe Mapbox Widget
+                MapWidget(
+                  key: const ValueKey('mapbox_globe_widget'),
+                  styleUri: MapboxStyles.SATELLITE_STREETS,
+                  cameraOptions: CameraOptions(
+                    center: Point(
+                      coordinates: Position(widget.initialLongitude, widget.initialLatitude),
                     ),
-                    if (widget.polygons.isNotEmpty)
-                      PolygonLayer(polygons: widget.polygons),
-                    if (widget.polylines.isNotEmpty)
-                      PolylineLayer(polylines: widget.polylines),
-                    if (widget.markers.isNotEmpty)
-                      MarkerLayer(markers: widget.markers),
-                  ],
+                    zoom: widget.initialZoom,
+                    pitch: 0.0,
+                    bearing: 0.0,
+                  ),
+                  onMapCreated: _onMapCreated,
+                  onCameraChangeListener: (cameraChangedEventData) {
+                    if (_shellController.mapboxMap != null) {
+                      _shellController.mapboxMap!.getCameraState().then((cameraState) {
+                        if (mounted) {
+                          setState(() {
+                            _currentZoom = cameraState.zoom;
+                            _currentLat = cameraState.center.coordinates.lat.toDouble();
+                          });
+                        }
+                      });
+                    }
+                  },
                 ),
 
-                // Map Scale Bar (0 | 500 km | 1000 km dynamic scale bar matching Mapbox native Android SDK)
+                // Map Scale Bar
                 MapScaleBar(
                   zoom: _currentZoom,
                   latitude: _currentLat,
@@ -112,7 +184,7 @@ class _MapShellState extends State<MapShell> {
                   padding: const EdgeInsets.only(left: 16, top: 16),
                 ),
 
-                // Floating Action Buttons (Home + Reset Zoom) positioned immediately adjacent to the 350dp sidebar
+                // Floating Action Buttons (Home + Reset Zoom)
                 Positioned(
                   right: effectiveSidebarWidth + 8,
                   top: 16,
@@ -160,102 +232,102 @@ class _MapShellState extends State<MapShell> {
                       image: const DecorationImage(
                         image: AssetImage(AppAssets.wallpaper),
                         fit: BoxFit.cover,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.35),
-                      blurRadius: 16,
-                      offset: const Offset(-4, 0),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.35),
+                          blurRadius: 16,
+                          offset: const Offset(-4, 0),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: SafeArea(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 30),
-                      // Title
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            widget.title,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontFamily: 'NotoKufi',
-                              fontSize: 30,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textBlack,
+                    child: SafeArea(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 30),
+                          // Title
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                widget.title,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontFamily: 'NotoKufi',
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textBlack,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                      // Optional Intro/Brief Button matching Android main_menu_btn
-                      if (widget.onBriefPressed != null) ...[
-                        Container(
-                          width: double.infinity,
-                          height: 70,
-                          margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
-                          decoration: BoxDecoration(
-                            color: AppColors.mainMenuBtnBg,
-                            borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                            border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.12),
-                                blurRadius: 6,
-                                offset: const Offset(0, 3),
+                          // Optional Intro/Brief Button matching Android main_menu_btn
+                          if (widget.onBriefPressed != null) ...[
+                            Container(
+                              width: double.infinity,
+                              height: 70,
+                              margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
+                              decoration: BoxDecoration(
+                                color: AppColors.mainMenuBtnBg,
+                                borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.12),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                              onTap: widget.onBriefPressed,
-                              child: Center(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    widget.briefButtonText,
-                                    style: const TextStyle(
-                                      fontFamily: 'NotoKufi',
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textBlack,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                  onTap: widget.onBriefPressed,
+                                  child: Center(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        widget.briefButtonText,
+                                        style: const TextStyle(
+                                          fontFamily: 'NotoKufi',
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.textBlack,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
+                          ],
+
+                          // Sidebar scrollable content
+                          Expanded(
+                            child: widget.sidebarContent,
                           ),
-                        ),
-                      ],
-
-                      // Sidebar scrollable content
-                      Expanded(
-                        child: widget.sidebarContent,
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-            // Loading overlay
-            if (widget.isLoading)
-              Container(
-                color: Colors.black.withOpacity(0.25),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryBrown,
+                // Loading overlay
+                if (widget.isLoading)
+                  Container(
+                    color: Colors.black.withOpacity(0.25),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primaryBrown,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-          ],
-        );
+              ],
+            );
           },
         ),
       ),

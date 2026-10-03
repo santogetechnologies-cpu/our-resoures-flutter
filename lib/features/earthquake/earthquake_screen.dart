@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
@@ -35,9 +34,9 @@ class EarthquakeScreen extends StatefulWidget {
 }
 
 class _EarthquakeScreenState extends State<EarthquakeScreen> {
-  MapController? _mapController;
-  List<Marker> _markers = [];
+  MapShellController? _mapController;
   bool _isLoading = false;
+  final Map<String, EarthquakePoint> _annotationEarthquakeMap = {};
 
   Future<void> _loadEarthquakeData(String dataFile, String iconAsset) async {
     setState(() {
@@ -60,35 +59,59 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
         );
       }).toList();
 
-      final markers = points.map((p) {
-        return Marker(
-          point: LatLng(p.latitude, p.longitude),
-          width: 20,
-          height: 20,
-          child: GestureDetector(
-            onTap: () {
+      if (_mapController?.pointAnnotationManager != null) {
+        final manager = _mapController!.pointAnnotationManager!;
+        await manager.deleteAll();
+        _annotationEarthquakeMap.clear();
+
+        final ByteData byteData = await rootBundle.load(iconAsset);
+        final Uint8List imageBytes = byteData.buffer.asUint8List();
+
+        final optionsList = points.map((p) {
+          return PointAnnotationOptions(
+            geometry: Point(coordinates: Position(p.longitude, p.latitude)),
+            image: imageBytes,
+            iconSize: 0.3,
+          );
+        }).toList();
+
+        final annotations = await manager.createMulti(optionsList);
+        for (int i = 0; i < annotations.length && i < points.length; i++) {
+          final ann = annotations[i];
+          if (ann != null) {
+            _annotationEarthquakeMap[ann.id] = points[i];
+          }
+        }
+
+        manager.addOnPointAnnotationClickListener(
+          AppPointAnnotationClickListener((annotation) {
+            final p = _annotationEarthquakeMap[annotation.id];
+            if (p != null) {
               AppPopupDialog.show(
                 context,
                 title: '',
                 description: 'قدر الزلزال (Magnitude) : ${p.magnitude}\nالتاريخ: ${p.date}\nالوقت: ${p.time} (GMT)',
               );
-            },
-            child: Image.asset(p.iconAsset),
-          ),
+            }
+          }),
         );
-      }).toList();
+      }
 
       if (mounted) {
         setState(() {
-          _markers = markers;
           _isLoading = false;
         });
       }
 
       if (points.isNotEmpty && _mapController != null) {
-        _mapController!.move(const LatLng(24.694291, 47.189224), 4.3);
+        _mapController!.flyTo(
+          latitude: 24.694291,
+          longitude: 47.189224,
+          zoom: 4.3,
+        );
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error loading earthquake points: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -113,9 +136,9 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
       title: 'قاعدة البيانات الزلزالية',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
-      markers: _markers,
+      initialStyleAsset: 'assets/maps/earthquake/allearth.json',
       isLoading: _isLoading,
-      onMapReady: (c) => _mapController = c,
+      onMapCreated: (c) => _mapController = c,
       sidebarContent: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 70),
         child: Column(
@@ -138,40 +161,31 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
               },
             ),
 
-            // Button: زلازل مقدارها 4 - 4.99 درجة
+            // Magnitude <= 3
             CustomButton(
-              text: 'زلازل مقدارها 4 - 4.99 درجة',
+              text: '< 3',
               styleType: ButtonStyleType.subMenu,
-              fontSize: 22,
-              margin: const EdgeInsets.only(left: 21, right: 21, top: 16),
-              onPressed: () => _loadEarthquakeData('4 to 5.xlsx', AppAssets.smallEarth),
+              fontSize: 20,
+              iconWidget: Image.asset(AppAssets.smallEarth, width: 22, height: 22),
+              onPressed: () => _loadEarthquakeData('under3.xlsx', AppAssets.smallEarth),
             ),
 
-            // Button: زلازل مقدارها 5 - 5.99 درجة
+            // Magnitude 3.0 - 5.0
             CustomButton(
-              text: 'زلازل مقدارها 5 - 5.99 درجة',
+              text: '3.0 - 5.0',
               styleType: ButtonStyleType.subMenu,
-              fontSize: 22,
-              margin: const EdgeInsets.only(left: 21, right: 21, top: 16),
-              onPressed: () => _loadEarthquakeData('5 to 6.xlsx', AppAssets.mediumEarth),
+              fontSize: 20,
+              iconWidget: Image.asset(AppAssets.mediumEarth, width: 22, height: 22),
+              onPressed: () => _loadEarthquakeData('between3_5.xlsx', AppAssets.mediumEarth),
             ),
 
-            // Button: زلازل مقدارها 6 - 6.99 درجة
+            // Magnitude >= 5.0
             CustomButton(
-              text: 'زلازل مقدارها 6 - 6.99 درجة',
+              text: '5.0 >',
               styleType: ButtonStyleType.subMenu,
-              fontSize: 22,
-              margin: const EdgeInsets.only(left: 21, right: 21, top: 16),
-              onPressed: () => _loadEarthquakeData('6 to 7.xlsx', AppAssets.largEarth),
-            ),
-
-            // Button: زلازل مقدارها أعلى من 7 درجات
-            CustomButton(
-              text: 'زلازل مقدارها أعلى من 7 درجات',
-              styleType: ButtonStyleType.subMenu,
-              fontSize: 22,
-              margin: const EdgeInsets.only(left: 21, right: 21, top: 16),
-              onPressed: () => _loadEarthquakeData('7 and above.xlsx', AppAssets.extraLargEarth),
+              fontSize: 20,
+              iconWidget: Image.asset(AppAssets.squareEarth, width: 22, height: 22),
+              onPressed: () => _loadEarthquakeData('high5.xlsx', AppAssets.squareEarth),
             ),
           ],
         ),

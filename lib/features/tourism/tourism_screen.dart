@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:flutter/services.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
@@ -33,9 +33,6 @@ class TourismScreen extends StatefulWidget {
 }
 
 class _TourismScreenState extends State<TourismScreen> {
-  MapController? _mapController;
-  String? _expandedRegion;
-
   final List<TourismLandmark> _landmarks = const [
     // منطقة المدينة المنورة
     TourismLandmark(
@@ -434,24 +431,53 @@ class _TourismScreenState extends State<TourismScreen> {
     'منطقة نجران',
   ];
 
-  List<Marker> get _markers {
-    return _landmarks.map((landmark) {
-      return Marker(
-        point: LatLng(landmark.latitude, landmark.longitude),
-        width: 30,
-        height: 30,
-        child: GestureDetector(
-          onTap: () => _showLandmark(landmark),
-          child: Image.asset(AppAssets.markerIcon),
-        ),
+  MapShellController? _mapController;
+  String? _expandedRegion;
+  final Map<String, TourismLandmark> _annotationLandmarkMap = {};
+
+  Future<void> _loadMarkers(MapShellController controller) async {
+    final manager = controller.pointAnnotationManager;
+    if (manager == null) return;
+
+    try {
+      final ByteData byteData = await rootBundle.load(AppAssets.markerIcon);
+      final Uint8List imageBytes = byteData.buffer.asUint8List();
+
+      final optionsList = _landmarks.map((landmark) {
+        return PointAnnotationOptions(
+          geometry: Point(coordinates: Position(landmark.longitude, landmark.latitude)),
+          image: imageBytes,
+          iconSize: 0.25,
+        );
+      }).toList();
+
+      final annotations = await manager.createMulti(optionsList);
+      for (int i = 0; i < annotations.length && i < _landmarks.length; i++) {
+        final ann = annotations[i];
+        if (ann != null) {
+          _annotationLandmarkMap[ann.id] = _landmarks[i];
+        }
+      }
+
+      manager.addOnPointAnnotationClickListener(
+        AppPointAnnotationClickListener((annotation) {
+          final landmark = _annotationLandmarkMap[annotation.id];
+          if (landmark != null) {
+            _showLandmark(landmark);
+          }
+        }),
       );
-    }).toList();
+    } catch (e) {
+      debugPrint('Error creating tourism annotations: $e');
+    }
   }
 
   void _showLandmark(TourismLandmark landmark) {
-    if (_mapController != null) {
-      _mapController!.move(LatLng(landmark.latitude, landmark.longitude), 10.0);
-    }
+    _mapController?.flyTo(
+      latitude: landmark.latitude,
+      longitude: landmark.longitude,
+      zoom: 9.5,
+    );
     AppPopupDialog.show(
       context,
       title: landmark.title,
@@ -476,8 +502,10 @@ class _TourismScreenState extends State<TourismScreen> {
       title: 'السياحة والآثار',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
-      markers: _markers,
-      onMapReady: (c) => _mapController = c,
+      onMapCreated: (c) {
+        _mapController = c;
+        _loadMarkers(c);
+      },
       sidebarContent: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 70),
         child: Column(
@@ -505,9 +533,10 @@ class _TourismScreenState extends State<TourismScreen> {
                         } else {
                           _expandedRegion = regionName;
                           if (regionLandmarks.isNotEmpty && _mapController != null) {
-                            _mapController!.move(
-                              LatLng(regionLandmarks.first.latitude, regionLandmarks.first.longitude),
-                              7.0,
+                            _mapController!.flyTo(
+                              latitude: regionLandmarks.first.latitude,
+                              longitude: regionLandmarks.first.longitude,
+                              zoom: 7.0,
                             );
                           }
                         }

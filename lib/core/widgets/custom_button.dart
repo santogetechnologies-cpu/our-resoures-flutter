@@ -18,6 +18,7 @@ class CustomButton extends StatelessWidget {
   final FontWeight fontWeight;
   final EdgeInsetsGeometry? margin;
   final EdgeInsetsGeometry? padding;
+  final Widget? iconWidget;
 
   const CustomButton({
     super.key,
@@ -30,6 +31,7 @@ class CustomButton extends StatelessWidget {
     this.fontWeight = FontWeight.w600,
     this.margin,
     this.padding,
+    this.iconWidget,
   });
 
   @override
@@ -104,15 +106,25 @@ class CustomButton extends StatelessWidget {
             child: Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'NotoKufi',
-                    fontSize: resolvedFontSize,
-                    fontWeight: fontWeight,
-                    color: textColor,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (iconWidget != null) ...[
+                      iconWidget!,
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'NotoKufi',
+                        fontSize: resolvedFontSize,
+                        fontWeight: fontWeight,
+                        color: textColor,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

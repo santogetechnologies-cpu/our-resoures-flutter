@@ -1,8 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
@@ -18,9 +14,7 @@ class GeologyScreen extends StatefulWidget {
 }
 
 class _GeologyScreenState extends State<GeologyScreen> {
-  MapController? _mapController;
-  List<Polygon> _polygons = [];
-  bool _isLoading = false;
+  MapShellController? _mapController;
 
   final Map<String, ({String title, String desc})> _haratInfo = {
     'hart_unayyir-bgxfcy': (
@@ -69,28 +63,6 @@ class _GeologyScreenState extends State<GeologyScreen> {
     ),
   };
 
-  @override
-  void initState() {
-    super.initState();
-    _loadHarratPolygons();
-  }
-
-  Future<void> _loadHarratPolygons() async {
-    try {
-      final jsonStr = await rootBundle.loadString('assets/maps/saudi_geo/harat.json');
-      final data = json.decode(jsonStr);
-      final List<Polygon> parsed = [];
-
-      // Parse geojson features
-      if (data is Map && data.containsKey('layers')) {
-        // Mapbox style json or geojson
-      }
-      setState(() {
-        _polygons = parsed;
-      });
-    } catch (_) {}
-  }
-
   void _showIntroBrief() {
     AppBriefDialog.show(
       context,
@@ -108,9 +80,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
   }
 
   void _showArabianShield() {
-    if (_mapController != null) {
-      _mapController!.move(const LatLng(23.5, 41.5), 6.0);
-    }
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/arabian_shield.json');
+    _mapController?.flyTo(latitude: 23.5, longitude: 41.5, zoom: 6.0);
     AppPopupDialog.show(
       context,
       title: 'الدرع العربي',
@@ -121,9 +92,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
   }
 
   void _showArabianPlatform() {
-    if (_mapController != null) {
-      _mapController!.move(const LatLng(24.5, 48.0), 5.8);
-    }
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/arabian_platform.json');
+    _mapController?.flyTo(latitude: 24.5, longitude: 48.0, zoom: 5.8);
     AppPopupDialog.show(
       context,
       title: 'الرصيف العربي',
@@ -135,9 +105,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
   }
 
   void _showHarrat() {
-    if (_mapController != null) {
-      _mapController!.move(const LatLng(25.0, 40.0), 6.5);
-    }
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/harat.json');
+    _mapController?.flyTo(latitude: 25.0, longitude: 40.0, zoom: 6.5);
     AppPopupDialog.show(
       context,
       title: 'الحرات البركانية',
@@ -173,9 +142,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
   }
 
   void _showSwahel() {
-    if (_mapController != null) {
-      _mapController!.move(const LatLng(21.0, 40.0), 6.0);
-    }
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/sahel.json');
+    _mapController?.flyTo(latitude: 21.0, longitude: 40.0, zoom: 6.0);
     AppPopupDialog.show(
       context,
       title: 'السهول الساحلية',
@@ -200,9 +168,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
       title: 'جيولوجية المملكة',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
-      polygons: _polygons,
-      isLoading: _isLoading,
-      onMapReady: (controller) => _mapController = controller,
+      initialStyleAsset: 'assets/maps/saudi_geo/saudigeo.json',
+      onMapCreated: (controller) => _mapController = controller,
       sidebarContent: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 24),
         child: Column(
@@ -211,7 +178,6 @@ class _GeologyScreenState extends State<GeologyScreen> {
             _buildLayerButton('الرصيف العربي', _showArabianPlatform),
             _buildLayerButton('الحرات البركانية', _showHarrat),
             _buildLayerButton('السهول الساحلية', _showSwahel),
-            _buildLayerButton('Empty quarter', () {}),
           ],
         ),
       ),

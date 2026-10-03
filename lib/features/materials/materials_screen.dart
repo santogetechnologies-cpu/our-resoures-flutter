@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
@@ -51,10 +50,10 @@ class MaterialsScreen extends StatefulWidget {
 }
 
 class _MaterialsScreenState extends State<MaterialsScreen> {
-  MapController? _mapController;
+  MapShellController? _mapController;
   List<MaterialLocation> _allLocations = [];
-  List<Marker> _markers = [];
   bool _isLoading = false;
+  final Map<String, MaterialLocation> _annotationMaterialMap = {};
 
   final Map<String, MaterialInfoData> _mineralsData = {
     'Copper': const MaterialInfoData(
@@ -427,41 +426,64 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     }
   }
 
-  void _onMetalSelected(String metalEn) {
+  Future<void> _onMetalSelected(String metalEn) async {
     final info = _mineralsData[metalEn];
 
-    // Filter markers for this metal
+    // Filter locations for this metal
     final filtered = _allLocations.where(
       (m) => m.nameEn.toLowerCase() == metalEn.toLowerCase(),
     ).toList();
 
-    final markers = filtered.map((loc) {
-      return Marker(
-        point: LatLng(loc.latitude, loc.longitude),
-        width: 34,
-        height: 34,
-        child: GestureDetector(
-          onTap: () {
-            AppPopupDialog.show(
-              context,
-              title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
-              description: 'الموقع: ${loc.region}\n'
-                  'المنطقة الإدارية: ${loc.locationName}\n'
-                  'خط الطول شرقاً: ${loc.longitude}\n'
-                  'خط العرض شمالاً: ${loc.latitude}',
-            );
-          },
-          child: Image.asset(
-            info?.iconAsset ?? AppAssets.mineralIcon(metalEn),
-            errorBuilder: (c, e, s) => Image.asset(AppAssets.markerIcon),
-          ),
-        ),
-      );
-    }).toList();
+    if (_mapController?.pointAnnotationManager != null) {
+      final manager = _mapController!.pointAnnotationManager!;
+      await manager.deleteAll();
+      _annotationMaterialMap.clear();
 
-    setState(() {
-      _markers = markers;
-    });
+      try {
+        final iconPath = info?.iconAsset ?? AppAssets.mineralIcon(metalEn);
+        ByteData byteData;
+        try {
+          byteData = await rootBundle.load(iconPath);
+        } catch (_) {
+          byteData = await rootBundle.load(AppAssets.markerIcon);
+        }
+        final Uint8List imageBytes = byteData.buffer.asUint8List();
+
+        final optionsList = filtered.map((loc) {
+          return PointAnnotationOptions(
+            geometry: Point(coordinates: Position(loc.longitude, loc.latitude)),
+            image: imageBytes,
+            iconSize: 0.35,
+          );
+        }).toList();
+
+        final annotations = await manager.createMulti(optionsList);
+        for (int i = 0; i < annotations.length && i < filtered.length; i++) {
+          final ann = annotations[i];
+          if (ann != null) {
+            _annotationMaterialMap[ann.id] = filtered[i];
+          }
+        }
+
+        manager.addOnPointAnnotationClickListener(
+          AppPointAnnotationClickListener((annotation) {
+            final loc = _annotationMaterialMap[annotation.id];
+            if (loc != null) {
+              AppPopupDialog.show(
+                context,
+                title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
+                description: 'الموقع: ${loc.region}\n'
+                    'المنطقة الإدارية: ${loc.locationName}\n'
+                    'خط الطول شرقاً: ${loc.longitude}\n'
+                    'خط العرض شمالاً: ${loc.latitude}',
+              );
+            }
+          }),
+        );
+      } catch (e) {
+        debugPrint('Error updating material annotations: $e');
+      }
+    }
 
     // Show specimen popup dialog matching Android popup_layout.xml (metalInfoPopUp)
     if (info != null) {
@@ -473,11 +495,12 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
       );
     }
 
-    // Zoom map if markers exist
+    // Fly 3D globe camera if locations exist
     if (filtered.isNotEmpty && _mapController != null) {
-      _mapController!.move(
-        LatLng(filtered.first.latitude, filtered.first.longitude),
-        6.5,
+      _mapController!.flyTo(
+        latitude: filtered.first.latitude,
+        longitude: filtered.first.longitude,
+        zoom: 6.5,
       );
     }
   }
@@ -508,9 +531,9 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
       title: 'المعادن الإقتصادية',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
-      markers: _markers,
+      initialStyleAsset: 'assets/maps/materials/allMaterials.json',
       isLoading: _isLoading,
-      onMapReady: (controller) => _mapController = controller,
+      onMapCreated: (controller) => _mapController = controller,
       sidebarContent: ListView.builder(
         padding: const EdgeInsets.only(bottom: 40),
         itemCount: _metalButtonLabels.length,

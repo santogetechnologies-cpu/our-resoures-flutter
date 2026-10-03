@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'core/theme/app_theme.dart';
 import 'features/start/start_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Set Mapbox Access Token
+  MapboxOptions.setAccessToken(
+    'sk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA',
+  );
 
   // Lock to landscape orientation matching original Android app
   await SystemChrome.setPreferredOrientations([

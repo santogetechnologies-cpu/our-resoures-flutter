@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:flutter/services.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
@@ -33,10 +33,11 @@ class OilGasScreen extends StatefulWidget {
 }
 
 class _OilGasScreenState extends State<OilGasScreen> {
-  MapController? _mapController;
+  MapShellController? _mapController;
   bool _renewableExpanded = true;
   bool _oilExpanded = false;
   bool _gasExpanded = false;
+  final Map<String, FieldLocation> _annotationFieldMap = {};
 
   final List<FieldLocation> _renewableProjects = const [
     FieldLocation(
@@ -237,80 +238,65 @@ class _OilGasScreenState extends State<OilGasScreen> {
     ),
   ];
 
-  List<Marker> get _allMarkers {
-    final List<Marker> list = [];
+  Future<void> _loadMarkers(MapShellController controller) async {
+    final manager = controller.pointAnnotationManager;
+    if (manager == null) return;
 
-    // Renewable Markers
-    for (final field in _renewableProjects) {
-      if (field.latitude > 0 && field.longitude > 0) {
-        list.add(
-          Marker(
-            point: LatLng(field.latitude, field.longitude),
-            width: 36,
-            height: 36,
-            child: GestureDetector(
-              onTap: () => _selectField(field),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1B8E5A),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.wb_sunny_rounded, color: Colors.white, size: 20),
-              ),
+    try {
+      final ByteData oilByteData = await rootBundle.load(AppAssets.oilMarker);
+      final Uint8List oilBytes = oilByteData.buffer.asUint8List();
+
+      final ByteData gasByteData = await rootBundle.load(AppAssets.gasMarker);
+      final Uint8List gasBytes = gasByteData.buffer.asUint8List();
+
+      final List<PointAnnotationOptions> optionsList = [];
+      final List<FieldLocation> allFields = [
+        ..._renewableProjects,
+        ..._oilFields,
+        ..._gasFields,
+      ];
+
+      for (final field in allFields) {
+        if (field.latitude > 0 && field.longitude > 0) {
+          optionsList.add(
+            PointAnnotationOptions(
+              geometry: Point(coordinates: Position(field.longitude, field.latitude)),
+              image: field.isGas ? gasBytes : oilBytes,
+              iconSize: 0.3,
             ),
-          ),
-        );
+          );
+        }
       }
-    }
 
-    // Oil Markers
-    for (final field in _oilFields) {
-      if (field.latitude > 0 && field.longitude > 0) {
-        list.add(
-          Marker(
-            point: LatLng(field.latitude, field.longitude),
-            width: 32,
-            height: 32,
-            child: GestureDetector(
-              onTap: () => _selectField(field),
-              child: Image.asset(AppAssets.oilMarker),
-            ),
-          ),
-        );
+      final annotations = await manager.createMulti(optionsList);
+      final validFields = allFields.where((f) => f.latitude > 0 && f.longitude > 0).toList();
+      for (int i = 0; i < annotations.length && i < validFields.length; i++) {
+        final ann = annotations[i];
+        if (ann != null) {
+          _annotationFieldMap[ann.id] = validFields[i];
+        }
       }
-    }
 
-    // Gas Markers
-    for (final field in _gasFields) {
-      if (field.latitude > 0 && field.longitude > 0) {
-        list.add(
-          Marker(
-            point: LatLng(field.latitude, field.longitude),
-            width: 32,
-            height: 32,
-            child: GestureDetector(
-              onTap: () => _selectField(field),
-              child: Image.asset(AppAssets.gasMarker),
-            ),
-          ),
-        );
-      }
+      manager.addOnPointAnnotationClickListener(
+        AppPointAnnotationClickListener((annotation) {
+          final field = _annotationFieldMap[annotation.id];
+          if (field != null) {
+            _selectField(field);
+          }
+        }),
+      );
+    } catch (e) {
+      debugPrint('Error creating oil/gas annotations: $e');
     }
-
-    return list;
   }
 
   void _selectField(FieldLocation field) {
     if (field.latitude > 0.0 && field.longitude > 0.0 && _mapController != null) {
-      _mapController!.move(LatLng(field.latitude, field.longitude), 9.0);
+      _mapController!.flyTo(
+        latitude: field.latitude,
+        longitude: field.longitude,
+        zoom: 9.0,
+      );
     }
 
     AppPopupDialog.show(
@@ -339,8 +325,10 @@ class _OilGasScreenState extends State<OilGasScreen> {
       title: 'الطاقة المتجددة و تقنياتها',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
-      markers: _allMarkers,
-      onMapReady: (c) => _mapController = c,
+      onMapCreated: (c) {
+        _mapController = c;
+        _loadMarkers(c);
+      },
       sidebarContent: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 70),
         child: Column(
