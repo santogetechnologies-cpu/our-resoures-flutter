@@ -325,7 +325,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'المحميات الطبيعية',
-                                      onTap: () {},
+                                      onTap: () => AboutDialogs.showNaturalReserves(context),
                                     ),
                                   ),
                                   const SizedBox(width: 22),
@@ -351,7 +351,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'الموسوعات والكتب',
-                                      onTap: () {},
+                                      onTap: () => AboutDialogs.showEncyclopedia(context),
                                     ),
                                   ),
                                   const SizedBox(width: 22),
