@@ -8,6 +8,7 @@ import '../materials/materials_screen.dart';
 import '../water/water_formations_screen.dart';
 import '../tourism/tourism_screen.dart';
 import '../earthquake/earthquake_screen.dart';
+import '../oil_gas/oil_gas_screen.dart';
 
 class FullscreenMenuScreen extends StatelessWidget {
   const FullscreenMenuScreen({super.key});
@@ -282,7 +283,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'الطاقة المتجددة و تقنياتها',
-                                      onTap: () {},
+                                      onTap: () => _navigate(context, const OilGasScreen()),
                                     ),
                                   ),
                                 ],
