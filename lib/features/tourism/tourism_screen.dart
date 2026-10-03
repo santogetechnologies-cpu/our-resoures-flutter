@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -436,6 +437,22 @@ class _TourismScreenState extends State<TourismScreen> {
   final Map<String, TourismLandmark> _annotationLandmarkMap = {};
 
   Future<void> _loadMarkers(MapShellController controller) async {
+    if (kIsWeb) {
+      controller.clearWebMarkers();
+      for (final landmark in _landmarks) {
+        controller.addWebMarker(
+          latitude: landmark.latitude,
+          longitude: landmark.longitude,
+          iconAsset: AppAssets.markerIcon,
+          id: '${landmark.latitude}_${landmark.longitude}',
+          onTap: () {
+            _showLandmark(landmark);
+          },
+        );
+      }
+      return;
+    }
+
     final manager = controller.pointAnnotationManager;
     if (manager == null) return;
 

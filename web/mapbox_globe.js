@@ -1,4 +1,4 @@
-// 3D Globe Web Bridge for Flutter Web (MapLibre / Mapbox GL)
+// 3D Globe Web Bridge for Flutter Web
 
 window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
 window.mapboxGlobeMarkers = window.mapboxGlobeMarkers || {};
@@ -50,48 +50,42 @@ window.initMapboxGlobeWeb = function(viewId, initialLng, initialLat, initialZoom
   const container = document.getElementById(viewId);
   if (!container) return;
 
-  const MapLibrary = window.maplibregl || window.mapboxgl;
-  if (!MapLibrary) {
-    console.error("Map library not found.");
-    return;
+  if (typeof mapboxgl !== 'undefined') {
+    mapboxgl.accessToken = 'pk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
+    // Disable external telemetry requests to avoid 401 warnings
+    if (mapboxgl.config) {
+      mapboxgl.config.EVENTS_URL = null;
+    }
   }
 
-  const map = new MapLibrary.Map({
+  const map = new mapboxgl.Map({
     container: viewId,
     style: ESRI_SATELLITE_GLOBE_STYLE,
     center: [initialLng || 47.189224, initialLat || 24.694291],
-    zoom: initialZoom || 4.3,
+    zoom: initialZoom || 3.8,
+    projection: 'globe',
+    renderWorldCopies: false,
     attributionControl: false
   });
 
-  // Enable 3D Globe Projection
-  const enableGlobe = () => {
+  const applyAtmosphere = () => {
     try {
-      if (typeof map.setProjection === 'function') {
-        map.setProjection({ type: 'globe' });
-      }
+      map.setFog({
+        'color': 'rgb(186, 210, 235)',
+        'high-color': 'rgb(36, 92, 223)',
+        'horizon-blend': 0.02,
+        'space-color': 'rgb(11, 11, 25)',
+        'star-intensity': 0.6
+      });
     } catch(e) {
-      console.warn("Could not set globe projection:", e);
+      console.warn("Could not set fog atmosphere:", e);
     }
-
-    try {
-      if (typeof map.setFog === 'function') {
-        map.setFog({
-          'color': 'rgb(186, 210, 235)',
-          'high-color': 'rgb(36, 92, 223)',
-          'horizon-blend': 0.02,
-          'space-color': 'rgb(11, 11, 25)',
-          'star-intensity': 0.6
-        });
-      }
-    } catch(e) {}
   };
 
-  map.on('load', enableGlobe);
-  map.on('style.load', enableGlobe);
+  map.on('style.load', applyAtmosphere);
+  map.on('load', applyAtmosphere);
 
   map.on('error', (e) => {
-    // Ignore minor tile load warnings
     if (e && e.error && e.error.status !== 401) {
       console.warn("Map event:", e);
     }
@@ -102,7 +96,7 @@ window.initMapboxGlobeWeb = function(viewId, initialLng, initialLat, initialZoom
 
   setTimeout(() => {
     map.resize();
-  }, 200);
+  }, 300);
 
   return map;
 };
@@ -147,9 +141,6 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
 
-  const MapLibrary = window.maplibregl || window.mapboxgl;
-  if (!MapLibrary) return;
-
   const el = document.createElement('div');
   el.className = 'mapbox-custom-marker';
   el.style.width = '32px';
@@ -167,7 +158,7 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
     }
   });
 
-  const marker = new MapLibrary.Marker({ element: el })
+  const marker = new mapboxgl.Marker({ element: el })
     .setLngLat([lng, lat])
     .addTo(map);
 

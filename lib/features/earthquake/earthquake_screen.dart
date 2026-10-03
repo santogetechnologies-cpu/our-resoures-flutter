@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -59,7 +60,24 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
         );
       }).toList();
 
-      if (_mapController?.pointAnnotationManager != null) {
+      if (kIsWeb && _mapController != null) {
+        _mapController!.clearWebMarkers();
+        for (final p in points) {
+          _mapController!.addWebMarker(
+            latitude: p.latitude,
+            longitude: p.longitude,
+            iconAsset: iconAsset,
+            id: '${p.latitude}_${p.longitude}_${p.date}',
+            onTap: () {
+              AppPopupDialog.show(
+                context,
+                title: 'زلزال مسجل',
+                description: 'قدر الزلزال (Magnitude) : ${p.magnitude}\nالتاريخ: ${p.date}\nالوقت: ${p.time} (GMT)',
+              );
+            },
+          );
+        }
+      } else if (_mapController?.pointAnnotationManager != null) {
         final manager = _mapController!.pointAnnotationManager!;
         await manager.deleteAll();
         _annotationEarthquakeMap.clear();

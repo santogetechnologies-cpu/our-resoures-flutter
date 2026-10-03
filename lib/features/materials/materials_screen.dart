@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -434,7 +435,28 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
       (m) => m.nameEn.toLowerCase() == metalEn.toLowerCase(),
     ).toList();
 
-    if (_mapController?.pointAnnotationManager != null) {
+    if (kIsWeb && _mapController != null) {
+      _mapController!.clearWebMarkers();
+      final iconPath = info?.iconAsset ?? AppAssets.mineralIcon(metalEn);
+      for (final loc in filtered) {
+        _mapController!.addWebMarker(
+          latitude: loc.latitude,
+          longitude: loc.longitude,
+          iconAsset: iconPath,
+          id: '${loc.latitude}_${loc.longitude}',
+          onTap: () {
+            AppPopupDialog.show(
+              context,
+              title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
+              description: 'الموقع: ${loc.region}\n'
+                  'المنطقة الإدارية: ${loc.locationName}\n'
+                  'خط الطول شرقاً: ${loc.longitude}\n'
+                  'خط العرض شمالاً: ${loc.latitude}',
+            );
+          },
+        );
+      }
+    } else if (_mapController?.pointAnnotationManager != null) {
       final manager = _mapController!.pointAnnotationManager!;
       await manager.deleteAll();
       _annotationMaterialMap.clear();

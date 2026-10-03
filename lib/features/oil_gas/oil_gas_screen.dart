@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -239,6 +240,30 @@ class _OilGasScreenState extends State<OilGasScreen> {
   ];
 
   Future<void> _loadMarkers(MapShellController controller) async {
+    final List<FieldLocation> allFields = [
+      ..._renewableProjects,
+      ..._oilFields,
+      ..._gasFields,
+    ];
+
+    if (kIsWeb) {
+      controller.clearWebMarkers();
+      for (final field in allFields) {
+        if (field.latitude > 0 && field.longitude > 0) {
+          controller.addWebMarker(
+            latitude: field.latitude,
+            longitude: field.longitude,
+            iconAsset: field.isGas ? AppAssets.gasMarker : AppAssets.oilMarker,
+            id: '${field.latitude}_${field.longitude}',
+            onTap: () {
+              _selectField(field);
+            },
+          );
+        }
+      }
+      return;
+    }
+
     final manager = controller.pointAnnotationManager;
     if (manager == null) return;
 
@@ -250,11 +275,6 @@ class _OilGasScreenState extends State<OilGasScreen> {
       final Uint8List gasBytes = gasByteData.buffer.asUint8List();
 
       final List<PointAnnotationOptions> optionsList = [];
-      final List<FieldLocation> allFields = [
-        ..._renewableProjects,
-        ..._oilFields,
-        ..._gasFields,
-      ];
 
       for (final field in allFields) {
         if (field.latitude > 0 && field.longitude > 0) {
