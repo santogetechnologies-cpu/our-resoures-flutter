@@ -28,6 +28,7 @@ class FullscreenMenuScreen extends StatelessWidget {
   Widget _buildCategoryButton({
     required BuildContext context,
     required String title,
+    String? subtitle,
     required VoidCallback onTap,
   }) {
     return Container(
@@ -50,20 +51,41 @@ class FullscreenMenuScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppColors.borderRadius),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'NotoKufi',
-                    fontSize: 21,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'NotoKufi',
+                        fontSize: 19,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                      ),
+                    ),
                   ),
-                ),
+                  if (subtitle != null && subtitle.isNotEmpty) ...[
+                    const SizedBox(height: 1),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        subtitle,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textDark.withOpacity(0.7),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
@@ -248,6 +270,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'الاستشعار عن بعد وال GIS',
+                                      subtitle: 'Remote Sensing and GIS',
                                       onTap: () {},
                                     ),
                                   ),
@@ -257,6 +280,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'جيولوجية و جيومورفولوجية المملكة',
+                                      subtitle: 'Geology and Geomorphology of the Kingdom',
                                       onTap: () => _navigate(context, const GeologyScreen()),
                                     ),
                                   ),
@@ -274,6 +298,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'مواقع المعادن الاقتصادية',
+                                      subtitle: 'Economic Mineral Deposits',
                                       onTap: () => _navigate(context, const MaterialsScreen()),
                                     ),
                                   ),
@@ -283,6 +308,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'الطاقة المتجددة و تقنياتها',
+                                      subtitle: 'Renewable Energy and Technologies',
                                       onTap: () => _navigate(context, const OilGasScreen()),
                                     ),
                                   ),
@@ -300,6 +326,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'مصادر المياه والتحديات',
+                                      subtitle: 'Water Resources and Challenges',
                                       onTap: () => _navigate(context, const WaterFormationsScreen()),
                                     ),
                                   ),
@@ -309,6 +336,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'المواقع الاثرية والقرى التراثية',
+                                      subtitle: 'Archaeological Sites and Heritage Villages',
                                       onTap: () => _navigate(context, const TourismScreen()),
                                     ),
                                   ),
@@ -326,6 +354,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'المحميات الطبيعية',
+                                      subtitle: 'Nature Reserves',
                                       onTap: () => AboutDialogs.showNaturalReserves(context),
                                     ),
                                   ),
@@ -335,6 +364,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'استراتيجية المخاطر الطبيعية',
+                                      subtitle: 'Natural Hazards Strategy',
                                       onTap: () => AboutDialogs.showHazards(context),
                                     ),
                                   ),
@@ -352,6 +382,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'الموسوعات والكتب',
+                                      subtitle: 'Encyclopedias and Books',
                                       onTap: () => AboutDialogs.showEncyclopedia(context),
                                     ),
                                   ),
@@ -361,6 +392,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     child: _buildCategoryButton(
                                       context: context,
                                       title: 'قاعدة البيانات الزلزالية',
+                                      subtitle: 'Seismic Database',
                                       onTap: () => _navigate(context, const EarthquakeScreen()),
                                     ),
                                   ),
