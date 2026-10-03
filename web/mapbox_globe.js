@@ -7,34 +7,57 @@ window.initMapboxGlobeWeb = function(viewId, initialLng, initialLat, initialZoom
   const container = document.getElementById(viewId);
   if (!container) return;
 
-  mapboxgl.accessToken = 'sk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
+  // Use public access token (pk.*) for Mapbox GL JS
+  mapboxgl.accessToken = 'pk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
 
   let mapStyle = 'mapbox://styles/mapbox/satellite-streets-v12';
-  if (initialStyleJson && initialStyleJson.length > 10) {
+  if (initialStyleJson && typeof initialStyleJson === 'string' && initialStyleJson.trim().length > 10) {
     try {
       mapStyle = JSON.parse(initialStyleJson);
     } catch(e) {
-      console.warn("Could not parse style JSON, using default satellite-streets", e);
+      console.warn("Could not parse style JSON, using default satellite-streets-v12", e);
     }
   }
 
-  const map = new mapboxgl.Map({
-    container: viewId,
-    style: mapStyle,
-    center: [initialLng || 47.189224, initialLat || 24.694291],
-    zoom: initialZoom || 4.3,
-    projection: 'globe',
-    attributionControl: false
-  });
-
-  map.on('style.load', () => {
-    map.setFog({
-      'color': 'rgb(186, 210, 235)',
-      'high-color': 'rgb(36, 92, 223)',
-      'horizon-blend': 0.02,
-      'space-color': 'rgb(11, 11, 25)',
-      'star-intensity': 0.6
+  let map;
+  try {
+    map = new mapboxgl.Map({
+      container: viewId,
+      style: mapStyle,
+      center: [initialLng || 47.189224, initialLat || 24.694291],
+      zoom: initialZoom || 4.3,
+      projection: 'globe',
+      attributionControl: false
     });
+  } catch(err) {
+    console.warn("Failed to init with primary style, falling back to satellite-streets-v12", err);
+    map = new mapboxgl.Map({
+      container: viewId,
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      center: [initialLng || 47.189224, initialLat || 24.694291],
+      zoom: initialZoom || 4.3,
+      projection: 'globe',
+      attributionControl: false
+    });
+  }
+
+  const applyAtmosphere = () => {
+    try {
+      map.setFog({
+        'color': 'rgb(186, 210, 235)',
+        'high-color': 'rgb(36, 92, 223)',
+        'horizon-blend': 0.02,
+        'space-color': 'rgb(11, 11, 25)',
+        'star-intensity': 0.6
+      });
+    } catch(e) {
+      console.warn("Could not set fog atmosphere:", e);
+    }
+  };
+
+  map.on('style.load', applyAtmosphere);
+  map.on('error', (e) => {
+    console.warn("Mapbox GL event warning/error:", e);
   });
 
   window.mapboxGlobeInstances[viewId] = map;
