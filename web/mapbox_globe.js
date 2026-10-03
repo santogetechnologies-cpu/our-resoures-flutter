@@ -1,9 +1,9 @@
-// Mapbox GL JS 3D Globe Web Bridge for Flutter Web
+// 3D Globe Web Bridge for Flutter Web (MapLibre / Mapbox GL)
 
 window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
 window.mapboxGlobeMarkers = window.mapboxGlobeMarkers || {};
 
-// Standalone High-Resolution Satellite 3D Globe Style (No 401 auth errors)
+// Standalone High-Resolution Satellite 3D Globe Style
 const ESRI_SATELLITE_GLOBE_STYLE = {
   version: 8,
   name: 'Satellite 3D Globe',
@@ -50,47 +50,56 @@ window.initMapboxGlobeWeb = function(viewId, initialLng, initialLat, initialZoom
   const container = document.getElementById(viewId);
   if (!container) return;
 
-  // Use public access token format for Mapbox GL JS
-  mapboxgl.accessToken = 'pk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
+  const MapLibrary = window.maplibregl || window.mapboxgl;
+  if (!MapLibrary) {
+    console.error("Map library not found.");
+    return;
+  }
 
-  // Always use the reliable standalone satellite globe style by default to prevent 401s
-  let mapStyle = ESRI_SATELLITE_GLOBE_STYLE;
-
-  const map = new mapboxgl.Map({
+  const map = new MapLibrary.Map({
     container: viewId,
-    style: mapStyle,
+    style: ESRI_SATELLITE_GLOBE_STYLE,
     center: [initialLng || 47.189224, initialLat || 24.694291],
     zoom: initialZoom || 4.3,
-    projection: 'globe',
     attributionControl: false
   });
 
-  const applyAtmosphere = () => {
+  // Enable 3D Globe Projection
+  const enableGlobe = () => {
     try {
-      map.setFog({
-        'color': 'rgb(186, 210, 235)',
-        'high-color': 'rgb(36, 92, 223)',
-        'horizon-blend': 0.02,
-        'space-color': 'rgb(11, 11, 25)',
-        'star-intensity': 0.6
-      });
+      if (typeof map.setProjection === 'function') {
+        map.setProjection({ type: 'globe' });
+      }
     } catch(e) {
-      console.warn("Could not set fog atmosphere:", e);
+      console.warn("Could not set globe projection:", e);
     }
+
+    try {
+      if (typeof map.setFog === 'function') {
+        map.setFog({
+          'color': 'rgb(186, 210, 235)',
+          'high-color': 'rgb(36, 92, 223)',
+          'horizon-blend': 0.02,
+          'space-color': 'rgb(11, 11, 25)',
+          'star-intensity': 0.6
+        });
+      }
+    } catch(e) {}
   };
 
-  map.on('style.load', applyAtmosphere);
+  map.on('load', enableGlobe);
+  map.on('style.load', enableGlobe);
+
   map.on('error', (e) => {
-    // Ignore tile 401/404 warnings silently without crashing the 3D globe
+    // Ignore minor tile load warnings
     if (e && e.error && e.error.status !== 401) {
-      console.warn("Mapbox GL event:", e);
+      console.warn("Map event:", e);
     }
   });
 
   window.mapboxGlobeInstances[viewId] = map;
   window.mapboxGlobeMarkers[viewId] = [];
 
-  // Spin globe slightly or handle resize
   setTimeout(() => {
     map.resize();
   }, 200);
@@ -116,13 +125,12 @@ window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
     try {
       if (typeof styleJsonStr === 'string' && styleJsonStr.trim().length > 10) {
         const parsed = JSON.parse(styleJsonStr);
-        // Only apply if it's a valid style
         if (parsed && parsed.version) {
           map.setStyle(parsed);
         }
       }
     } catch(e) {
-      console.warn("Error setting custom map style, keeping base satellite globe:", e);
+      console.warn("Error setting custom map style:", e);
     }
   }
 };
@@ -138,6 +146,9 @@ window.mapboxGlobeClearMarkersWeb = function(viewId) {
 window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, callbackName) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
+
+  const MapLibrary = window.maplibregl || window.mapboxgl;
+  if (!MapLibrary) return;
 
   const el = document.createElement('div');
   el.className = 'mapbox-custom-marker';
@@ -156,7 +167,7 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
     }
   });
 
-  const marker = new mapboxgl.Marker(el)
+  const marker = new MapLibrary.Marker({ element: el })
     .setLngLat([lng, lat])
     .addTo(map);
 
