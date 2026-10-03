@@ -154,7 +154,7 @@ class FullscreenMenuScreen extends StatelessWidget {
           children: [
             // Background wallpaper
             Image.asset(
-              AppAssets.wallpaper2,
+              AppAssets.wallpaper5,
               fit: BoxFit.cover,
               errorBuilder: (c, e, s) => Container(color: const Color(0xFFF7F4EF)),
             ),
