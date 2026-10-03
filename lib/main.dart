@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,10 +9,14 @@ import 'features/start/start_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set Mapbox Access Token
-  MapboxOptions.setAccessToken(
-    'sk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA',
-  );
+  // Set Mapbox Access Token on mobile platforms
+  if (!kIsWeb) {
+    try {
+      MapboxOptions.setAccessToken(
+        'sk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA',
+      );
+    } catch (_) {}
+  }
 
   // Lock to landscape orientation matching original Android app
   await SystemChrome.setPreferredOrientations([

@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
 import 'map_scale_bar.dart';
+import 'map_view_platform.dart';
 
 class AppPointAnnotationClickListener extends OnPointAnnotationClickListener {
   final void Function(PointAnnotation annotation) onClick;
@@ -16,17 +18,23 @@ class AppPointAnnotationClickListener extends OnPointAnnotationClickListener {
 }
 
 class MapShellController {
+  final String? webDomId;
   MapboxMap? mapboxMap;
   PointAnnotationManager? pointAnnotationManager;
 
+  MapShellController({this.webDomId});
+
   Future<void> setStyleFromAsset(String assetPath) async {
-    if (mapboxMap == null) return;
     try {
       final styleJson = await rootBundle.loadString(assetPath);
-      await mapboxMap!.style.setStyleJSON(styleJson);
-      try {
-        await mapboxMap!.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
-      } catch (_) {}
+      if (kIsWeb && webDomId != null) {
+        setWebStyleJSON(webDomId!, styleJson);
+      } else if (mapboxMap != null) {
+        await mapboxMap!.style.setStyleJSON(styleJson);
+        try {
+          await mapboxMap!.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
+        } catch (_) {}
+      }
     } catch (e) {
       debugPrint('Error loading style asset $assetPath: $e');
     }
@@ -39,16 +47,37 @@ class MapShellController {
     double? pitch,
     double? bearing,
   }) async {
-    if (mapboxMap == null) return;
-    await mapboxMap!.flyTo(
-      CameraOptions(
-        center: Point(coordinates: Position(longitude, latitude)),
-        zoom: zoom,
-        pitch: pitch,
-        bearing: bearing,
-      ),
-      MapAnimationOptions(duration: 1000),
-    );
+    if (kIsWeb && webDomId != null) {
+      flyToWeb(webDomId!, longitude, latitude, zoom ?? 6.0);
+    } else if (mapboxMap != null) {
+      await mapboxMap!.flyTo(
+        CameraOptions(
+          center: Point(coordinates: Position(longitude, latitude)),
+          zoom: zoom,
+          pitch: pitch,
+          bearing: bearing,
+        ),
+        MapAnimationOptions(duration: 1000),
+      );
+    }
+  }
+
+  void addWebMarker({
+    required double latitude,
+    required double longitude,
+    required String iconAsset,
+    required String id,
+    required VoidCallback onTap,
+  }) {
+    if (kIsWeb && webDomId != null) {
+      addMarkerWeb(webDomId!, longitude, latitude, iconAsset, id, onTap);
+    }
+  }
+
+  void clearWebMarkers() {
+    if (kIsWeb && webDomId != null) {
+      clearMarkersWeb(webDomId!);
+    }
   }
 }
 
@@ -85,49 +114,21 @@ class MapShell extends StatefulWidget {
 }
 
 class _MapShellState extends State<MapShell> {
-  final MapShellController _shellController = MapShellController();
+  MapShellController? _controller;
   double _currentZoom = 4.3;
   double _currentLat = 24.694291;
+  late final String _viewId;
 
   @override
   void initState() {
     super.initState();
     _currentZoom = widget.initialZoom;
     _currentLat = widget.initialLatitude;
-  }
-
-  void _onMapCreated(MapboxMap mapboxMap) async {
-    _shellController.mapboxMap = mapboxMap;
-
-    // Load initial custom style from assets if provided, or default satellite-streets
-    if (widget.initialStyleAsset != null && widget.initialStyleAsset!.isNotEmpty) {
-      await _shellController.setStyleFromAsset(widget.initialStyleAsset!);
-    } else {
-      try {
-        await mapboxMap.style.setStyleURI(MapboxStyles.SATELLITE_STREETS);
-      } catch (_) {}
-    }
-
-    // Set globe projection explicitly to ensure 3D spherical globe is rendered
-    try {
-      await mapboxMap.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
-    } catch (_) {}
-
-    // Initialize point annotation manager for high-performance markers
-    try {
-      _shellController.pointAnnotationManager =
-          await mapboxMap.annotations.createPointAnnotationManager();
-    } catch (e) {
-      debugPrint('Error creating PointAnnotationManager: $e');
-    }
-
-    if (widget.onMapCreated != null) {
-      widget.onMapCreated!(_shellController);
-    }
+    _viewId = widget.title.hashCode.abs().toString();
   }
 
   void _resetZoom() {
-    _shellController.flyTo(
+    _controller?.flyTo(
       latitude: widget.initialLatitude,
       longitude: widget.initialLongitude,
       zoom: widget.initialZoom,
@@ -149,31 +150,29 @@ class _MapShellState extends State<MapShell> {
 
             return Stack(
               children: [
-                // 3D Globe Mapbox Widget
-                MapWidget(
-                  key: const ValueKey('mapbox_globe_widget'),
-                  styleUri: MapboxStyles.SATELLITE_STREETS,
-                  cameraOptions: CameraOptions(
-                    center: Point(
-                      coordinates: Position(widget.initialLongitude, widget.initialLatitude),
-                    ),
-                    zoom: widget.initialZoom,
-                    pitch: 0.0,
-                    bearing: 0.0,
+                // Platform-specific 3D Globe Map (Web / Mobile)
+                Positioned.fill(
+                  child: buildPlatformMapWidget(
+                    viewId: _viewId,
+                    initialLongitude: widget.initialLongitude,
+                    initialLatitude: widget.initialLatitude,
+                    initialZoom: widget.initialZoom,
+                    initialStyleAsset: widget.initialStyleAsset,
+                    onMapReady: (ctrl) {
+                      _controller = ctrl;
+                      if (widget.onMapCreated != null) {
+                        widget.onMapCreated!(ctrl);
+                      }
+                    },
+                    onCameraChange: (zoom, lat) {
+                      if (mounted) {
+                        setState(() {
+                          _currentZoom = zoom;
+                          _currentLat = lat;
+                        });
+                      }
+                    },
                   ),
-                  onMapCreated: _onMapCreated,
-                  onCameraChangeListener: (cameraChangedEventData) {
-                    if (_shellController.mapboxMap != null) {
-                      _shellController.mapboxMap!.getCameraState().then((cameraState) {
-                        if (mounted) {
-                          setState(() {
-                            _currentZoom = cameraState.zoom;
-                            _currentLat = cameraState.center.coordinates.lat.toDouble();
-                          });
-                        }
-                      });
-                    }
-                  },
                 ),
 
                 // Map Scale Bar
