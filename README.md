@@ -1,189 +1,180 @@
-# ثرواتنا من أرضنا (Our Resources) - Flutter App
+# Our Resources (ثرواتنا من أرضنا)
 
-مشروع متكامل ومُعاد بناؤه بنسبة 100% باستخدام **Flutter & Dart** كنسخة مطابقة تماماً (1:1 Migration) لتطبيق الأندرويد الأصلي `map`، مع دعمه لجميع المنصات:
-- **Android**
-- **iOS**
-- **Web**
-- **Windows Desktop**
+An interactive, high-performance **3D Digital Geospatial Atlas and Geological Information System** of the Kingdom of Saudi Arabia, engineered with **Flutter**, **Dart**, and **Mapbox 3D Globe Engine**.
 
 ---
 
-## 🌟 مميزات التطبيق والأقسام المطابقة
+## 🌍 Overview
 
-1. **شاشة البداية (Start Screen)**:
-   - خلفية رخامية برديّة مطابقة (`wallpaper2.jpg`).
-   - شعار رؤية المملكة 2030 وشعار جامعة الملك سعود.
-   - زر التفاعل واللمس المركزي مع تأثير النبض (`click.png`).
-   - التوجيه الأفقي التلقائي (Landscape Mode) والاتجاه الكامل من اليمين لليسار (RTL).
+**Our Resources** is an educational and scientific exploration application showcasing the natural wealth, geological formations, mineral reserves, hydrology, energy infrastructures, seismic history, and geo-tourism heritage of Saudi Arabia. 
 
-2. **القائمة الرئيسية (Fullscreen Menu)**:
-   - خلفية مطابقة (`wallpaper5.jpg`) وشريط ترويسة يحمل عنوان "ثرواتنا من أرضنا".
-   - زر "نبذة تعريفية": يفتح نافذة منبثقة تفاعلية توضح أهداف المشروع، والفريق العلمي والتقني، مع توقيع المشرف على المشروع أ. د. عبد الله بن محمد العمري (`sign.png`).
-   - شبكة (2×3) متناسقة لأقسام التطبيق الستة:
-     1. **جيولوجية المملكة**
-     2. **الصخور والمعادن الإقتصادية**
-     3. **مصادر المياه**
-     4. **البترول والغاز**
-     5. **السياحة والآثار**
-     6. **قاعدة البيانات الزلزالية**
-   - زر "المصادر والمراجع": يفتح نافذة المراجع العلمية العربية والدولية.
-
-3. **جيولوجية المملكة (General Geology)**:
-   - خريطة تفاعلية فضائية عالية الدقة (Satellite Imagery).
-   - قائمة جانبية برديّة مطابقة للأصل (`wallpaper.png`).
-   - استعراض النطق الجيولوجية الأربعة:
-     - **الدرع العربي**: مع نافذة الشرح والصورة الجيولوجية (`arabian_shield.png`).
-     - **الرصيف العربي**: مع نافذة الشرح والصورة الجيولوجية (`arabian_platform.png`).
-     - **الحرات البركانية**: مع نافذة الشرح وصورة الحرات (`harat.jpg`) وخريطة تفاعلية لفوهات وبراكين الحرات (حرة رهط، خيبر، كشب، عويرض، الحرة، الشاقة، إلخ).
-     - **السهول الساحلية**: مع نافذة الشرح وصورة السهول (`swahel.png`).
-
-4. **الصخور والمعادن الإقتصادية (Economic Minerals)**:
-   - قراءة وتحليل بيانات ملف الإكسل الحقيقي `materials.xlsx` بدقة وسرعة فائقة باستخدام حزمة Dart الأصلية.
-   - قائمة تشمل 41 معدناً وصخراً اقتصادياً (الذهب، الفضة، النحاس، الحديد، البوكسيت، الفوسفات، الزنك، الرصاص، النيكل، الكروم، المغنيزايت، الفلدسبار، الجبس، الحجر الجيري، الرخام، الجرانيت، البازلت، رمال السيليكا، الكوارتزايت، الكاولين، الطين، التلك، البارايت، اليورانيوم، الزيولايت، الجرافيت، الدولومايت، الكيانايت، إلخ).
-   - عند اختيار أي معدن:
-     - عرض نافذة مواصفات المعدن واستخداماته مع صورته الحقيقية (`*.jpg`).
-     - تحديد كافة مواقع تواجد هذا الخام على خريطة المملكة بأيقونته الخاصة (`ic_<metal>.png`).
-     - إمكانية النقر على أي موقع لمعرفة اسم الموقع والمنطقة الإدارية وإحداثيات خط الطول والعرض.
-
-5. **مصادر المياه (Water Resources)**:
-   - عرض فوري تلقائي عند الدخول لنافذة "مشاكل ومصادر المياه" التي تحوي الشرح المائي الشامل وجميع اللوحات والمخططات الإيضاحية العشرة (`waterproblems1.png` إلى `waterproblems10.png`).
-   - 4 تبويبات رئيسية:
-     - **التكاوين المائية الرئيسية**: (ساق، تبوك، وجيد، منجور، بياض، وسيع).
-     - **التكاوين المائية الثانوية**: (أم الرضمة، الدمام، النيوجين، الجوف، الخف، الجلح، ضرما، سكاكا، العرمة).
-     - **الأودية (53 وادياً)**: قراءة وعرض مسارات الـ 53 وادياً من ملفات `GeoJSON` مع ألوانها الأصلية المميزة والتحليق لموقع الوادي.
-     - **السدود**: قراءة سدود المملكة من ملف الإكسل `dams.xlsx` وعرضها برموز قطرات الماء (`droplet.png`) وتفاصيل ارتفاع وسعة كل سد.
-
-6. **البترول والغاز (Petroleum & Gas)**:
-   - مقدمة جيولوجية مصورة (`oil_brief.png`) حول نشأة ومكامن النفط والغاز.
-   - قائمتان منسدلتان متطابقتان:
-     - **حقول النفط (12 حقلاً)**: الغوار، خريص، اللغفة، الجوب، الشطفة، الشيبة، الرملة، الحوطة، بقيق، السفانية، منيفة، البري.
-     - **حقول الغاز (12 حقلاً)**: مدين، برقان، الحلوة، شمعة، الكدن الشمالي، الكدن الجنوبي، المحاكيك، شدون، الوضيحي، أوتاد، مزاليج، إلخ.
-   - علامات الخريطة المخصصة (`oil_marker.png` و `gas_marker.png`).
-   - عند النقر على أي حقل: التكبير الفوري إلى الحقل وعرض بطاقة معلوماته التفصيلية واحتياطياته وصخور مكمنه ومصدره.
-
-7. **السياحة والآثار (Geological Tourism)**:
-   - مقدمة عن السياحة الجيولوجية ومواقع التراث العالمي في المملكة.
-   - تصفح المعالم حسب المناطق الإدارية (المدينة المنورة، الرياض، مكة المكرمة، تبوك، حائل، عسير، الشرقية، جازان، نجران، الجوف، الباحة، إلخ).
-   - بطاقات تعريفية مصورة للمعالم الجيولوجية البارزة (جبل الفيل، قوس مقرط الدبوس، غراميل العلا، فوهة الوعبة، بركان جبل الملساء، بركان جبل البيضاء، حافة العالم، عين هيت، وادي الديسة، صخرة النصلة، جبل القارة، وادي لجب، جبال فيفا، قرية ذي عين، جزر فرسان، مدائن صالح، إلخ).
-
-8. **قاعدة البيانات الزلزالية (Seismic Database)**:
-   - مقدمة زلزالية وتكتونية حول حركة الصفيحة العربية.
-   - تصنيف زلزالي تفاعلي عبر 5 ملفات إكسل حقيقية:
-     - الزلازل التاريخية (`Histroical.xlsx` - أيقونة مربعة)
-     - من 4 إلى 4.9 درجات (`4 to 5.xlsx` - أيقونة دائرية صغيرة)
-     - من 5 إلى 5.9 درجات (`5 to 6.xlsx` - أيقونة متوسطة)
-     - من 6 إلى 6.9 درجات (`6 to 7.xlsx` - أيقونة كبيرة)
-     - 7 درجات فما فوق (`7 and above.xlsx` - أيقونة كبيرة جداً)
-   - قراءة الإحداثيات وتاريخ ووقت الهزة وقوتها بمقياس ريختر وإظهارها عند النقر على الهزة.
+Originally created as an interactive GIS kiosk application for the Saudi Society of Geosciences and King Saud University, this repository represents a modern, cross-platform codebase supporting **Web**, **Android**, **iOS**, and **Desktop** environments.
 
 ---
 
-## 🚀 تشغيل التطبيق (How to Run)
+## ✨ Core Features & Modules
 
-### 1. المتطلبات:
-- تثبيت Flutter SDK (الإصدار 3.10 فما فوق).
+### 1. 🌐 Interactive 3D Globe & GIS Viewport
+* **Spherical 3D Globe Projection**: Renders the Earth as a realistic 3D globe with atmospheric glow, star field background, and spherical navigation.
+* **Vector & Satellite Imagery**: High-resolution satellite base layers layered with custom geological shapefiles and vector features.
+* **Smart Camera Control**: Dynamic fly-to transitions with automated pitch, bearing, and zoom level adjustments.
+* **Authentic GIS Scale Bar**: Live distance ruler calculating real-time ground resolution per pixel based on camera altitude and latitude.
 
-### 2. تثبيت الحزم:
+---
+
+### 2. ⛰️ General Geology of the Kingdom (`GeologyScreen`)
+Explore the primary geological provinces shaping the Arabian Plate:
+* **The Arabian Shield (*الدرع العربي*)**: Pre-Cambrian crystalline igneous and metamorphic basement rocks rich in precious and base metals.
+* **The Arabian Platform (*الرصيف القاري العربي*)**: Extensive sedimentary cover occupying over two-thirds of Saudi Arabia, hosting global hydrocarbon reserves and major deep aquifers.
+* **Volcanic Harrat (*الحرات البركانية*)**: Cenozoic basaltic lava fields and volcanic cones, including Harrat Rahat, Khaybar, Kishb, Lunayyir, and volcanic calderas (e.g., Al-Wahbah Crater).
+* **Coastal Plains (*السهول الساحلية*)**: Red Sea Tihama plains and Arabian Gulf coastal flats with evaporite sequences and marine deposits.
+
+---
+
+### 3. 💎 Economic Rocks & Minerals (`MaterialsScreen`)
+* **Comprehensive Mineral Registry**: Interactive explorer covering over 40 industrial minerals and metallic ores (Gold, Silver, Copper, Iron, Phosphate, Bauxite, Zinc, Lithium, Silica Sand, Granite, Marble, Kaolin, Gypsum, Uranium, etc.).
+* **Geospatial Extraction Sites**: Coordinates and mining sites across the Kingdom with specialized category icons.
+* **Specimen Inspection & Data**: High-resolution specimen imagery, geological characteristics, industrial applications, and Vision 2030 mining sector targets.
+
+---
+
+### 4. 💧 Water Formations & Hydrology (`WaterFormationsScreen`)
+* **Major Aquifers**: Deep groundwater formations including Saq, Wajid, Tabuk, Minjur, Biyadh, and Wasia sandstone reservoirs.
+* **Secondary Aquifers**: Regional formations including Umm Er Radhuma, Dammam, Neogene, Al-Jouf, Khuff, and Jilh.
+* **Wadi River Networks**: Vector routing and path visualization for 53 primary wadi basins across Saudi Arabia (Wadi Al-Rummah, Wadi Hanifah, Wadi Bishah, Wadi Al-Batin, etc.) rendered with customized color schemes and length metrics.
+* **Drinking & Agricultural Dams**: Geographic database of major dams across all provinces with structural metrics (height, length, reservoir capacity, and construction year).
+
+---
+
+### 5. ⚡ Energy, Petroleum & Renewables (`OilGasScreen`)
+* **Renewable Energy Megaprojects**: Clean energy initiatives under Vision 2030 and the Saudi Green Initiative:
+  * Sakaka Solar Power Plant (300 MW)
+  * Dumat Al-Jandal Wind Farm (400 MW)
+  * Sudair Solar PV Project (1,500 MW)
+  * NEOM Green Hydrogen Facility
+  * Shuaibah Solar PV Complex
+  * Geothermal exploration across volcanic Harrat fields.
+* **Oil Fields**: Ghawar, Khurais, Safaniya, Shaybah, Manifa, Abqaiq, Berri, and more.
+* **Natural Gas Fields**: Midyan, Jafurah unconventional basin, Mazalij, Karan, and Arabiyah.
+
+---
+
+### 6. 🏛️ Geo-Tourism & Cultural Heritage (`TourismScreen`)
+* **Provincial Landmark Explorer**: Curated regional categories covering Riyadh, Madinah, Makkah, Asir, Tabuk, Al-Jawf, Najran, Hail, and the Eastern Province.
+* **Natural Wonders & UNESCO Sites**: Detailed photographic cards and geospatial pins for Elephant Rock (Jabal Al-Fil), Madain Saleh (Hegra), Al-Gharameel, Edge of the World, Al-Ukhdood, Hema Rock Inscriptions, Farasan Islands, and Habala.
+
+---
+
+### 7. 🌋 Seismic Database & Tectonics (`EarthquakeScreen`)
+* **Seismic History Catalog**: Complete historical and instrumental earthquake records from 112 AD to present from the King Saud University Seismic Studies Center.
+* **Magnitude Classification**: Real-time filtering by Richter scale thresholds:
+  * Historical Seismicity (112 AD – 1899 AD)
+  * Minor Seismicity ($M < 3.0$)
+  * Moderate Seismicity ($3.0 \le M < 5.0$)
+  * Significant Seismicity ($M \ge 5.0$)
+* **Detailed Epicenter Popups**: Magnitude, focal depth, GMT timestamp, and tectonic boundary associations.
+
+---
+
+## 🏗️ Architecture & Technology Stack
+
+```
+our-resources-flutter/
+├── lib/
+│   ├── main.dart                          # Application entry point & configuration
+│   ├── core/
+│   │   ├── constants/app_assets.dart      # Centralized asset paths & data registry
+│   │   ├── dialogs/                       # Infographic & popup modal system
+│   │   ├── theme/app_theme.dart           # Color palette, parchment styling & typography
+│   │   └── widgets/
+│   │       ├── custom_button.dart         # Styled parchment navigation buttons
+│   │       ├── map_scale_bar.dart         # Live GIS distance ruler
+│   │       ├── map_shell.dart             # Cross-platform map layout & controller
+│   │       ├── map_view_platform.dart     # Platform-agnostic map interface
+│   │       ├── map_view_platform_web.dart # Mapbox GL JS 3D Globe Web engine
+│   │       └── map_view_platform_stub.dart# Mapbox Mobile native engine
+│   └── features/
+│       ├── start/start_screen.dart        # Immersive splash screen
+│       ├── menu/fullscreen_menu_screen.dart # 6-module grid navigation
+│       ├── geology/                       # General geology module
+│       ├── materials/                     # Economic minerals module
+│       ├── water/                         # Hydrology & dams module
+│       ├── oil_gas/                       # Energy & petroleum module
+│       ├── tourism/                       # Geo-tourism module
+│       └── earthquake/                    # Seismic database module
+├── web/
+│   ├── index.html                         # Web entry point with Mapbox GL JS v3
+│   └── mapbox_globe.js                    # WebGL 3D Globe bridge script
+└── assets/
+    ├── data/                              # Datasets (materials, dams, tourism)
+    ├── earthquake/                        # Earthquake catalogs (JSON/XLSX)
+    ├── images/                            # Textures, specimens, banners & icons
+    └── maps/                              # Mapbox Style JSONs & GeoJSON vectors
+```
+
+### Key Technical Choices
+* **Flutter & Dart**: Single cross-platform codebase maintaining native performance on mobile and canvas/HTML rendering on web.
+* **Mapbox 3D Globe Hybrid Engine**:
+  * **Web**: WebGL-accelerated **Mapbox GL JS v3** with native `globe` projection, atmospheric fog, and hardware-rendered satellite layers embedded via `HtmlElementView`.
+  * **Android / iOS**: **Mapbox Maps Flutter SDK** (`mapbox_maps_flutter`) backed by native Android/iOS vector tiles.
+* **Full RTL & Typography**: Custom Arabic typography (`Noto Kufi` & `Reem Kufi`) paired with Right-to-Left directional layouts.
+* **Decoupled Controller Architecture**: Uniform `MapShellController` interface ensuring identical behavior across web and mobile platforms.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+* [Flutter SDK](https://docs.flutter.dev/get-started/install) (version `3.10.0` or higher).
+* Google Chrome (for web development) or Android Studio / Xcode (for mobile deployment).
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/santogetechnologies-cpu/our-resoures-flutter.git
+cd our-resoures-flutter
+```
+
+### 2. Install Dependencies
 ```bash
 flutter pub get
 ```
 
-### 3. الفحص البرمجي:
+### 3. Validate Codebase
 ```bash
 flutter analyze
 ```
 
-### 4. التشغيل على المنصات:
-- **تشغيل على متصفح الويب (Chrome)**:
+### 4. Run Locally
+* **Run in Web Browser**:
   ```bash
   flutter run -d chrome
   ```
-- **تشغيل على نظام ويندوز (Windows Desktop)**:
-  ```bash
-  flutter run -d windows
-  ```
-- **تشغيل على أجهزة أندرويد (Android)**:
+* **Run on Android Device / Emulator**:
   ```bash
   flutter run -d android
   ```
-- **تشغيل على أجهزة آبل (iOS)**:
-  ```bash
-  flutter run -d ios
-  ```
 
 ---
 
-## 📁 هيكلية المشروع المستحدثة (Restructured Repository Architecture)
+## 🌐 Deployment (Vercel)
 
-```text
-our resoures flutter/
-├── .github/
-│   └── workflows/
-│       └── deploy.yml            # CI/CD: Automated Flutter Web build & Vercel deployment
-├── vercel.json                   # Vercel SPA routing and header configuration
-├── .gitignore                    # Flutter, Android, iOS, Windows, Vercel ignore rules
-├── assets/
-│   ├── data/                     # materials.xlsx, dams.xlsx, tourism_data.json
-│   ├── earthquake/               # 5 earthquake Excel datasets
-│   ├── fonts/                    # Noto Kufi Arabic Fonts & Reem Kufi
-│   ├── images/                   # Wallpapers, icons, specimen photos, infographics
-│   └── maps/                     # 53 Valley GeoJSONs, water formations, saudi_geo
-├── lib/
-│   ├── main.dart                 # App entrypoint, RTL config, Landscape lock
-│   ├── core/
-│   │   ├── constants/            # AppAssets paths
-│   │   ├── theme/                # AppColors, typography & button themes
-│   │   ├── widgets/              # MapShell, CustomButton
-│   │   └── dialogs/              # Info, Brief, Water Infographics, About dialogs
-│   └── features/
-│       ├── start/                # StartScreen (matching StartActivity)
-│       ├── menu/                 # FullscreenMenuScreen (matching FullscreenListActivity)
-│       ├── geology/              # GeologyScreen (matching MainActivity)
-│       ├── materials/            # MaterialsScreen (matching MaterialsActivity)
-│       ├── water/                # WaterFormationsScreen (matching WaterFormations)
-│       ├── oil_gas/              # OilGasScreen (matching OilGas)
-│       ├── earthquake/           # EarthquakeScreen (matching EarthquakeActivity)
-│       └── tourism/              # TourismScreen (matching TourismActivity)
-├── android/                      # Flutter Android native runner
-├── ios/                          # Flutter iOS native runner
-├── web/                          # Flutter Web entrypoint & manifest
-├── windows/                      # Flutter Windows desktop runner
-├── pubspec.yaml                  # Flutter assets & dependencies
-│
-└── kotlin_android_legacy/        # 📦 التطبيق الأصلي بكود Kotlin محفوظ بالكامل
-    └── map/                      # Original Android Kotlin Android Studio Project
-```
+The web version is configured for automated CI/CD deployment on [Vercel](https://vercel.com):
+* **Build Script**: `vercel-build.sh` automatically fetches the stable Flutter SDK, installs dependencies, and compiles the web bundle (`flutter build web --release --base-href "/"`).
+* **Output Directory**: Configured in `vercel.json` pointing to `build/web`.
 
 ---
 
-## 🚀 الاستضافة والنشر على Vercel عبر GitHub (Vercel + GitHub Deployment)
+## 📜 Scientific Supervision & Credits
 
-### الطريقة الأولى: النشر الآلي عبر GitHub Actions (موصى بها)
-1. قم بإنشاء مستودع جديد على **GitHub** (New Repository).
-2. ادفع الكود إلى المستودع:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Our Resources Flutter Multiplatform App"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-   git push -u origin main
-   ```
-3. في حسابك على **Vercel**:
-   - احصل على `VERCEL_TOKEN` من إعدادات حسابك (Account Settings -> Tokens).
-   - قم بربط المشروع في Vercel، وضع أسرار المشروع في GitHub Secrets:
-     - `VERCEL_TOKEN`
-     - `VERCEL_ORG_ID`
-     - `VERCEL_PROJECT_ID`
-4. عند كل `git push` إلى `main`، سيقوم GitHub Actions ببناء تطبيق Flutter Web ونشره فوراً على Vercel!
+* **Project Supervisor**: Prof. Dr. Abdullah bin Mohammed Al-Amri (*أ. د. عبد الله بن محمد العمري*)
+* **Scientific Organizations**:
+  * Saudi Society of Geosciences (*الجمعية السعودية لعلوم الأرض*)
+  * King Saud University (*جامعة الملك سعود*)
+  * Center for Seismic Studies (*مركز الدراسات الزلزالية*)
+* **Design & Digital Development**: Santoge Technologies
 
-### الطريقة الثانية: الرفع المباشر عبر Vercel CLI
-1. بناء ملفات الويب محلياً:
-   ```bash
-   flutter build web --release
-   ```
-2. النشر المباشر عبر أمر Vercel:
-   ```bash
-   vercel --prod
-   ```
+---
 
+## 📄 License
+
+This software and its associated educational datasets are published for scientific, academic, and exploration purposes.
