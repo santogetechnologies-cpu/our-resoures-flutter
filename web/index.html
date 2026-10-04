@@ -32,7 +32,9 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background-color: #0b0b19;
+      /* Loading screen background — matches wallpaper2.jpg used in StartScreen */
+      background: url('assets/assets/images/wallpaper2.jpg') center center / cover no-repeat;
+      background-color: #F7F4EF; /* fallback if image hasn't loaded yet */
       overflow: hidden;
     }
     .maplibregl-canvas, .mapboxgl-canvas {
@@ -44,6 +46,7 @@
     }
   </style>
 
+
   <script>
     // The value below is injected by flutter build, do not touch.
     const serviceWorkerVersion = null;
@@ -51,7 +54,8 @@
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
-<body style="margin: 0; background-color: #F7F4EF; overflow: hidden;">
+<body style="margin: 0; overflow: hidden; background: url('assets/assets/images/wallpaper2.jpg') center center / cover no-repeat; background-color: #F7F4EF;">
+
   <script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
