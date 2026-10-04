@@ -57,16 +57,21 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   const SIZE = 38;
   const resolvedUrl = resolveAssetUrl(iconUrl);
 
+  // MapLibre's Marker attaches translate(X, Y) to `el`. We must NEVER modify `el.style.transform`.
   const el = document.createElement('div');
-  el.style.cssText =
+  el.className = 'mapbox-custom-marker';
+  el.style.cssText = 'pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-select:none;';
+
+  // Inner container for styling, shadow, and scale animations
+  const inner = document.createElement('div');
+  inner.style.cssText =
     `width:${SIZE}px;height:${SIZE}px;` +
     'display:flex;align-items:center;justify-content:center;' +
     'filter:drop-shadow(0 3px 8px rgba(0,0,0,.65));' +
-    'transition:transform .15s ease;pointer-events:auto;cursor:pointer;' +
-    'touch-action:none;'; // prevent browser scroll/pan gesture on the marker
+    'transition:transform .15s ease;pointer-events:auto;';
 
-  el.onmouseenter = () => { el.style.transform = 'scale(1.3)'; };
-  el.onmouseleave = () => { el.style.transform = 'scale(1.0)'; };
+  inner.onmouseenter = () => { inner.style.transform = 'scale(1.25)'; };
+  inner.onmouseleave = () => { inner.style.transform = 'scale(1.0)'; };
 
   const img = document.createElement('img');
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;';
@@ -83,52 +88,54 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
       if (fbIdx <= fallbacks.length) { this.src = fallbacks[fbIdx-1]; return; }
     }
     // Gold dot fallback
-    el.innerHTML =
+    inner.innerHTML =
       '<div style="width:22px;height:22px;background:#D4AF37;border:2px solid #fff;' +
       'border-radius:50%;box-shadow:0 0 10px rgba(212,175,55,.9);"></div>';
   };
 
-  el.appendChild(img);
+  inner.appendChild(img);
+  el.appendChild(inner);
 
   // ── Click (mouse) ──────────────────────────────────────────────────────────
   el.addEventListener('click', e => {
     e.stopPropagation();
-    e.preventDefault();
     if (window[callbackName]) window[callbackName](markerId);
   });
 
   // ── Touch (mobile / tablet) ────────────────────────────────────────────────
-  // Track touch start position so we can distinguish a tap from a drag.
-  let _touchStartX = 0;
-  let _touchStartY = 0;
+  let touchMoved = false;
+  let startX = 0, startY = 0;
 
   el.addEventListener('touchstart', e => {
-    // Block the map from receiving this touch and starting a pan/drag.
-    e.stopPropagation();
-    e.preventDefault();
+    touchMoved = false;
     if (e.touches.length > 0) {
-      _touchStartX = e.touches[0].clientX;
-      _touchStartY = e.touches[0].clientY;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
     }
-    el.style.transform = 'scale(1.3)';
-  }, { passive: false });
+    inner.style.transform = 'scale(1.25)';
+  }, { passive: true });
+
+  el.addEventListener('touchmove', e => {
+    if (e.touches.length > 0) {
+      const dx = Math.abs(e.touches[0].clientX - startX);
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      if (dx > 8 || dy > 8) {
+        touchMoved = true;
+      }
+    }
+  }, { passive: true });
 
   el.addEventListener('touchend', e => {
-    e.stopPropagation();
-    e.preventDefault();
-    el.style.transform = 'scale(1.0)';
-    // Only fire callback if the finger didn't move much (tap, not drag).
-    const dx = e.changedTouches.length > 0 ? Math.abs(e.changedTouches[0].clientX - _touchStartX) : 0;
-    const dy = e.changedTouches.length > 0 ? Math.abs(e.changedTouches[0].clientY - _touchStartY) : 0;
-    if (dx < 10 && dy < 10) {
+    inner.style.transform = 'scale(1.0)';
+    if (!touchMoved) {
+      e.stopPropagation();
       if (window[callbackName]) window[callbackName](markerId);
     }
-  }, { passive: false });
+  });
 
-  el.addEventListener('touchcancel', e => {
-    e.stopPropagation();
-    el.style.transform = 'scale(1.0)';
-  }, { passive: false });
+  el.addEventListener('touchcancel', () => {
+    inner.style.transform = 'scale(1.0)';
+  });
 
   try {
     // anchor:'center' = the element's center sits exactly on [lng,lat]
