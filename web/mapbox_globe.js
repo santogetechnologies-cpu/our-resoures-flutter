@@ -1,7 +1,8 @@
 // 3D Globe Web Bridge for Flutter Web (MapLibre GL JS v5 — Token-Free)
 
-window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
-window.mapboxGlobeMarkers   = window.mapboxGlobeMarkers   || {};
+window.mapboxGlobeInstances  = window.mapboxGlobeInstances  || {};
+window.mapboxGlobeMarkers    = window.mapboxGlobeMarkers    || {};
+window.mapboxGlobePendingCbs = window.mapboxGlobePendingCbs || {};   // queued marker calls
 
 // ---------------------------------------------------------------------------
 // Satellite + Labels base style (ArcGIS / Esri — fully public, no token)
@@ -28,97 +29,144 @@ const ESRI_SATELLITE_GLOBE_STYLE = {
     }
   },
   layers: [
-    { id: 'imagery', type: 'raster', source: 'esri-world-imagery',
-      minzoom: 0, maxzoom: 19 },
+    { id: 'imagery', type: 'raster', source: 'esri-world-imagery', minzoom: 0, maxzoom: 19 },
     { id: 'labels',  type: 'raster', source: 'esri-labels',
       minzoom: 0, maxzoom: 19, paint: { 'raster-opacity': 0.85 } }
   ]
 };
 
 // ---------------------------------------------------------------------------
-// Resolve Flutter Web asset paths  (assets/images/x  →  assets/assets/images/x)
+// Resolve Flutter Web asset path  (Flutter dev server doubles the "assets/" prefix)
+// Input:  "assets/assets/images/x.png"  → "assets/assets/images/x.png"
+// Input:  "assets/images/x.png"         → "assets/assets/images/x.png"
+// Input:  "images/x.png"                → "assets/assets/images/x.png"
 // ---------------------------------------------------------------------------
 function resolveAssetUrl(url) {
   if (!url) return '';
   if (/^(https?:|data:|blob:)/.test(url)) return url;
-  const clean = url.replace(/^\.?\//, '');
+  let clean = url.replace(/^\.?\//, '');
   if (clean.startsWith('assets/assets/')) return clean;
   if (clean.startsWith('assets/'))        return 'assets/' + clean;
   return 'assets/assets/' + clean;
 }
 
 // ---------------------------------------------------------------------------
-// Deep-DOM search (handles Flutter's Shadow-Root iframes / glass-pane)
+// Internal: actually add a single marker to a ready map
 // ---------------------------------------------------------------------------
-function findElementDeep(id) {
-  const direct = document.getElementById(id);
-  if (direct) return direct;
+function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
+  const SIZE = 38;
+  const resolvedUrl = resolveAssetUrl(iconUrl);
 
-  function searchRoot(root) {
-    if (!root) return null;
-    const hit = root.querySelector && root.querySelector('[id="' + id + '"]');
-    if (hit) return hit;
-    const all = root.querySelectorAll ? root.querySelectorAll('*') : [];
-    for (let i = 0; i < all.length; i++) {
-      if (all[i].id === id) return all[i];
-      const inner = all[i].shadowRoot ? searchRoot(all[i].shadowRoot) : null;
-      if (inner) return inner;
-    }
-    return null;
-  }
+  const el = document.createElement('div');
+  el.style.cssText =
+    `width:${SIZE}px;height:${SIZE}px;` +
+    'display:flex;align-items:center;justify-content:center;' +
+    'filter:drop-shadow(0 3px 8px rgba(0,0,0,.65));' +
+    'transition:transform .15s ease;pointer-events:auto;cursor:pointer;';
 
-  const hosts = document.querySelectorAll('flt-glass-pane,flutter-view,flt-platform-view,*');
-  for (let i = 0; i < hosts.length; i++) {
-    if (hosts[i].shadowRoot) {
-      const found = searchRoot(hosts[i].shadowRoot);
-      if (found) return found;
+  el.onmouseenter = () => { el.style.transform = 'scale(1.3)'; };
+  el.onmouseleave = () => { el.style.transform = 'scale(1.0)'; };
+
+  const img = document.createElement('img');
+  img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;';
+  img.src = resolvedUrl;
+
+  // Resilient fallback chain: resolved → raw → assets/raw → dot
+  const fallbacks = [iconUrl, 'assets/' + iconUrl, 'assets/assets/' + iconUrl];
+  let fbIdx = 0;
+  img.onerror = function() {
+    if (fbIdx < fallbacks.length) {
+      const next = fallbacks[fbIdx++];
+      if (next !== this.src) { this.src = next; return; }
+      fbIdx++;
+      if (fbIdx <= fallbacks.length) { this.src = fallbacks[fbIdx-1]; return; }
     }
+    // Gold dot fallback
+    el.innerHTML =
+      '<div style="width:22px;height:22px;background:#D4AF37;border:2px solid #fff;' +
+      'border-radius:50%;box-shadow:0 0 10px rgba(212,175,55,.9);"></div>';
+  };
+
+  el.appendChild(img);
+  el.addEventListener('click', e => {
+    e.stopPropagation();
+    if (window[callbackName]) window[callbackName](markerId);
+  });
+
+  try {
+    // anchor:'center' = the element's center sits exactly on [lng,lat]
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([lng, lat])
+      .addTo(map);
+
+    window.mapboxGlobeMarkers[viewId] = window.mapboxGlobeMarkers[viewId] || [];
+    window.mapboxGlobeMarkers[viewId].push(marker);
+  } catch (e) {
+    console.warn('[Globe] addMarker error:', e);
   }
-  return null;
 }
 
 // ---------------------------------------------------------------------------
-// initMapboxGlobeWeb(viewId, containerEl, lng, lat, zoom, styleJson)
-//   containerEl can be an HTMLElement (passed from Dart) or omitted (null/number)
+// initMapboxGlobeWeb
+//   viewId       – the DOM id of the container element (domId from Dart)
+//   containerEl  – the actual HTMLElement (passed from Dart via js interop)
+//   lng, lat, zoom – initial camera
 // ---------------------------------------------------------------------------
 window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat, initialZoom) {
   let lng = initialLng, lat = initialLat, zoom = initialZoom;
   let targetContainer = null;
 
-  if (containerEl && (containerEl instanceof HTMLElement || containerEl.nodeType === 1)) {
+  if (containerEl && (typeof HTMLElement !== 'undefined') &&
+      (containerEl instanceof HTMLElement || containerEl.nodeType === 1)) {
     targetContainer = containerEl;
   } else if (typeof containerEl === 'number') {
-    // Called with old 5-arg signature (no containerEl)
+    // Old 5-arg call (no containerEl)
     lng = containerEl; lat = initialLng; zoom = initialLat;
+  }
+
+  // Also accept the div by ID immediately (sometimes JS receives it before Dart interop resolves)
+  if (!targetContainer) {
+    targetContainer = document.getElementById(viewId);
   }
 
   let attempts = 0;
   function tryInit() {
-    if (++attempts > 60) {
-      console.warn('[Globe] Container not found for', viewId);
+    if (++attempts > 80) {
+      console.warn('[Globe] Giving up on container', viewId);
       return;
     }
+    if (!targetContainer) {
+      targetContainer = document.getElementById(viewId);
+    }
+    // Deep shadow-DOM search as last resort
+    if (!targetContainer) {
+      const all = document.querySelectorAll('*');
+      for (let i = 0; i < all.length; i++) {
+        if (all[i].id === viewId) { targetContainer = all[i]; break; }
+        if (all[i].shadowRoot) {
+          const hit = all[i].shadowRoot.querySelector('[id="' + viewId + '"]');
+          if (hit) { targetContainer = hit; break; }
+        }
+      }
+    }
 
-    if (!targetContainer) targetContainer = findElementDeep(viewId);
     if (!targetContainer || typeof maplibregl === 'undefined') {
       return setTimeout(tryInit, 80);
     }
 
-    // Style the container
+    // Style container to fill its slot
     Object.assign(targetContainer.style, {
       width: '100%', height: '100%',
-      position: 'absolute', inset: '0',
+      position: 'absolute', top: '0', left: '0', right: '0', bottom: '0',
       overflow: 'hidden', backgroundColor: '#0b0b19'
     });
 
-    // Destroy previous instance for this viewId
+    // Destroy existing instance
     if (window.mapboxGlobeInstances[viewId]) {
       try { window.mapboxGlobeInstances[viewId].remove(); } catch (_) {}
+      delete window.mapboxGlobeInstances[viewId];
     }
 
-    // -----------------------------------------------------------------------
-    // Create MapLibre v5 Map  (no token needed)
-    // -----------------------------------------------------------------------
     const map = new maplibregl.Map({
       container:          targetContainer,
       style:              ESRI_SATELLITE_GLOBE_STYLE,
@@ -128,46 +176,43 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       attributionControl: false
     });
 
-    // -----------------------------------------------------------------------
-    // Apply 3D Globe + Atmosphere after style loads  (MapLibre v5 API)
-    // -----------------------------------------------------------------------
     map.on('style.load', () => {
-      // Globe projection — MapLibre v5 API
-      try { map.setProjection({ type: 'globe' }); } catch(e) {
-        console.warn('[Globe] setProjection failed:', e);
+      // Globe projection (MapLibre v5 API)
+      try { map.setProjection({ type: 'globe' }); } catch (e) {
+        console.warn('[Globe] setProjection:', e);
       }
-
-      // Atmospheric sky / fog
+      // Atmosphere
       try {
         map.setFog({
-          'range':            [0.5, 10],
-          'color':            'rgb(186,210,235)',
-          'high-color':       'rgb(36,92,223)',
-          'horizon-blend':    0.05,
-          'space-color':      'rgb(11,11,25)',
-          'star-intensity':   0.6
+          'range':          [0.5, 10],
+          'color':          'rgb(186,210,235)',
+          'high-color':     'rgb(36,92,223)',
+          'horizon-blend':  0.05,
+          'space-color':    'rgb(11,11,25)',
+          'star-intensity': 0.6
         });
-      } catch (e) {
-        console.warn('[Globe] setFog failed:', e);
-      }
-
+      } catch (_) {}
       map.resize();
+
+      // ── Flush any markers that arrived before the map was ready ──
+      window.mapboxGlobeInstances[viewId] = map;   // mark ready BEFORE flush
+      const pending = window.mapboxGlobePendingCbs[viewId] || [];
+      pending.forEach(fn => fn(map));
+      delete window.mapboxGlobePendingCbs[viewId];
     });
 
     map.on('error', e => {
-      const status = e && e.error && e.error.status;
-      if (status && status !== 401 && status !== 404) console.warn('[Globe] Map error:', e);
+      const s = e && e.error && e.error.status;
+      if (s && s !== 401 && s !== 404) console.warn('[Globe] error:', e);
     });
 
-    window.mapboxGlobeInstances[viewId] = map;
+    window.mapboxGlobeInstances[viewId] = map;   // also set immediately for resize calls
     window.mapboxGlobeMarkers[viewId]   = [];
 
-    // Progressive resize bursts (Flutter canvas settles over ~2 s)
+    // Progressive resize
     [50, 150, 300, 600, 1200, 2000].forEach(d =>
       setTimeout(() => { try { map.resize(); } catch (_) {} }, d)
     );
-
-    // Continuous resize via ResizeObserver
     if (typeof ResizeObserver !== 'undefined') {
       new ResizeObserver(() => { try { map.resize(); } catch (_) {} })
         .observe(targetContainer);
@@ -185,11 +230,11 @@ window.mapboxGlobeFlyToWeb = function(viewId, lng, lat, zoom) {
   if (!map) return;
   try {
     map.flyTo({ center: [lng, lat], zoom: zoom || 6.0, essential: true, duration: 1500 });
-  } catch (e) { console.warn('[Globe] flyTo error:', e); }
+  } catch (e) { console.warn('[Globe] flyTo:', e); }
 };
 
 // ---------------------------------------------------------------------------
-// setStyle — ignores Mapbox-proprietary styles; falls back gracefully
+// setStyle — strips mapbox:// sources that need a token
 // ---------------------------------------------------------------------------
 window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
   const map = window.mapboxGlobeInstances[viewId];
@@ -197,34 +242,29 @@ window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
   try {
     const parsed = JSON.parse(styleJsonStr || '');
     if (parsed && parsed.version) {
-      // Strip out mapbox:// sources that won't work without a valid token
-      if (parsed.sources) {
-        Object.keys(parsed.sources).forEach(key => {
-          const src = parsed.sources[key];
-          if (src.url && src.url.startsWith('mapbox://')) delete parsed.sources[key];
-          if (src.tiles) {
-            src.tiles = src.tiles.filter(t => !t.startsWith('mapbox://'));
-            if (!src.tiles.length) delete parsed.sources[key];
-          }
-        });
-      }
-      // Filter layers that reference removed sources
+      // Remove mapbox:// sources
+      Object.keys(parsed.sources || {}).forEach(k => {
+        const s = parsed.sources[k];
+        const hasMapboxUrl   = s.url   && s.url.startsWith('mapbox://');
+        const hasMapboxTiles = s.tiles && s.tiles.some(t => t.startsWith('mapbox://'));
+        if (hasMapboxUrl || hasMapboxTiles) delete parsed.sources[k];
+      });
+      // Remove layers referencing deleted sources
       if (parsed.layers) {
-        const validSources = new Set(Object.keys(parsed.sources || {}));
-        parsed.layers = parsed.layers.filter(l => !l.source || validSources.has(l.source));
+        const ok = new Set(Object.keys(parsed.sources || {}));
+        parsed.layers = parsed.layers.filter(l => !l.source || ok.has(l.source));
       }
-      // Re-inject satellite tiles if nothing is left
+      // If nothing is left after stripping, use base satellite
       if (!parsed.sources || !Object.keys(parsed.sources).length) {
         parsed.sources = ESRI_SATELLITE_GLOBE_STYLE.sources;
         parsed.layers  = ESRI_SATELLITE_GLOBE_STYLE.layers;
       }
       map.setStyle(parsed);
-      // Re-apply globe after style swap
       map.once('style.load', () => {
         try { map.setProjection({ type: 'globe' }); } catch (_) {}
         try {
           map.setFog({
-            'range': [0.5, 10], 'color': 'rgb(186,210,235)',
+            'range': [0.5,10], 'color': 'rgb(186,210,235)',
             'high-color': 'rgb(36,92,223)', 'horizon-blend': 0.05,
             'space-color': 'rgb(11,11,25)', 'star-intensity': 0.6
           });
@@ -238,78 +278,38 @@ window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
 };
 
 // ---------------------------------------------------------------------------
-// Markers — clear
+// Clear markers
 // ---------------------------------------------------------------------------
 window.mapboxGlobeClearMarkersWeb = function(viewId) {
-  const markers = window.mapboxGlobeMarkers[viewId];
-  if (!Array.isArray(markers)) return;
-  markers.forEach(m => { try { m.remove(); } catch (_) {} });
+  (window.mapboxGlobeMarkers[viewId] || []).forEach(m => { try { m.remove(); } catch (_) {} });
   window.mapboxGlobeMarkers[viewId] = [];
+  // Also clear any pending queue
+  delete window.mapboxGlobePendingCbs[viewId];
 };
 
 // ---------------------------------------------------------------------------
-// Markers — add
-//   The key fix for "scattering": anchor the marker element to its CENTER
-//   so it sits exactly on the coordinate, not at the top-left corner.
+// Add marker — queues call if the map isn't ready yet
 // ---------------------------------------------------------------------------
 window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, callbackName) {
   const map = window.mapboxGlobeInstances[viewId];
-  if (!map) return;
 
-  const SIZE = 36;
-  const resolvedUrl = resolveAssetUrl(iconUrl);
-
-  // Outer wrapper — MUST be 0×0 so the marker anchor = center of the icon
-  const wrapper = document.createElement('div');
-  wrapper.style.cssText =
-    'position:relative;width:0;height:0;overflow:visible;cursor:pointer;';
-
-  // Icon div — centred via negative margin
-  const el = document.createElement('div');
-  el.className = 'mapbox-custom-marker';
-  el.style.cssText =
-    `width:${SIZE}px;height:${SIZE}px;` +
-    `position:absolute;top:-${SIZE/2}px;left:-${SIZE/2}px;` +
-    'display:flex;align-items:center;justify-content:center;' +
-    'filter:drop-shadow(0 3px 6px rgba(0,0,0,.55));' +
-    'transition:transform .15s ease;pointer-events:auto;';
-
-  el.onmouseenter = () => { el.style.transform = 'scale(1.3)'; };
-  el.onmouseleave = () => { el.style.transform = 'scale(1.0)'; };
-
-  const img = document.createElement('img');
-  img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;';
-  img.src = resolvedUrl;
-
-  let _retry = 0;
-  const fallbackPaths = [iconUrl, 'assets/' + iconUrl, 'assets/assets/' + iconUrl];
-  img.onerror = function() {
-    if (_retry < fallbackPaths.length) { this.src = fallbackPaths[_retry++]; }
-    else {
-      // Gold dot fallback
-      el.innerHTML =
-        '<div style="width:20px;height:20px;background:#D4AF37;border:2px solid #fff;' +
-        'border-radius:50%;box-shadow:0 0 8px rgba(212,175,55,.8);"></div>';
-    }
-  };
-
-  el.appendChild(img);
-  wrapper.appendChild(el);
-
-  wrapper.addEventListener('click', e => {
-    e.stopPropagation();
-    if (window[callbackName]) window[callbackName](markerId);
-  });
-
-  try {
-    // anchor:'center' ensures the marker point = exact [lng,lat]
-    const marker = new maplibregl.Marker({ element: wrapper, anchor: 'center' })
-      .setLngLat([lng, lat])
-      .addTo(map);
-
-    window.mapboxGlobeMarkers[viewId] = window.mapboxGlobeMarkers[viewId] || [];
-    window.mapboxGlobeMarkers[viewId].push(marker);
-  } catch (e) {
-    console.warn('[Globe] addMarker error:', e);
+  // Map is ready → add immediately
+  if (map && map.loaded && map.loaded()) {
+    _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName);
+    return;
   }
+
+  // Map exists but style not loaded yet → wait for load event
+  if (map) {
+    map.once('load', () => _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName));
+    return;
+  }
+
+  // Map not initialised yet → queue and execute when initMapboxGlobeWeb fires
+  if (!window.mapboxGlobePendingCbs[viewId]) {
+    window.mapboxGlobePendingCbs[viewId] = [];
+  }
+  window.mapboxGlobePendingCbs[viewId].push(
+    readyMap => _doAddMarker(readyMap, viewId, lng, lat, iconUrl, markerId, callbackName)
+  );
 };

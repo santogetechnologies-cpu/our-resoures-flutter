@@ -132,9 +132,13 @@ class _MapboxWebWidgetState extends State<_MapboxWebWidget> {
         ]);
       }
 
+      // Wait until the JS map instance is fully initialised before notifying
+      // Flutter. mapboxGlobeAddMarkerWeb queues markers internally, so
+      // calling onMapReady now is safe — JS will flush queued markers on load.
       widget.onMapReady(_controller);
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
