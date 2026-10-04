@@ -80,23 +80,29 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           errorBuilder: (c, e, s) => const SizedBox(width: 140),
                         ),
 
-                        // Center Arabic Title: ثرواتنا من أرضنا
+                        // Center Arabic Title: ثرواتنا من أرضنا (Doubled font size with responsive scaling)
                         const Expanded(
-                          child: Text(
-                            'ثرواتنا من أرضنا',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'NotoKufi',
-                              fontSize: 42,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF6B3A22),
-                              shadows: [
-                                Shadow(
-                                  color: Colors.white,
-                                  offset: Offset(0, 1),
-                                  blurRadius: 6,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'ثرواتنا من أرضنا',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'NotoKufi',
+                                  fontSize: 84,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF6B3A22),
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.white,
+                                      offset: Offset(0, 2),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
