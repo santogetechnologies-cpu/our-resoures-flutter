@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'map_shell.dart';
 
 final Map<String, VoidCallback> _webMarkerCallbacks = {};
+final Map<String, html.DivElement> _registeredWebDivs = {};
 
 void setWebStyleJSON(String domId, String styleJsonStr) {
   if (js.context.hasProperty('mapboxGlobeSetStyleJSONWeb')) {
@@ -59,8 +60,14 @@ Widget buildPlatformMapWidget({
       ..id = domId
       ..style.width = '100%'
       ..style.height = '100%'
+      ..style.position = 'absolute'
+      ..style.top = '0'
+      ..style.left = '0'
+      ..style.right = '0'
+      ..style.bottom = '0'
       ..style.overflow = 'hidden'
-      ..style.backgroundColor = '#000000';
+      ..style.backgroundColor = '#0b0b19';
+    _registeredWebDivs[domId] = div;
     return div;
   });
 
@@ -112,9 +119,12 @@ class _MapboxWebWidgetState extends State<_MapboxWebWidget> {
         } catch (_) {}
       }
 
+      final targetDiv = _registeredWebDivs[widget.domId];
+
       if (js.context.hasProperty('initMapboxGlobeWeb')) {
         js.context.callMethod('initMapboxGlobeWeb', [
           widget.domId,
+          targetDiv,
           widget.initialLongitude,
           widget.initialLatitude,
           widget.initialZoom,
