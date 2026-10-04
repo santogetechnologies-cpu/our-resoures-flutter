@@ -70,9 +70,15 @@ class MapShellController {
     required VoidCallback onTap,
   }) {
     if (kIsWeb && webDomId != null) {
-      addMarkerWeb(webDomId!, longitude, latitude, iconAsset, id, onTap);
+      // Flutter Web serves bundled assets under 'assets/<asset-path>'
+      // e.g. 'assets/images/oil_marker.png' → 'assets/assets/images/oil_marker.png'
+      final webUrl = iconAsset.startsWith('assets/')
+          ? 'assets/$iconAsset'
+          : iconAsset;
+      addMarkerWeb(webDomId!, longitude, latitude, webUrl, id, onTap);
     }
   }
+
 
   void clearWebMarkers() {
     if (kIsWeb && webDomId != null) {
