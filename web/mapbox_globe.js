@@ -62,7 +62,8 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
     `width:${SIZE}px;height:${SIZE}px;` +
     'display:flex;align-items:center;justify-content:center;' +
     'filter:drop-shadow(0 3px 8px rgba(0,0,0,.65));' +
-    'transition:transform .15s ease;pointer-events:auto;cursor:pointer;';
+    'transition:transform .15s ease;pointer-events:auto;cursor:pointer;' +
+    'touch-action:none;'; // prevent browser scroll/pan gesture on the marker
 
   el.onmouseenter = () => { el.style.transform = 'scale(1.3)'; };
   el.onmouseleave = () => { el.style.transform = 'scale(1.0)'; };
@@ -88,10 +89,46 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   };
 
   el.appendChild(img);
+
+  // ── Click (mouse) ──────────────────────────────────────────────────────────
   el.addEventListener('click', e => {
     e.stopPropagation();
+    e.preventDefault();
     if (window[callbackName]) window[callbackName](markerId);
   });
+
+  // ── Touch (mobile / tablet) ────────────────────────────────────────────────
+  // Track touch start position so we can distinguish a tap from a drag.
+  let _touchStartX = 0;
+  let _touchStartY = 0;
+
+  el.addEventListener('touchstart', e => {
+    // Block the map from receiving this touch and starting a pan/drag.
+    e.stopPropagation();
+    e.preventDefault();
+    if (e.touches.length > 0) {
+      _touchStartX = e.touches[0].clientX;
+      _touchStartY = e.touches[0].clientY;
+    }
+    el.style.transform = 'scale(1.3)';
+  }, { passive: false });
+
+  el.addEventListener('touchend', e => {
+    e.stopPropagation();
+    e.preventDefault();
+    el.style.transform = 'scale(1.0)';
+    // Only fire callback if the finger didn't move much (tap, not drag).
+    const dx = e.changedTouches.length > 0 ? Math.abs(e.changedTouches[0].clientX - _touchStartX) : 0;
+    const dy = e.changedTouches.length > 0 ? Math.abs(e.changedTouches[0].clientY - _touchStartY) : 0;
+    if (dx < 10 && dy < 10) {
+      if (window[callbackName]) window[callbackName](markerId);
+    }
+  }, { passive: false });
+
+  el.addEventListener('touchcancel', e => {
+    e.stopPropagation();
+    el.style.transform = 'scale(1.0)';
+  }, { passive: false });
 
   try {
     // anchor:'center' = the element's center sits exactly on [lng,lat]
@@ -299,9 +336,9 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
     return;
   }
 
-  // Map exists but style not loaded yet → wait for load event
+  // Map exists but style not loaded yet → wait for style.load event
   if (map) {
-    map.once('load', () => _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName));
+    map.once('style.load', () => _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName));
     return;
   }
 

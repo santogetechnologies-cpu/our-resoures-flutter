@@ -22,11 +22,15 @@ void flyToWeb(String domId, double lng, double lat, double zoom) {
 }
 
 void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String markerId, VoidCallback onTap) {
+  // callbackKey must be unique per marker+page so that two pages with the
+  // same markerId values don't overwrite each other's callbacks.
   final callbackKey = 'mapbox_marker_cb_${markerId}_$domId';
-  _webMarkerCallbacks[markerId] = onTap;
+  _webMarkerCallbacks[callbackKey] = onTap; // ← keyed by full callbackKey
 
   js.context[callbackKey] = (String id) {
-    final cb = _webMarkerCallbacks[id];
+    // JS passes markerId; reconstruct the full key to look up the callback.
+    final key = 'mapbox_marker_cb_${id}_$domId';
+    final cb = _webMarkerCallbacks[key];
     if (cb != null) {
       cb();
     }
