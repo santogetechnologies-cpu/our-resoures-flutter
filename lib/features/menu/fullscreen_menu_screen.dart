@@ -60,7 +60,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 27, // Increased by 40% from 19
+                    fontSize: 27, // Increased by 40%
                     fontWeight: FontWeight.w600,
                     color: AppColors.textDark,
                   ),
@@ -159,7 +159,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 27, // Increased by 40% from 19
+                    fontSize: 27, // Increased by 40%
                     fontWeight: FontWeight.w600,
                     color: AppColors.textDark,
                   ),
@@ -220,16 +220,16 @@ class FullscreenMenuScreen extends StatelessWidget {
                             errorBuilder: (c, e, s) => const SizedBox(width: 80),
                           ),
 
-                          // Centered Title (Increased Arabic text size by 40% to 40px)
+                          // Centered Title: المنصة التفاعلية للأرض والطبيعة والتراث
                           const Expanded(
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                'علوم الأرض في خدمة الجميع',
+                                'المنصة التفاعلية للأرض والطبيعة والتراث',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'NotoKufi',
-                                  fontSize: 40, // Increased by 40% from 28
+                                  fontSize: 40, // Increased by 40%
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textBlack,
                                 ),
@@ -251,7 +251,7 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                     const SizedBox(height: 6),
 
-                    // Centered, non-full-length button for "ثرواتنا من أرضنا" (Arabic only)
+                    // Centered, non-full-length button for "ثرواتنا من أرضنا"
                     _buildCompactBannerButton(
                       context: context,
                       width: 340,
@@ -261,19 +261,19 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                     const SizedBox(height: 6),
 
-                    // Main 2-Column Grid (10 Category Buttons with reduced height & Arabic only)
+                    // Main 2-Column Grid (10 Category Buttons with exact order matching reference image)
                     // In RTL:
                     // Column 1 (Visual Right - Odd: 1, 3, 5, 7, 9):
                     // 1: الاستشعار عن بعد وال GIS
-                    // 3: مواقع المعادن الاقتصادية
-                    // 5: مصادر المياه والتحديات
+                    // 3: المعادن الاقتصادية ومواقعها
+                    // 5: المياه والأودية والسدود
                     // 7: المحميات الطبيعية
                     // 9: الموسوعات والكتب
                     //
                     // Column 2 (Visual Left - Even: 2, 4, 6, 8, 10):
                     // 2: جيولوجية و جيومورفولوجية المملكة
-                    // 4: الطاقة المتجددة و تقنياتها
-                    // 6: المواقع الاثرية والقرى التراثية
+                    // 4: الطاقة المتجددة وتطبيقاتها
+                    // 6: القرى التراثية والمواقع الاثرية
                     // 8: استراتيجية المخاطر الطبيعية
                     // 10: قاعدة البيانات الزلزالية
                     Padding(
@@ -310,21 +310,21 @@ class FullscreenMenuScreen extends StatelessWidget {
                           // Row 2 (3 & 4)
                           Row(
                             children: [
-                              // Right (3): مواقع المعادن الاقتصادية
+                              // Right (3): المعادن الاقتصادية ومواقعها
                               Expanded(
                                 child: _buildCategoryButton(
                                   context: context,
-                                  title: 'مواقع المعادن الاقتصادية',
+                                  title: 'المعادن الاقتصادية ومواقعها',
                                   height: 38,
                                   onTap: () => _navigate(context, const MaterialsScreen()),
                                 ),
                               ),
                               const SizedBox(width: 20),
-                              // Left (4): الطاقة المتجددة و تقنياتها
+                              // Left (4): الطاقة المتجددة وتطبيقاتها
                               Expanded(
                                 child: _buildCategoryButton(
                                   context: context,
-                                  title: 'الطاقة المتجددة و تقنياتها',
+                                  title: 'الطاقة المتجددة وتطبيقاتها',
                                   height: 38,
                                   onTap: () => _navigate(context, const OilGasScreen()),
                                 ),
@@ -336,21 +336,21 @@ class FullscreenMenuScreen extends StatelessWidget {
                           // Row 3 (5 & 6)
                           Row(
                             children: [
-                              // Right (5): مصادر المياه والتحديات
+                              // Right (5): المياه والأودية والسدود
                               Expanded(
                                 child: _buildCategoryButton(
                                   context: context,
-                                  title: 'مصادر المياه والتحديات',
+                                  title: 'المياه والأودية والسدود',
                                   height: 38,
                                   onTap: () => _navigate(context, const WaterFormationsScreen()),
                                 ),
                               ),
                               const SizedBox(width: 20),
-                              // Left (6): المواقع الاثرية والقرى التراثية
+                              // Left (6): القرى التراثية والمواقع الاثرية
                               Expanded(
                                 child: _buildCategoryButton(
                                   context: context,
-                                  title: 'المواقع الاثرية والقرى التراثية',
+                                  title: 'القرى التراثية والمواقع الاثرية',
                                   height: 38,
                                   onTap: () => _navigate(context, const TourismScreen()),
                                 ),
