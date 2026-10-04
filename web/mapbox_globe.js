@@ -1,4 +1,4 @@
-// 3D Globe Web Bridge for Flutter Web
+// 3D Globe Web Bridge for Flutter Web (MapLibre v4 / Mapbox GL)
 
 window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
 window.mapboxGlobeMarkers = window.mapboxGlobeMarkers || {};
@@ -46,20 +46,32 @@ const ESRI_SATELLITE_GLOBE_STYLE = {
   ]
 };
 
-// Helper to find DOM elements across Shadow DOM boundaries in Flutter Web (CanvasKit / HTML / multi-view)
+function resolveAssetUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+    return url;
+  }
+  let clean = url.replace(/^\.?\//, '');
+  if (clean.startsWith('assets/assets/')) {
+    return clean;
+  }
+  if (clean.startsWith('assets/')) {
+    return 'assets/' + clean;
+  }
+  return 'assets/assets/' + clean;
+}
+
+// Helper to find DOM elements across Shadow DOM boundaries in Flutter Web
 function findElementDeep(id) {
   if (!id) return null;
-  // 1. Direct getElementById
   let el = document.getElementById(id);
   if (el) return el;
 
-  // 2. Query selector
   try {
     el = document.querySelector('#' + CSS.escape(id)) || document.querySelector('[id="' + id + '"]');
     if (el) return el;
   } catch (_) {}
 
-  // 3. Recursive Shadow Root search
   function searchShadow(root) {
     if (!root) return null;
     const direct = root.querySelector ? root.querySelector('[id="' + id + '"]') : null;
@@ -89,7 +101,6 @@ function findElementDeep(id) {
 }
 
 window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat, initialZoom, initialStyleJson) {
-  // Allow signature flexibility: (viewId, initialLng, initialLat, initialZoom, initialStyleJson) OR (viewId, containerEl, initialLng, initialLat, initialZoom, initialStyleJson)
   let lng = initialLng;
   let lat = initialLat;
   let zoom = initialZoom;
@@ -99,7 +110,6 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
   if (containerEl && (containerEl instanceof HTMLElement || containerEl.nodeType === 1)) {
     targetContainer = containerEl;
   } else if (typeof containerEl === 'number') {
-    // containerEl was actually initialLng
     lng = containerEl;
     lat = initialLng;
     zoom = initialLat;
@@ -107,7 +117,7 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
   }
 
   let attempts = 0;
-  const maxAttempts = 40;
+  const maxAttempts = 50;
 
   function tryInit() {
     attempts++;
@@ -116,55 +126,67 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       targetContainer = findElementDeep(viewId);
     }
 
-    if (!targetContainer || typeof mapboxgl === 'undefined') {
+    const MapEngine = (typeof maplibregl !== 'undefined') ? maplibregl : (typeof mapboxgl !== 'undefined' ? mapboxgl : null);
+
+    if (!targetContainer || !MapEngine) {
       if (attempts < maxAttempts) {
-        setTimeout(tryInit, 100);
+        setTimeout(tryInit, 80);
       } else {
-        console.warn("Could not find container or mapboxgl for viewId:", viewId);
+        console.warn("Could not find container or map engine for viewId:", viewId);
       }
       return;
     }
 
-    // Ensure container has fill styles
+    // Ensure container styling
     targetContainer.style.width = '100%';
     targetContainer.style.height = '100%';
     targetContainer.style.position = 'relative';
     targetContainer.style.overflow = 'hidden';
     targetContainer.style.backgroundColor = '#0b0b19';
 
-    // If an instance already exists for this viewId, remove it first
+    // Remove any previous instance on the same container
     if (window.mapboxGlobeInstances[viewId]) {
       try {
         window.mapboxGlobeInstances[viewId].remove();
       } catch (_) {}
     }
 
-    mapboxgl.accessToken = 'pk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
-    if (mapboxgl.config) {
-      mapboxgl.config.EVENTS_URL = null;
+    // Configure token for Mapbox if Mapbox GL is active
+    if (typeof mapboxgl !== 'undefined' && MapEngine === mapboxgl) {
+      mapboxgl.accessToken = 'pk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
+      if (mapboxgl.config) {
+        mapboxgl.config.EVENTS_URL = null;
+      }
     }
 
-    const map = new mapboxgl.Map({
+    const map = new MapEngine.Map({
       container: targetContainer,
       style: ESRI_SATELLITE_GLOBE_STYLE,
       center: [lng || 47.189224, lat || 24.694291],
       zoom: zoom || 3.8,
-      projection: 'globe',
+      projection: (typeof maplibregl !== 'undefined') ? { type: 'globe' } : 'globe',
       renderWorldCopies: false,
       attributionControl: false
     });
 
     const applyAtmosphere = () => {
       try {
-        map.setFog({
-          'color': 'rgb(186, 210, 235)',
-          'high-color': 'rgb(36, 92, 223)',
-          'horizon-blend': 0.02,
-          'space-color': 'rgb(11, 11, 25)',
-          'star-intensity': 0.6
-        });
+        if (map.setProjection) {
+          map.setProjection({ type: 'globe' });
+        }
+      } catch (_) {}
+      try {
+        if (map.setFog) {
+          map.setFog({
+            'color': 'rgb(186, 210, 235)',
+            'high-color': 'rgb(36, 92, 223)',
+            'horizon-blend': 0.02,
+            'space-color': 'rgb(11, 11, 25)',
+            'star-intensity': 0.6
+          });
+        }
       } catch (e) {
-        console.warn("Could not set fog atmosphere:", e);
+        console.warn("Fog setting:", e);
       }
     };
 
@@ -175,16 +197,16 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     });
 
     map.on('error', (e) => {
-      if (e && e.error && e.error.status !== 401) {
-        console.warn("Mapbox event:", e);
+      if (e && e.error && e.error.status !== 401 && e.error.status !== 404) {
+        console.warn("Map event:", e);
       }
     });
 
     window.mapboxGlobeInstances[viewId] = map;
     window.mapboxGlobeMarkers[viewId] = [];
 
-    // Trigger multiple resize checks as Flutter completes layout & sizing
-    [50, 150, 300, 600, 1200].forEach(delay => {
+    // Trigger progressive resize cycles as Flutter completes canvas layout
+    [50, 150, 300, 600, 1200, 2000].forEach(delay => {
       setTimeout(() => {
         try {
           map.resize();
@@ -231,14 +253,12 @@ window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
       if (typeof styleJsonStr === 'string' && styleJsonStr.trim().length > 10) {
         const parsed = JSON.parse(styleJsonStr);
         if (parsed && parsed.version) {
-          // If style does not have esri-world-imagery or relies purely on broken mapbox urls,
-          // ensure globe projection and imagery stay intact
           parsed.projection = parsed.projection || { name: 'globe' };
           map.setStyle(parsed);
         }
       }
     } catch (e) {
-      console.warn("Error setting custom map style, falling back to base satellite:", e);
+      console.warn("Falling back to base satellite style:", e);
       try {
         map.setStyle(ESRI_SATELLITE_GLOBE_STYLE);
       } catch (_) {}
@@ -262,15 +282,42 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
 
+  const resolvedUrl = resolveAssetUrl(iconUrl);
+
   const el = document.createElement('div');
   el.className = 'mapbox-custom-marker';
-  el.style.width = '32px';
-  el.style.height = '32px';
+  el.style.width = '36px';
+  el.style.height = '36px';
   el.style.cursor = 'pointer';
-  el.style.backgroundImage = 'url(' + iconUrl + ')';
-  el.style.backgroundSize = 'contain';
-  el.style.backgroundRepeat = 'no-repeat';
-  el.style.backgroundPosition = 'center';
+  el.style.display = 'flex';
+  el.style.alignItems = 'center';
+  el.style.justifyContent = 'center';
+  el.style.filter = 'drop-shadow(0px 3px 6px rgba(0,0,0,0.5))';
+  el.style.transition = 'transform 0.15s ease';
+
+  el.onmouseenter = () => { el.style.transform = 'scale(1.25)'; };
+  el.onmouseleave = () => { el.style.transform = 'scale(1.0)'; };
+
+  const img = document.createElement('img');
+  img.src = resolvedUrl;
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'contain';
+
+  // Resilient fallback if asset path differs
+  img.onerror = function() {
+    if (!this._retriedDirect) {
+      this._retriedDirect = true;
+      this.src = iconUrl;
+    } else if (!this._retriedAssets) {
+      this._retriedAssets = true;
+      this.src = 'assets/' + iconUrl;
+    } else {
+      el.innerHTML = '<div style="width:22px;height:22px;background:#D4AF37;border:2px solid #ffffff;border-radius:50%;box-shadow:0 0 8px rgba(212,175,55,0.8);"></div>';
+    }
+  };
+
+  el.appendChild(img);
 
   el.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -279,8 +326,9 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
     }
   });
 
+  const MapEngine = (typeof maplibregl !== 'undefined') ? maplibregl : mapboxgl;
   try {
-    const marker = new mapboxgl.Marker({ element: el })
+    const marker = new MapEngine.Marker({ element: el })
       .setLngLat([lng, lat])
       .addTo(map);
 
