@@ -148,6 +148,7 @@ class _MapShellState extends State<MapShell> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
+        backgroundColor: const Color(0xFF0B0B19),
         body: LayoutBuilder(
           builder: (context, constraints) {
             final effectiveSidebarWidth = constraints.maxWidth < 600
@@ -156,12 +157,8 @@ class _MapShellState extends State<MapShell> {
 
             return Stack(
               children: [
-                // Platform-specific 3D Globe Map (Web / Mobile) - only covers map viewport, not sidebar
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  right: effectiveSidebarWidth,
+                // Platform-specific 3D Globe Map fills the full screen behind the UI
+                Positioned.fill(
                   child: buildPlatformMapWidget(
                     viewId: _viewId,
                     initialLongitude: widget.initialLongitude,

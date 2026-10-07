@@ -261,6 +261,55 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       new ResizeObserver(() => { try { map.resize(); } catch (_) {} })
         .observe(targetContainer);
     }
+
+    // ── Interaction Guard: Isolate Sidebar from Globe ─────────────────────────
+    // Prevent the globe from zooming, panning, or moving when the user scrolls
+    // or interacts with the right-side sidebar menu.
+    function isPointerOverSidebar(e) {
+      const w = window.innerWidth;
+      const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 355;
+      let clientX = e.clientX;
+      if (clientX === undefined && e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+      }
+      if (clientX === undefined && e.changedTouches && e.changedTouches.length > 0) {
+        clientX = e.changedTouches[0].clientX;
+      }
+      return clientX !== undefined && clientX >= (w - sidebarWidth);
+    }
+
+    function setGlobeInteractions(enabled) {
+      if (!map) return;
+      try {
+        if (enabled) {
+          if (map.scrollZoom && !map.scrollZoom.isEnabled()) map.scrollZoom.enable();
+          if (map.dragPan && !map.dragPan.isEnabled()) map.dragPan.enable();
+          if (map.dragRotate && !map.dragRotate.isEnabled()) map.dragRotate.enable();
+          if (map.touchZoomRotate && !map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
+        } else {
+          if (map.scrollZoom && map.scrollZoom.isEnabled()) map.scrollZoom.disable();
+          if (map.dragPan && map.dragPan.isEnabled()) map.dragPan.disable();
+          if (map.dragRotate && map.dragRotate.isEnabled()) map.dragRotate.disable();
+          if (map.touchZoomRotate && map.touchZoomRotate.isEnabled()) map.touchZoomRotate.disable();
+        }
+      } catch (_) {}
+    }
+
+    const onPointerCheck = (e) => {
+      const overSidebar = isPointerOverSidebar(e);
+      setGlobeInteractions(!overSidebar);
+      if (overSidebar && (e.type === 'wheel' || e.type === 'pointerdown' || e.type === 'touchstart' || e.type === 'mousedown')) {
+        e.stopPropagation();
+      }
+    };
+
+    window.addEventListener('mousemove', onPointerCheck, { passive: true });
+    window.addEventListener('pointermove', onPointerCheck, { passive: true });
+    window.addEventListener('wheel', onPointerCheck, { capture: true, passive: true });
+    window.addEventListener('touchstart', onPointerCheck, { capture: true, passive: true });
+    window.addEventListener('touchmove', onPointerCheck, { capture: true, passive: true });
+    targetContainer.addEventListener('wheel', onPointerCheck, { capture: true, passive: false });
+    targetContainer.addEventListener('pointerdown', onPointerCheck, { capture: true, passive: true });
   }
 
   tryInit();
