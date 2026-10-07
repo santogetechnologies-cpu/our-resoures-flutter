@@ -233,56 +233,51 @@ class _MapShellState extends State<MapShell> {
                   top: 0,
                   bottom: 0,
                   width: effectiveSidebarWidth,
-                  child: Listener(
-                    behavior: HitTestBehavior.opaque,
-                    onPointerSignal: (_) {
-                      // Absorb pointer scroll events so they don't propagate to map
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        image: const DecorationImage(
-                          image: AssetImage(AppAssets.wallpaper),
-                          fit: BoxFit.cover,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
-                            blurRadius: 16,
-                            offset: const Offset(-4, 0),
-                          ),
-                        ],
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: const DecorationImage(
+                        image: AssetImage(AppAssets.wallpaper),
+                        fit: BoxFit.cover,
                       ),
-                      child: SafeArea(
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 30),
-                            // Title
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  widget.title,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontFamily: 'NotoKufi',
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textBlack,
-                                  ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.35),
+                          blurRadius: 16,
+                          offset: const Offset(-4, 0),
+                        ),
+                      ],
+                    ),
+                    child: SafeArea(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 30),
+                          // Title
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                widget.title,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontFamily: 'NotoKufi',
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textBlack,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 16),
+                          ),
+                          const SizedBox(height: 16),
 
-                            // Sidebar scrollable content (unified scroll view for all buttons)
-                            Expanded(
-                              child: SingleChildScrollView(
-                                physics: const ClampingScrollPhysics(),
-                                padding: const EdgeInsets.only(bottom: 80),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
+                          // Sidebar scrollable content (unified scroll view for all buttons)
+                          Expanded(
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.only(bottom: 80),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
                                     if (widget.onBriefPressed != null) ...[
                                       Container(
                                         width: double.infinity,

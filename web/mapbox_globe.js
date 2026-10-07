@@ -298,18 +298,18 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     const onPointerCheck = (e) => {
       const overSidebar = isPointerOverSidebar(e);
       setGlobeInteractions(!overSidebar);
-      if (overSidebar && (e.type === 'wheel' || e.type === 'pointerdown' || e.type === 'touchstart' || e.type === 'mousedown')) {
-        e.stopPropagation();
-      }
     };
 
     window.addEventListener('mousemove', onPointerCheck, { passive: true });
     window.addEventListener('pointermove', onPointerCheck, { passive: true });
-    window.addEventListener('wheel', onPointerCheck, { capture: true, passive: true });
-    window.addEventListener('touchstart', onPointerCheck, { capture: true, passive: true });
-    window.addEventListener('touchmove', onPointerCheck, { capture: true, passive: true });
-    targetContainer.addEventListener('wheel', onPointerCheck, { capture: true, passive: false });
-    targetContainer.addEventListener('pointerdown', onPointerCheck, { capture: true, passive: true });
+    window.addEventListener('wheel', onPointerCheck, { passive: true });
+    window.addEventListener('touchstart', onPointerCheck, { passive: true });
+    window.addEventListener('touchmove', onPointerCheck, { passive: true });
+    targetContainer.addEventListener('wheel', (e) => {
+      if (isPointerOverSidebar(e)) {
+        e.stopPropagation();
+      }
+    }, { passive: true });
   }
 
   tryInit();
