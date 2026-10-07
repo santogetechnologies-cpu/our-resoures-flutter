@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
+import '../widgets/map_view_platform.dart';
 
 class AboutDialogs {
+  static Future<void> _showStyledDialog(BuildContext context, WidgetBuilder builder) async {
+    setModalOpenWeb(true);
+    try {
+      await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: builder,
+      );
+    } finally {
+      setModalOpenWeb(false);
+    }
+  }
+
   static void showIntroduction(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final dialogWidth = size.width * 0.75;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Directionality(
+    _showStyledDialog(
+      context,
+      (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape: RoundedRectangleBorder(
@@ -159,10 +172,9 @@ class AboutDialogs {
     final size = MediaQuery.of(context).size;
     final dialogWidth = size.width * 0.75;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Directionality(
+    _showStyledDialog(
+      context,
+      (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape: RoundedRectangleBorder(
@@ -277,10 +289,9 @@ class AboutDialogs {
     final size = MediaQuery.of(context).size;
     final dialogWidth = size.width * 0.75;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Directionality(
+    _showStyledDialog(
+      context,
+      (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape: RoundedRectangleBorder(
@@ -389,10 +400,9 @@ class AboutDialogs {
     final size = MediaQuery.of(context).size;
     final dialogWidth = size.width * 0.75;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Directionality(
+    _showStyledDialog(
+      context,
+      (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape: RoundedRectangleBorder(
@@ -502,10 +512,9 @@ class AboutDialogs {
     final size = MediaQuery.of(context).size;
     final dialogWidth = size.width * 0.75;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Directionality(
+    _showStyledDialog(
+      context,
+      (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape: RoundedRectangleBorder(
@@ -615,10 +624,9 @@ class AboutDialogs {
     final size = MediaQuery.of(context).size;
     final dialogWidth = size.width * 0.75;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Directionality(
+    _showStyledDialog(
+      context,
+      (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape: RoundedRectangleBorder(
@@ -729,10 +737,9 @@ class AboutDialogs {
     final size = MediaQuery.of(context).size;
     final dialogWidth = size.width * 0.75;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Directionality(
+    _showStyledDialog(
+      context,
+      (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
           shape: RoundedRectangleBorder(

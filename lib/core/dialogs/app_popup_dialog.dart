@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
 
+import '../widgets/map_view_platform.dart';
+
 class AppPopupDialog extends StatelessWidget {
   final String title;
   final String description;
@@ -22,17 +24,22 @@ class AppPopupDialog extends StatelessWidget {
     required String description,
     String? imageAsset,
     Widget? customContent,
-  }) {
-    return showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => AppPopupDialog(
-        title: title,
-        description: description,
-        imageAsset: imageAsset,
-        customContent: customContent,
-      ),
-    );
+  }) async {
+    setModalOpenWeb(true);
+    try {
+      await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (ctx) => AppPopupDialog(
+          title: title,
+          description: description,
+          imageAsset: imageAsset,
+          customContent: customContent,
+        ),
+      );
+    } finally {
+      setModalOpenWeb(false);
+    }
   }
 
   @override

@@ -2,15 +2,22 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
 
+import '../widgets/map_view_platform.dart';
+
 class WaterInfographicDialog extends StatelessWidget {
   const WaterInfographicDialog({super.key});
 
-  static Future<void> show(BuildContext context) {
-    return showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => const WaterInfographicDialog(),
-    );
+  static Future<void> show(BuildContext context) async {
+    setModalOpenWeb(true);
+    try {
+      await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (ctx) => const WaterInfographicDialog(),
+      );
+    } finally {
+      setModalOpenWeb(false);
+    }
   }
 
   @override

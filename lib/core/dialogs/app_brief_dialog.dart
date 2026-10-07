@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
 
+import '../widgets/map_view_platform.dart';
+
 class AppBriefDialog extends StatelessWidget {
   final String title;
   final String description;
@@ -25,23 +27,30 @@ class AppBriefDialog extends StatelessWidget {
     String? bannerAsset,
     String? bottomImageAsset,
     Widget? bottomWidget,
-  }) {
-    return showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => AppBriefDialog(
-        title: title,
-        description: description,
-        bannerAsset: bannerAsset,
-        bottomImageAsset: bottomImageAsset,
-        bottomWidget: bottomWidget,
-      ),
-    );
+  }) async {
+    setModalOpenWeb(true);
+    try {
+      await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (ctx) => AppBriefDialog(
+          title: title,
+          description: description,
+          bannerAsset: bannerAsset,
+          bottomImageAsset: bottomImageAsset,
+          bottomWidget: bottomWidget,
+        ),
+      );
+    } finally {
+      setModalOpenWeb(false);
+    }
   }
 
-  void _showZoomableImage(BuildContext context, String imageAsset) {
-    showDialog(
-      context: context,
+  void _showZoomableImage(BuildContext context, String imageAsset) async {
+    setModalOpenWeb(true);
+    try {
+      await showDialog(
+        context: context,
       builder: (ctx) => Dialog(
         backgroundColor: Colors.black.withOpacity(0.92),
         insetPadding: const EdgeInsets.all(12),
@@ -79,6 +88,9 @@ class AppBriefDialog extends StatelessWidget {
         ),
       ),
     );
+    } finally {
+      setModalOpenWeb(false);
+    }
   }
 
   @override

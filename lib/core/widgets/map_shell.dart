@@ -124,6 +124,7 @@ class _MapShellState extends State<MapShell> {
   double _currentZoom = 4.3;
   double _currentLat = 24.694291;
   late final String _viewId;
+  late final ScrollController _sidebarScrollController;
 
   @override
   void initState() {
@@ -131,6 +132,13 @@ class _MapShellState extends State<MapShell> {
     _currentZoom = widget.initialZoom;
     _currentLat = widget.initialLatitude;
     _viewId = widget.title.hashCode.abs().toString();
+    _sidebarScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _sidebarScrollController.dispose();
+    super.dispose();
   }
 
   void _resetZoom() {
@@ -272,12 +280,18 @@ class _MapShellState extends State<MapShell> {
 
                           // Sidebar scrollable content (unified scroll view for all buttons)
                           Expanded(
-                            child: SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.only(bottom: 80),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
+                            child: Scrollbar(
+                              controller: _sidebarScrollController,
+                              thumbVisibility: true,
+                              radius: const Radius.circular(8),
+                              thickness: 5.0,
+                              child: SingleChildScrollView(
+                                controller: _sidebarScrollController,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 80),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
                                     if (widget.onBriefPressed != null) ...[
                                       Container(
                                         width: double.infinity,
@@ -323,11 +337,12 @@ class _MapShellState extends State<MapShell> {
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                ),
 
                 // Loading overlay
                 if (widget.isLoading)

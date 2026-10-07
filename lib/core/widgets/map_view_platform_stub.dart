@@ -10,6 +10,8 @@ void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String m
 
 void clearMarkersWeb(String domId) {}
 
+void setModalOpenWeb(bool isOpen) {}
+
 Widget buildPlatformMapWidget({
   required String viewId,
   required double initialLongitude,

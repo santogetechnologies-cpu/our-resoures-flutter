@@ -47,6 +47,12 @@ void clearMarkersWeb(String domId) {
   }
 }
 
+void setModalOpenWeb(bool isOpen) {
+  if (js.context.hasProperty('setModalOpenWeb')) {
+    js.context.callMethod('setModalOpenWeb', [isOpen]);
+  }
+}
+
 Widget buildPlatformMapWidget({
   required String viewId,
   required double initialLongitude,

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,6 +33,19 @@ void main() async {
   runApp(const OurResourcesApp());
 }
 
+class AppScrollBehavior extends MaterialScrollBehavior {
+  const AppScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  };
+}
+
 class OurResourcesApp extends StatelessWidget {
   const OurResourcesApp({super.key});
 
@@ -40,6 +54,7 @@ class OurResourcesApp extends StatelessWidget {
     return MaterialApp(
       title: 'ثرواتنا من أرضنا',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const AppScrollBehavior(),
       theme: AppTheme.theme,
       locale: const Locale('ar', 'SA'),
       supportedLocales: const [

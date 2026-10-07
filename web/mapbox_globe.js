@@ -217,14 +217,18 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       center:             [lng || 47.189224, lat || 24.694291],
       zoom:               zoom || 3.8,
       renderWorldCopies:  false,
-      attributionControl: false
+      attributionControl: false,
+      doubleClickZoom:    false
     });
+
+    try { map.doubleClickZoom.disable(); } catch (_) {}
 
     map.on('style.load', () => {
       // Globe projection (MapLibre v5 API)
       try { map.setProjection({ type: 'globe' }); } catch (e) {
         console.warn('[Globe] setProjection:', e);
       }
+      try { map.doubleClickZoom.disable(); } catch (_) {}
       // Atmosphere
       try {
         map.setFog({
@@ -262,9 +266,9 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
         .observe(targetContainer);
     }
 
-    // ── Interaction Guard: Isolate Sidebar from Globe ─────────────────────────
+    // ── Interaction Guard: Isolate Sidebar & Modals from Globe ───────────────
     // Prevent the globe from zooming, panning, or moving when the user scrolls
-    // or interacts with the right-side sidebar menu.
+    // or interacts with the right-side sidebar menu or modal dialogs.
     function isPointerOverSidebar(e) {
       const w = window.innerWidth;
       const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 355;
@@ -280,6 +284,10 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
 
     function setGlobeInteractions(enabled) {
       if (!map) return;
+      // If a modal popup dialog is open anywhere on screen, force map to be inactive
+      if (window.flutterModalOpen) {
+        enabled = false;
+      }
       try {
         if (enabled) {
           if (map.scrollZoom && !map.scrollZoom.isEnabled()) map.scrollZoom.enable();
@@ -291,6 +299,7 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
           if (map.dragPan && map.dragPan.isEnabled()) map.dragPan.disable();
           if (map.dragRotate && map.dragRotate.isEnabled()) map.dragRotate.disable();
           if (map.touchZoomRotate && map.touchZoomRotate.isEnabled()) map.touchZoomRotate.disable();
+          if (map.doubleClickZoom && map.doubleClickZoom.isEnabled()) map.doubleClickZoom.disable();
         }
       } catch (_) {}
     }
@@ -306,13 +315,39 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     window.addEventListener('touchstart', onPointerCheck, { passive: true });
     window.addEventListener('touchmove', onPointerCheck, { passive: true });
     targetContainer.addEventListener('wheel', (e) => {
-      if (isPointerOverSidebar(e)) {
+      if (window.flutterModalOpen || isPointerOverSidebar(e)) {
         e.stopPropagation();
       }
     }, { passive: true });
   }
 
   tryInit();
+};
+
+// ---------------------------------------------------------------------------
+// Modal State Bridge: Freezes map controls while modal dialogs are open
+// ---------------------------------------------------------------------------
+window.flutterModalOpen = false;
+window.setModalOpenWeb = function(isOpen) {
+  window.flutterModalOpen = !!isOpen;
+  Object.values(window.mapboxGlobeInstances || {}).forEach(map => {
+    if (map) {
+      try {
+        if (window.flutterModalOpen) {
+          if (map.scrollZoom && map.scrollZoom.isEnabled()) map.scrollZoom.disable();
+          if (map.dragPan && map.dragPan.isEnabled()) map.dragPan.disable();
+          if (map.dragRotate && map.dragRotate.isEnabled()) map.dragRotate.disable();
+          if (map.touchZoomRotate && map.touchZoomRotate.isEnabled()) map.touchZoomRotate.disable();
+          if (map.doubleClickZoom && map.doubleClickZoom.isEnabled()) map.doubleClickZoom.disable();
+        } else {
+          if (map.scrollZoom && !map.scrollZoom.isEnabled()) map.scrollZoom.enable();
+          if (map.dragPan && !map.dragPan.isEnabled()) map.dragPan.enable();
+          if (map.dragRotate && !map.dragRotate.isEnabled()) map.dragRotate.enable();
+          if (map.touchZoomRotate && !map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
+        }
+      } catch (_) {}
+    }
+  });
 };
 
 // ---------------------------------------------------------------------------
