@@ -63,19 +63,89 @@ class _GeologyScreenState extends State<GeologyScreen> {
     ),
   };
 
+  // ----------------------------------------------------
+  // Geomorphology Dialogs & Actions
+  // ----------------------------------------------------
+  void _showGeomorphologyOverview() {
+    AppBriefDialog.show(
+      context,
+      title: 'جيومورفولوجية المملكة العربية السعودية',
+      description: 'تتميز تضاريس المملكة العربية السعودية بتنوع جيومورفولوجي واسع ناتج عن العمليات التكتونية وحركات الرفع والتعرية عبر العصور الجيولوجية.\n\n'
+          'وتنقسم التضاريس الجيومورفولوجية الرئيسية في المملكة إلى خمس وحدات كبرى:\n\n'
+          '1. المرتفعات الغربية: وتشمل جبال مدين والحجاز والسروات وتمتد بمحاذاة البحر الأحمر.\n'
+          '2. الهضاب: وتشمل هضبة نجد وهضاب الصمان وحسمة والحماد والوديان.\n'
+          '3. التكوينات الرملية: وتشمل صحراء النفود الكبير وصحراء الدهناء وصحراء الجافورة.\n'
+          '4. صحراء الربع الخالي: أكبر بحر رملي متصل في العالم بمساحة تقارب 650 ألف كم2.\n'
+          '5. السهول الساحلية: سهل تهامة في الغرب وسهول الخليج العربي المنبسطة في الشرق.',
+    );
+  }
+
+  void _showWesternHighlands() {
+    _mapController?.flyTo(latitude: 19.5, longitude: 42.0, zoom: 6.2);
+    AppPopupDialog.show(
+      context,
+      title: 'المرتفعات الغربية',
+      imageAsset: AppAssets.arabianShield,
+      description: 'تمتد المرتفعات الغربية (جبال السروات والحجاز ومدين) على طول الساحل الشرقي للبحر الأحمر لمسافة تزيد عن 1500 كم من حدود الأردن شمالاً إلى اليمن جنوباً.\n\n'
+          '• جبال مدين في الشمال الغربي: وتتميز بجبالها الوعرة وتكويناتها الجرانيتية الحادة.\n'
+          '• جبال الحجاز في الوسط: متوسطة الارتفاع وتتخللها الأودية والحرات البركانية.\n'
+          '• جبال السروات في الجنوب: أعلى مناطق المملكة ارتفاعاً حيث تبلغ قمة جبل السودة حوالي 3000 متر فوق مستوى سطح البحر.\n\n'
+          'تنحدر هذه المرتفعات بشدة نحو الغرب باتجاه سهل تهامة، بينما تنحدر تدريجياً نحو الشرق لتتصل بهضاب نجد.',
+    );
+  }
+
+  void _showPlateaus() {
+    _mapController?.flyTo(latitude: 24.5, longitude: 45.0, zoom: 5.8);
+    AppPopupDialog.show(
+      context,
+      title: 'الهضاب في المملكة',
+      imageAsset: AppAssets.arabianPlatform,
+      description: 'تشغل الهضاب مساحات شاسعة من أراضي المملكة العربية السعودية، وتتدرج في الارتفاع من الغرب إلى الشرق:\n\n'
+          '• هضبة نجد: كبرى هضاب المملكة، تتألف من هضبة عالية نجد في الغرب وهضبة نجد السفلى في الشرق، وتخترقها حواف صخرية شهيرة مثل جبال طويق وجبال العارض.\n'
+          '• هضبة حسمة: في الشمال الغربي وتشتهر بتكويناتها الصخرية الرملية الرائعة في تبوك وديسة.\n'
+          '• هضبة الحِماد والحَجَرة: في أقصى الشمال.\n'
+          '• هضبة الصمان: هضبة جيرية منبسطة تمتد بمحاذاة الدهناء شرقاً باتجاه الخليج العربي.',
+    );
+  }
+
+  void _showSandFormations() {
+    _mapController?.flyTo(latitude: 27.5, longitude: 42.0, zoom: 5.8);
+    AppPopupDialog.show(
+      context,
+      title: 'التكوينات الرملية',
+      description: 'تغطي التكوينات الرملية حوالي ثلث مساحة المملكة وتتوزع على عدة بحار وكثبان رملية عملاقة:\n\n'
+          '• صحراء النَفود الكبير: في شمال المملكة، تبلغ مساحتها حوالي 65,000 كم2 وتتألف من كثبان طولية وعروق رملية حمراء غنية.\n'
+          '• صحراء الدَّهْناء: شريط رملي قوسي ضيق يمتد لأكثر من 1,200 كم ليربط بين النفود الكبير في الشمال والربع الخالي في الجنوب.\n'
+          '• صحراء الجافورة: تقع في المنطقة الشرقية بمحاذاة سواحل الخليج العربي وجنوب الأحساء.',
+    );
+  }
+
+  void _showEmptyQuarter() {
+    _mapController?.flyTo(latitude: 20.0, longitude: 50.0, zoom: 5.4);
+    AppPopupDialog.show(
+      context,
+      title: 'صحراء الربع الخالي',
+      description: 'يعد الربع الخالي أكبر صحراء رملية متصلة في العالم، بمساحة تقارب 650,000 كم2 يشغل الجزء الأكبر منها جنوب وجنوب شرقي المملكة العربية السعودية.\n\n'
+          '• يتميز بوجود كثبان رملية نجمية عملاقة يصل ارتفاع بعضها إلى أكثر من 250 متراً فوق القيعان.\n'
+          '• تشتمل بيئته على مساحات شاسعة من السباخ القارية والمطرية.\n'
+          '• يضم الربع الخالي أحواضاً رسوبية عميقة تحتوي على أضخم حقول النفط والغاز الطبيعي في العالم (مثل حقل الشيبة)، بالإضافة إلى خزانات مياه جوفية عميقة.',
+    );
+  }
+
+  // ----------------------------------------------------
+  // Geology Dialogs & Actions
+  // ----------------------------------------------------
   void _showIntroBrief() {
     AppBriefDialog.show(
       context,
       title: 'جيولوجية المملكة',
       bottomImageAsset: AppAssets.geologicMapArabianPeninsula,
-      description: 'تعود أقدم الصخور في المملكة إلى عصر ما قبل الكمبري، أي قبل حوالي 3 مليارات سنة. وهي تشكل أجزاء من الصفيحة العربية التي تشمل شبه الجزيرة العربية. ومع ذلك، فإن معظم مناطق المملكة العربية السعودية تقع تحت صخور حقبة الحياة الحديثة (منذ 1000 إلى 540 مليون سنة). تشمل هذه الصخور الأحدث تلك التي تعود إلى حقبة الحياة القديمة والمتوسطة، وعصور الحياة الحديثة، والتي يطلق عليها مجتمعة الغلاف الصخري لدهر الحياة الفانيروزية Phanerozoic.\n\n'
-          'توجد صخور ما قبل الكمبري في الجزء الغربي من المملكة، والتي تشكل الدرع العربي. يمتد الدرع من جنوب الأردن إلى اليمن، لكن مساحته الأكبر تقع في المملكة. ويقدر طول الصفيحة العربية بحوالي 2600 كيلومتر من الشمال إلى الجنوب وحوالي 3000 كيلومتر من الشرق إلى الغرب. يحد الصفيحة العربية من الغرب صدع البحر الأحمر وصدع البحر الميت التحويلي، ومن الشرق منطقة اندساس زاغروس ومنطقة صدع أوين، ومن الشمال منطقة صدع الأناضول الشرقية، ومن الجنوب منطقة صدع عدن.\n\n'
-          'يقع الغطاء الرسوبي شرق القاعدة النارية والمتحولة للدرع العربي، ويشغل نحو ثلثي مساحة أراضي المملكة العربية السعودية، أي حوالي 68%، وتقدر مساحته الإجمالية بـ 1,320,000 كم2. يعد الغطاء الرسوبي ككل جزءًا متبقيًا من طريق تيثيس البحري، والذي نتج عن التأثيرات العامة والمجمعة للعمليات الرسوبية والحركات التكتونية حول الدرع العربي.\n\n'
-          'وباختصار تنقسم المملكة جيولوجياً إلى أربعة نطق متميزة وهي:\n'
+      description: 'تعود أقدم الصخور في المملكة إلى عصر ما قبل الكمبري، أي قبل حوالي 3 مليارات سنة. وهي تشكل أجزاء من الصفيحة العربية التي تشمل شبه الجزيرة العربية.\n\n'
+          'وباختصار تنقسم المملكة جيولوجياً إلى وحدات متميزة:\n'
           '• الدرع العربي وهو يتبع دهر طلائع الحياة ويتمثل في التتابعات البركانية الرسوبية المتحولة التي يتداخل فيها الجرانيت والجابرو.\n'
           '• الرصيف القاري العربي وهو يتبع دهر الحياة الظاهرة ويحتوي على تتابعات رسوبية فتاتية وجيرية ومتبخرات تميل بدرجات خفيفة نحو الشرق مبتعدة عن الدرع العربي.\n'
-          '• حرات العصر الثلاثي البركانية وهي في الغالب تعلو صخور الدرع العربي.\n'
-          '• السهل الساحلي للبحر الأحمر.',
+          '• حرات العصر الثلاثي والرباعي البركانية وهي في الغالب تعلو صخور الدرع العربي.\n'
+          '• السهل الساحلي للبحر الأحمر والخليج العربي.',
     );
   }
 
@@ -86,8 +156,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
       context,
       title: 'الدرع العربي',
       imageAsset: AppAssets.arabianShield,
-      description: 'يعتبر الدرع العربي في شبه الجزيرة العربية والدرع النوبي في مصر والسودان جزءً من كتلة شرق أفريقيا والمكونة قلب قارة جوندوانا الكبيرة في نهاية عصر ما قبل الكمبري، وقد انفصل الدرع العربي عن نظيره الدرع النوبي بواسطة أخدود البحر الأحمر. يظهر الدرع العربي على شكل شبه منحرف تبلغ مساحته حوالي (660,000 كم2) حيث يمثل الجزء الغربي من الجزيرة العربية ويحده من الغرب أخدود البحر الأحمر والسهول الساحلية المسماة سهول تهامة ويحده من الشمال والشرق صخور الغطاء الرسوبي التابعة لدهر الحياة الظاهرة ويبلغ طول الدرع العربي حوالي 1800 كم وعرضه كحد أقصى حوالي 700 كم.\n\n'
-          'تعتبر صخور الدرع العربي موطناً مناسباً لتمعدن الخامات المعدنية نظراً لتاريخها الجيولوجي وتطورها وموقعها على هامش الصفائح المتقاربة خلال 300 مليون سنة من تكوين ونمو القشرة الأرضية. وتم تمعدن صخور الدرع العربي بالذهب والنحاس والزنك والرصاص والحديد والنيكل والرواسب المعدنية الأخرى المرتبطة بالأنظمة الجبلية المتطورة.',
+      description: 'يعتبر الدرع العربي في شبه الجزيرة العربية والدرع النوبي في مصر والسودان جزءً من كتلة شرق أفريقيا والمكونة قلب قارة جوندوانا الكبيرة في نهاية عصر ما قبل الكمبري، وقد انفصل الدرع العربي عن نظيره الدرع النوبي بواسطة أخدود البحر الأحمر.\n\n'
+          'يظهر الدرع العربي على شكل شبه منحرف تبلغ مساحته حوالي (660,000 كم2) حيث يمثل الجزء الغربي من الجزيرة العربية، ويتميز بتنوع المعادن الفلزية مثل الذهب والفضة والنحاس والزنك والرصاص والحديد.',
     );
   }
 
@@ -96,11 +166,10 @@ class _GeologyScreenState extends State<GeologyScreen> {
     _mapController?.flyTo(latitude: 24.5, longitude: 48.0, zoom: 5.8);
     AppPopupDialog.show(
       context,
-      title: 'الرصيف العربي',
+      title: 'الرصيف القاري العربي',
       imageAsset: AppAssets.arabianPlatform,
       description: 'يمثل الرصيف القاري العربي (الغطاء الرسوبي) الجزء الأكبر من أراضي المملكة العربية السعودية شرق الدرع العربي، ويشغل نحو ثلثي مساحة المملكة (حوالي 68%) وتقدر مساحته الإجمالية بـ 1,320,000 كم2.\n\n'
-          'ترسبت الصخور الرسوبية فوق صخور القاعدة القديمة التابعة للدرع العربي وتتألف من صخور رملية وجيرية ومتبخرات ذات منشأ بحري وقاري، يصل سمكها في بعض الأحواض إلى أكثر من 7,000 متر في حوض الخليج العربي والربع الخالي.\n\n'
-          'ويحتوي الرصيف العربي على أضخم المكامن الهيدروكربونية (النفط والغاز) في العالم، وخزانات المياه الجوفية العميقة، بالإضافة إلى الرواسب المعدنية الصناعية مثل الفوسفات، البوكسيت، الحجر الجيري، ورمل السيليكا.',
+          'ترسبت الصخور الرسوبية فوق صخور القاعدة القديمة وتتألف من صخور رملية وجيرية ومتبخرات، ويحتوي على أضخم المكامن الهيدروكربونية (النفط والغاز) وخزانات المياه الجوفية العميقة والمعادن الصناعية كالفوسفات والبوكسيت.',
     );
   }
 
@@ -111,9 +180,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
       context,
       title: 'الحرات البركانية',
       imageAsset: AppAssets.harat,
-      description: 'الحرات البركانية عبارة عن هضاب بازلتية وتدفقات حمم بركانية تكونت خلال العصر الثلاثي والرباعي نتيجة لانفتاح أخدود البحر الأحمر وانفصال الصفيحة العربية عن الصفيحة الإفريقية.\n\n'
-          'تغطي الحرات مساحة تزيد عن 80,000 كم2 في المملكة وتنتشر في غرب وشمال غرب البلاد، ومن أشهرها: حرة رهط، حرة خيبر، حرة كشب، حرة عويرض، حرة الحرة، وحرة الشاقة. وتضم مئات البراكين الخامدة وفوهات بركانية عملاقة مثل فوهة الوعبة (مقلع طمية).\n\n'
-          'يمكنك النقر على أي حرة لمعرفة التفاصيل الجيولوجية الخاصة بها.',
+      description: 'الحرات البركانية عبارة عن هضاب بازلتية وتدفقات حمم بركانية تكونت خلال العصرين الثلاثي والرباعي نتيجة لانفتاح أخدود البحر الأحمر وانفصال الصفيحة العربية عن الصفيحة الإفريقية.\n\n'
+          'تغطي الحرات مساحة تزيد عن 80,000 كم2 في المملكة وتنتشر في غرب وشمال غرب البلاد (حرة رهط، خيبر، كشب، عويرض، الحرة، الشاقة وغيرها).',
       customContent: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -141,6 +209,33 @@ class _GeologyScreenState extends State<GeologyScreen> {
     );
   }
 
+  void _showVolcanicActivity() {
+    _mapController?.flyTo(latitude: 24.5, longitude: 39.8, zoom: 6.5);
+    AppPopupDialog.show(
+      context,
+      title: 'النشاط البركاني',
+      imageAsset: AppAssets.harat,
+      description: 'شهدت شبه الجزيرة العربية نشاطاً بركانياً مكثفاً ارتبط بتصدع وانفتاح البحر الأحمر عبر ملايين السنين:\n\n'
+          '• سجل التاريخ ثوران بركان المدينة المنورة الشهير عام 1256م (654هـ) في حرة رهط الشرقية، حيث تدفقت الحمم لمسافة وصلت إلى مقربة من المدينة المنورة.\n'
+          '• في عام 2009م، شهدت حرة الشاقة (لونيير) نشاطاً زلزالياً وبركانياً وصعوداً للصهارة أدى إلى حدوث تشققات أرضية واسعة.\n'
+          '• تنتشر في المملكة المئات من الفوهات البركانية الخامدة مثل فوهة الوعبة وفوهات جبل القدر والبيضاء.',
+    );
+  }
+
+  void _showEarthquakes() {
+    _mapController?.flyTo(latitude: 24.0, longitude: 42.0, zoom: 5.5);
+    AppPopupDialog.show(
+      context,
+      title: 'الزلازل في شبه الجزيرة العربية',
+      imageAsset: AppAssets.earth,
+      description: 'يرتبط النشاط الزلزالي في شبه الجزيرة العربية بالحدود التكتونية الحركية للصفيحة العربية:\n\n'
+          '• خليج العقبة وشمال البحر الأحمر: منطقة نشطة زلزالياً نتيجة الصدع التحويلي للبحر الميت.\n'
+          '• محور انفتاح البحر الأحمر وخليج عدن: نشاط زلزالي متكرر مرافق لتوسع قاع البحر.\n'
+          '• الحرات البركانية الغربية: حدوث أسراب زلزالية بركانية مرافقة لحركة الصهارة والغازات في باطن الأرض.\n'
+          '• تتابع هيئة المساحة الجيولوجية السعودية عبر الشبكة الوطنية للرصد الزلزالي كافة الهزات بدقة عالية على مدار الساعة.',
+    );
+  }
+
   void _showSwahel() {
     _mapController?.setStyleFromAsset('assets/maps/saudi_geo/sahel.json');
     _mapController?.flyTo(latitude: 21.0, longitude: 40.0, zoom: 6.0);
@@ -149,38 +244,197 @@ class _GeologyScreenState extends State<GeologyScreen> {
       title: 'السهول الساحلية',
       imageAsset: AppAssets.swahel,
       description: 'السهول الساحلية في المملكة العربية السعودية تضم السهل الساحلي للبحر الأحمر (سهل تهامة) في الغرب والسهول الساحلية للخليج العربي في الشرق.\n\n'
-          'سهل تهامة: يمتد بمحاذاة البحر الأحمر من خليج العقبة شمالاً حتى الحدود مع اليمن جنوباً، ويتراوح اتساعه من بضعة كيلومترات في الشمال إلى أكثر من 40 كم في جازان جنوباً، ويتكون من رواسب فيضية ورملية وطينية حملتها السيول المتدفقة من جبال السروات والحجاز.\n\n'
+          'سهل تهامة: يمتد بمحاذاة البحر الأحمر من خليج العقبة شمالاً حتى الحدود مع اليمن جنوباً، ويتراوح اتساعه من بضعة كيلومترات في الشمال إلى أكثر من 40 كم في جازان جنوباً.\n\n'
           'سهول الخليج العربي: سهول منبسطة منخفضة تغطي الرمال والسباخ الساحلية أجزاء كبيرة منها وتتميز بوجود تكوينات المتبخرات والأحجار الجيرية البحرية الحديثة.',
     );
   }
 
-  Widget _buildLayerButton(String text, VoidCallback onPressed) {
-    return CustomButton(
-      text: text,
-      onPressed: onPressed,
-      styleType: ButtonStyleType.mainMenu,
+  // ----------------------------------------------------
+  // Section Button & Sub-item Builder Widgets
+  // ----------------------------------------------------
+  Widget _buildMainSectionHeader({
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 58,
+      margin: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 6),
+      decoration: BoxDecoration(
+        color: AppColors.mainMenuBtnBg,
+        borderRadius: BorderRadius.circular(AppColors.borderRadius),
+        border: Border.all(color: Colors.white.withOpacity(0.9), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.14),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'NotoKufi',
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textBlack,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubItemButton({
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 44,
+      margin: const EdgeInsets.symmetric(horizontal: 22, vertical: 3.5),
+      decoration: BoxDecoration(
+        color: AppColors.subMenuBtnBg,
+        borderRadius: BorderRadius.circular(AppColors.borderRadius),
+        border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+            child: Row(
+              children: [
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryBrown,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FittedBox(
+                    alignment: Alignment.centerRight,
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: 'NotoKufi',
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textBlack,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return MapShell(
-      title: 'جيولوجية المملكة',
-      onBriefPressed: _showIntroBrief,
-      briefButtonText: 'مقدمة',
+      title: 'جيولوجية و جيومورفولوجية المملكة',
       initialStyleAsset: 'assets/maps/saudi_geo/saudigeo.json',
       onMapCreated: (controller) => _mapController = controller,
       sidebarContent: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildLayerButton('الدرع العربي', _showArabianShield),
-            _buildLayerButton('الرصيف العربي', _showArabianPlatform),
-            _buildLayerButton('الحرات البركانية', _showHarrat),
-            _buildLayerButton('السهول الساحلية', _showSwahel),
+            // ==========================================
+            // Main Button 1: جيومورفولوجية المملكة
+            // ==========================================
+            _buildMainSectionHeader(
+              title: 'جيومورفولوجية المملكة',
+              onTap: _showGeomorphologyOverview,
+            ),
+            _buildSubItemButton(
+              title: 'المرتفعات الغربية',
+              onTap: _showWesternHighlands,
+            ),
+            _buildSubItemButton(
+              title: 'الهضاب',
+              onTap: _showPlatelays,
+            ),
+            _buildSubItemButton(
+              title: 'التكوينات الرملية',
+              onTap: _showSandFormations,
+            ),
+            _buildSubItemButton(
+              title: 'الربع الخالي',
+              onTap: _showEmptyQuarter,
+            ),
+            _buildSubItemButton(
+              title: 'السهول الساحلية',
+              onTap: _showSwahel,
+            ),
+
+            const SizedBox(height: 10),
+
+            // ==========================================
+            // Main Button 2: جيولوجية المملكة
+            // ==========================================
+            _buildMainSectionHeader(
+              title: 'جيولوجية المملكة',
+              onTap: _showIntroBrief,
+            ),
+            _buildSubItemButton(
+              title: 'الدرع العربي',
+              onTap: _showArabianShield,
+            ),
+            _buildSubItemButton(
+              title: 'الرصيف القاري العربي',
+              onTap: _showArabianPlatform,
+            ),
+            _buildSubItemButton(
+              title: 'الحرات البركانية',
+              onTap: _showHarrat,
+            ),
+            _buildSubItemButton(
+              title: 'النشاط البركاني',
+              onTap: _showVolcanicActivity,
+            ),
+            _buildSubItemButton(
+              title: 'الزلازل في شبه الجزيرة العربية',
+              onTap: _showEarthquakes,
+            ),
           ],
         ),
       ),
     );
   }
+
+  // Alias for plateaus spelling
+  void _showPlatelays() => _showPlateaus();
 }
