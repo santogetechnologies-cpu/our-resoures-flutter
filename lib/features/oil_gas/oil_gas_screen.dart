@@ -349,74 +349,71 @@ class _OilGasScreenState extends State<OilGasScreen> {
         _mapController = c;
         _loadMarkers(c);
       },
-      sidebarContent: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 70),
-        child: Column(
-          children: [
-            // Button 1: مشاريع الطاقة المتجددة
-            CustomButton(
-              text: 'مشاريع الطاقة المتجددة',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () {
-                setState(() {
-                  _renewableExpanded = !_renewableExpanded;
-                });
-              },
+      sidebarContent: Column(
+        children: [
+          // Button 1: مشاريع الطاقة المتجددة
+          CustomButton(
+            text: 'مشاريع الطاقة المتجددة',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _renewableExpanded = !_renewableExpanded;
+              });
+            },
+          ),
+
+          // Renewable Projects List
+          if (_renewableExpanded)
+            ..._renewableProjects.map(
+              (f) => CustomButton(
+                text: f.title,
+                styleType: ButtonStyleType.subMenu,
+                onPressed: () => _selectField(f),
+              ),
             ),
 
-            // Renewable Projects List
-            if (_renewableExpanded)
-              ..._renewableProjects.map(
-                (f) => CustomButton(
-                  text: f.title,
-                  styleType: ButtonStyleType.subMenu,
-                  onPressed: () => _selectField(f),
-                ),
-              ),
+          // Button 2: حقول البترول
+          CustomButton(
+            text: 'حقول البترول',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _oilExpanded = !_oilExpanded;
+              });
+            },
+          ),
 
-            // Button 2: حقول البترول
-            CustomButton(
-              text: 'حقول البترول',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () {
-                setState(() {
-                  _oilExpanded = !_oilExpanded;
-                });
-              },
+          // Oil Fields List
+          if (_oilExpanded)
+            ..._oilFields.map(
+              (f) => CustomButton(
+                text: f.title,
+                styleType: ButtonStyleType.subMenu,
+                onPressed: () => _selectField(f),
+              ),
             ),
 
-            // Oil Fields List
-            if (_oilExpanded)
-              ..._oilFields.map(
-                (f) => CustomButton(
-                  text: f.title,
-                  styleType: ButtonStyleType.subMenu,
-                  onPressed: () => _selectField(f),
-                ),
-              ),
+          // Button 3: حقول الغاز
+          CustomButton(
+            text: 'حقول الغاز',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _gasExpanded = !_gasExpanded;
+              });
+            },
+          ),
 
-            // Button 3: حقول الغاز
-            CustomButton(
-              text: 'حقول الغاز',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () {
-                setState(() {
-                  _gasExpanded = !_gasExpanded;
-                });
-              },
+          // Gas Fields List
+          if (_gasExpanded)
+            ..._gasFields.map(
+              (f) => CustomButton(
+                text: f.title,
+                styleType: ButtonStyleType.subMenu,
+                onPressed: () => _selectField(f),
+              ),
             ),
-
-            // Gas Fields List
-            if (_gasExpanded)
-              ..._gasFields.map(
-                (f) => CustomButton(
-                  text: f.title,
-                  styleType: ButtonStyleType.subMenu,
-                  onPressed: () => _selectField(f),
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

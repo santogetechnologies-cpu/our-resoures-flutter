@@ -236,90 +236,103 @@ class _MapShellState extends State<MapShell> {
                   top: 0,
                   bottom: 0,
                   width: effectiveSidebarWidth,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      image: const DecorationImage(
-                        image: AssetImage(AppAssets.wallpaper),
-                        fit: BoxFit.cover,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.35),
-                          blurRadius: 16,
-                          offset: const Offset(-4, 0),
+                  child: Listener(
+                    behavior: HitTestBehavior.opaque,
+                    onPointerSignal: (_) {
+                      // Absorb pointer scroll events so they don't propagate to map
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage(AppAssets.wallpaper),
+                          fit: BoxFit.cover,
                         ),
-                      ],
-                    ),
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 30),
-                          // Title
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                widget.title,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontFamily: 'NotoKufi',
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textBlack,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.35),
+                            blurRadius: 16,
+                            offset: const Offset(-4, 0),
+                          ),
+                        ],
+                      ),
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 30),
+                            // Title
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  widget.title,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontFamily: 'NotoKufi',
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textBlack,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
+                            const SizedBox(height: 16),
 
-                          // Optional Intro/Brief Button matching Android main_menu_btn
-                          if (widget.onBriefPressed != null) ...[
-                            Container(
-                              width: double.infinity,
-                              height: 70,
-                              margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
-                              decoration: BoxDecoration(
-                                color: AppColors.mainMenuBtnBg,
-                                borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                                border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.12),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                                  onTap: widget.onBriefPressed,
-                                  child: Center(
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        widget.briefButtonText,
-                                        style: const TextStyle(
-                                          fontFamily: 'NotoKufi',
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textBlack,
+                            // Sidebar scrollable content (unified scroll view for all buttons)
+                            Expanded(
+                              child: SingleChildScrollView(
+                                physics: const ClampingScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 80),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (widget.onBriefPressed != null) ...[
+                                      Container(
+                                        width: double.infinity,
+                                        height: 70,
+                                        margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.mainMenuBtnBg,
+                                          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                          border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.12),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                            onTap: widget.onBriefPressed,
+                                            child: Center(
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  widget.briefButtonText,
+                                                  style: const TextStyle(
+                                                    fontFamily: 'NotoKufi',
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppColors.textBlack,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
+                                    ],
+                                    widget.sidebarContent,
+                                  ],
                                 ),
                               ),
                             ),
                           ],
-
-                          // Sidebar scrollable content
-                          Expanded(
-                            child: widget.sidebarContent,
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

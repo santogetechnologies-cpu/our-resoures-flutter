@@ -556,11 +556,8 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
       initialStyleAsset: 'assets/maps/materials/allMaterials.json',
       isLoading: _isLoading,
       onMapCreated: (controller) => _mapController = controller,
-      sidebarContent: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 40),
-        itemCount: _metalButtonLabels.length,
-        itemBuilder: (context, index) {
-          final entry = _metalButtonLabels.entries.elementAt(index);
+      sidebarContent: Column(
+        children: _metalButtonLabels.entries.map((entry) {
           final key = entry.key;
           final arabicLabel = entry.value;
 
@@ -603,7 +600,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
               ),
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }

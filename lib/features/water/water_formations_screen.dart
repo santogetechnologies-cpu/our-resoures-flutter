@@ -351,114 +351,111 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
       initialStyleAsset: 'assets/maps/water_formation/allformations.json',
       isLoading: _isLoading,
       onMapCreated: (controller) => _mapController = controller,
-      sidebarContent: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 70),
-        child: Column(
-          children: [
-            // Button 1: الأودية الرئيسية
-            CustomButton(
-              text: 'الأودية الرئيسية',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () {
-                setState(() {
-                  _valleysExpanded = !_valleysExpanded;
-                  if (_valleysExpanded) {
-                    _damsExpanded = false;
-                    _mainFormationsExpanded = false;
-                    _subFormationsExpanded = false;
-                  }
-                });
-              },
+      sidebarContent: Column(
+        children: [
+          // Button 1: الأودية الرئيسية
+          CustomButton(
+            text: 'الأودية الرئيسية',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _valleysExpanded = !_valleysExpanded;
+                if (_valleysExpanded) {
+                  _damsExpanded = false;
+                  _mainFormationsExpanded = false;
+                  _subFormationsExpanded = false;
+                }
+              });
+            },
+          ),
+
+          if (_valleysExpanded)
+            ..._valleys.entries.map(
+              (v) => CustomButton(
+                text: v.value.nameAr,
+                styleType: ButtonStyleType.subMenu,
+                onPressed: () => _selectValley(v.key),
+              ),
             ),
 
-            if (_valleysExpanded)
-              ..._valleys.entries.map(
-                (v) => CustomButton(
-                  text: v.value.nameAr,
-                  styleType: ButtonStyleType.subMenu,
-                  onPressed: () => _selectValley(v.key),
-                ),
-              ),
+          // Button 2: سدود الشرب
+          CustomButton(
+            text: 'سدود الشرب',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _damsExpanded = !_damsExpanded;
+                if (_damsExpanded) {
+                  _valleysExpanded = false;
+                  _mainFormationsExpanded = false;
+                  _subFormationsExpanded = false;
+                  _showDamsOnMap();
+                } else {
+                  _mapController?.pointAnnotationManager?.deleteAll();
+                }
+              });
+            },
+          ),
 
-            // Button 2: سدود الشرب
-            CustomButton(
-              text: 'سدود الشرب',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () {
-                setState(() {
-                  _damsExpanded = !_damsExpanded;
-                  if (_damsExpanded) {
-                    _valleysExpanded = false;
-                    _mainFormationsExpanded = false;
-                    _subFormationsExpanded = false;
-                    _showDamsOnMap();
-                  } else {
-                    _mapController?.pointAnnotationManager?.deleteAll();
-                  }
-                });
-              },
+          if (_damsExpanded)
+            ..._dams.map(
+              (dam) => CustomButton(
+                text: dam.name,
+                styleType: ButtonStyleType.subMenu,
+                onPressed: () => _showDamPopup(dam),
+              ),
             ),
 
-            if (_damsExpanded)
-              ..._dams.map(
-                (dam) => CustomButton(
-                  text: dam.name,
-                  styleType: ButtonStyleType.subMenu,
-                  onPressed: () => _showDamPopup(dam),
-                ),
-              ),
+          // Button 3: التكوينات الرئيسية
+          CustomButton(
+            text: 'التكوينات الرئيسية',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _mainFormationsExpanded = !_mainFormationsExpanded;
+                if (_mainFormationsExpanded) {
+                  _valleysExpanded = false;
+                  _damsExpanded = false;
+                  _subFormationsExpanded = false;
+                }
+              });
+            },
+          ),
 
-            // Button 3: التكوينات الرئيسية
-            CustomButton(
-              text: 'التكوينات الرئيسية',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () {
-                setState(() {
-                  _mainFormationsExpanded = !_mainFormationsExpanded;
-                  if (_mainFormationsExpanded) {
-                    _valleysExpanded = false;
-                    _damsExpanded = false;
-                    _subFormationsExpanded = false;
-                  }
-                });
-              },
+          if (_mainFormationsExpanded)
+            ..._mainFormations.entries.map(
+              (f) => CustomButton(
+                text: f.value.nameAr,
+                styleType: ButtonStyleType.subMenu,
+                onPressed: () => _showFormationPopup(f.key, f.value.nameAr, f.value.desc),
+              ),
             ),
 
-            if (_mainFormationsExpanded)
-              ..._mainFormations.entries.map(
-                (f) => CustomButton(
-                  text: f.value.nameAr,
-                  styleType: ButtonStyleType.subMenu,
-                  onPressed: () => _showFormationPopup(f.key, f.value.nameAr, f.value.desc),
-                ),
-              ),
+          // Button 4: التكوينات الفرعية
+          CustomButton(
+            text: 'التكوينات الفرعية',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _subFormationsExpanded = !_subFormationsExpanded;
+                if (_subFormationsExpanded) {
+                  _valleysExpanded = false;
+                  _damsExpanded = false;
+                  _mainFormationsExpanded = false;
+                }
+              });
+            },
+          ),
 
-            // Button 4: التكوينات الفرعية
-            CustomButton(
-              text: 'التكوينات الفرعية',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () {
-                setState(() {
-                  _subFormationsExpanded = !_subFormationsExpanded;
-                  if (_subFormationsExpanded) {
-                    _valleysExpanded = false;
-                    _damsExpanded = false;
-                    _mainFormationsExpanded = false;
-                  }
-                });
-              },
+          if (_subFormationsExpanded)
+            ..._subFormations.entries.map(
+              (f) => CustomButton(
+                text: f.value.nameAr,
+                styleType: ButtonStyleType.subMenu,
+                onPressed: () => _showFormationPopup(f.key, f.value.nameAr, f.value.desc),
+              ),
             ),
-
-            if (_subFormationsExpanded)
-              ..._subFormations.entries.map(
-                (f) => CustomButton(
-                  text: f.value.nameAr,
-                  styleType: ButtonStyleType.subMenu,
-                  onPressed: () => _showFormationPopup(f.key, f.value.nameAr, f.value.desc),
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

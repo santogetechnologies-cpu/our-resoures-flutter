@@ -356,84 +356,81 @@ class _GeologyScreenState extends State<GeologyScreen> {
       title: 'جيولوجية و جيومورفولوجية المملكة',
       initialStyleAsset: 'assets/maps/saudi_geo/saudigeo.json',
       onMapCreated: (controller) => _mapController = controller,
-      sidebarContent: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ==========================================
-            // Main Button 1: جيومورفولوجية المملكة
-            // ==========================================
-            _buildMainSectionHeader(
-              title: 'جيومورفولوجية المملكة',
-              onTap: () {
-                setState(() {
-                  _geomorphologyExpanded = !_geomorphologyExpanded;
-                });
-                _showGeomorphologyOverview();
-              },
+      sidebarContent: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ==========================================
+          // Main Button 1: جيومورفولوجية المملكة
+          // ==========================================
+          _buildMainSectionHeader(
+            title: 'جيومورفولوجية المملكة',
+            onTap: () {
+              setState(() {
+                _geomorphologyExpanded = !_geomorphologyExpanded;
+              });
+              _showGeomorphologyOverview();
+            },
+          ),
+          if (_geomorphologyExpanded) ...[
+            _buildSubItemButton(
+              title: 'المرتفعات الغربية',
+              onTap: _showWesternHighlands,
             ),
-            if (_geomorphologyExpanded) ...[
-              _buildSubItemButton(
-                title: 'المرتفعات الغربية',
-                onTap: _showWesternHighlands,
-              ),
-              _buildSubItemButton(
-                title: 'الهضاب',
-                onTap: _showPlatelays,
-              ),
-              _buildSubItemButton(
-                title: 'التكوينات الرملية',
-                onTap: _showSandFormations,
-              ),
-              _buildSubItemButton(
-                title: 'الربع الخالي',
-                onTap: _showEmptyQuarter,
-              ),
-              _buildSubItemButton(
-                title: 'السهول الساحلية',
-                onTap: _showSwahel,
-              ),
-            ],
-
-            const SizedBox(height: 10),
-
-            // ==========================================
-            // Main Button 2: جيولوجية المملكة
-            // ==========================================
-            _buildMainSectionHeader(
-              title: 'جيولوجية المملكة',
-              onTap: () {
-                setState(() {
-                  _geologyExpanded = !_geologyExpanded;
-                });
-                _showIntroBrief();
-              },
+            _buildSubItemButton(
+              title: 'الهضاب',
+              onTap: _showPlatelays,
             ),
-            if (_geologyExpanded) ...[
-              _buildSubItemButton(
-                title: 'الدرع العربي',
-                onTap: _showArabianShield,
-              ),
-              _buildSubItemButton(
-                title: 'الرصيف القاري العربي',
-                onTap: _showArabianPlatform,
-              ),
-              _buildSubItemButton(
-                title: 'الحرات البركانية',
-                onTap: _showHarrat,
-              ),
-              _buildSubItemButton(
-                title: 'النشاط البركاني',
-                onTap: _showVolcanicActivity,
-              ),
-              _buildSubItemButton(
-                title: 'الزلازل في شبه الجزيرة العربية',
-                onTap: _showEarthquakes,
-              ),
-            ],
+            _buildSubItemButton(
+              title: 'التكوينات الرملية',
+              onTap: _showSandFormations,
+            ),
+            _buildSubItemButton(
+              title: 'الربع الخالي',
+              onTap: _showEmptyQuarter,
+            ),
+            _buildSubItemButton(
+              title: 'السهول الساحلية',
+              onTap: _showSwahel,
+            ),
           ],
-        ),
+
+          const SizedBox(height: 10),
+
+          // ==========================================
+          // Main Button 2: جيولوجية المملكة
+          // ==========================================
+          _buildMainSectionHeader(
+            title: 'جيولوجية المملكة',
+            onTap: () {
+              setState(() {
+                _geologyExpanded = !_geologyExpanded;
+              });
+              _showIntroBrief();
+            },
+          ),
+          if (_geologyExpanded) ...[
+            _buildSubItemButton(
+              title: 'الدرع العربي',
+              onTap: _showArabianShield,
+            ),
+            _buildSubItemButton(
+              title: 'الرصيف القاري العربي',
+              onTap: _showArabianPlatform,
+            ),
+            _buildSubItemButton(
+              title: 'الحرات البركانية',
+              onTap: _showHarrat,
+            ),
+            _buildSubItemButton(
+              title: 'النشاط البركاني',
+              onTap: _showVolcanicActivity,
+            ),
+            _buildSubItemButton(
+              title: 'الزلازل في شبه الجزيرة العربية',
+              onTap: _showEarthquakes,
+            ),
+          ],
+        ],
       ),
     );
   }

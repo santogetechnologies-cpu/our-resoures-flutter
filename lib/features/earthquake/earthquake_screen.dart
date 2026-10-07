@@ -157,56 +157,53 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
       initialStyleAsset: 'assets/maps/earthquake/allearth.json',
       isLoading: _isLoading,
       onMapCreated: (c) => _mapController = c,
-      sidebarContent: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 70),
-        child: Column(
-          children: [
-            // Button: الزلازل التاريخية (112م - 1899م)
-            CustomButton(
-              text: 'الزلازل التاريخية (112م - 1899م)',
-              styleType: ButtonStyleType.mainMenu,
-              fontSize: 22,
-              onPressed: () => _loadEarthquakeData('Histroical.xlsx', AppAssets.squareEarth),
-            ),
+      sidebarContent: Column(
+        children: [
+          // Button: الزلازل التاريخية (112م - 1899م)
+          CustomButton(
+            text: 'الزلازل التاريخية (112م - 1899م)',
+            styleType: ButtonStyleType.mainMenu,
+            fontSize: 22,
+            onPressed: () => _loadEarthquakeData('Histroical.xlsx', AppAssets.squareEarth),
+          ),
 
-            // Button: الزلازل الحديثة (1900م - 2023م)
-            CustomButton(
-              text: 'الزلازل الحديثة (1900م - 2023م)',
-              styleType: ButtonStyleType.mainMenu,
-              fontSize: 22,
-              onPressed: () {
-                // Informational button matching Android activity_earthquake.xml
-              },
-            ),
+          // Button: الزلازل الحديثة (1900م - 2023م)
+          CustomButton(
+            text: 'الزلازل الحديثة (1900م - 2023م)',
+            styleType: ButtonStyleType.mainMenu,
+            fontSize: 22,
+            onPressed: () {
+              // Informational button matching Android activity_earthquake.xml
+            },
+          ),
 
-            // Magnitude <= 3
-            CustomButton(
-              text: '< 3',
-              styleType: ButtonStyleType.subMenu,
-              fontSize: 20,
-              iconWidget: Image.asset(AppAssets.smallEarth, width: 22, height: 22),
-              onPressed: () => _loadEarthquakeData('under3.xlsx', AppAssets.smallEarth),
-            ),
+          // Magnitude <= 3
+          CustomButton(
+            text: '< 3',
+            styleType: ButtonStyleType.subMenu,
+            fontSize: 20,
+            iconWidget: Image.asset(AppAssets.smallEarth, width: 22, height: 22),
+            onPressed: () => _loadEarthquakeData('under3.xlsx', AppAssets.smallEarth),
+          ),
 
-            // Magnitude 3.0 - 5.0
-            CustomButton(
-              text: '3.0 - 5.0',
-              styleType: ButtonStyleType.subMenu,
-              fontSize: 20,
-              iconWidget: Image.asset(AppAssets.mediumEarth, width: 22, height: 22),
-              onPressed: () => _loadEarthquakeData('between3_5.xlsx', AppAssets.mediumEarth),
-            ),
+          // Magnitude 3.0 - 5.0
+          CustomButton(
+            text: '3.0 - 5.0',
+            styleType: ButtonStyleType.subMenu,
+            fontSize: 20,
+            iconWidget: Image.asset(AppAssets.mediumEarth, width: 22, height: 22),
+            onPressed: () => _loadEarthquakeData('between3_5.xlsx', AppAssets.mediumEarth),
+          ),
 
-            // Magnitude >= 5.0
-            CustomButton(
-              text: '5.0 >',
-              styleType: ButtonStyleType.subMenu,
-              fontSize: 20,
-              iconWidget: Image.asset(AppAssets.squareEarth, width: 22, height: 22),
-              onPressed: () => _loadEarthquakeData('high5.xlsx', AppAssets.squareEarth),
-            ),
-          ],
-        ),
+          // Magnitude >= 5.0
+          CustomButton(
+            text: '5.0 >',
+            styleType: ButtonStyleType.subMenu,
+            fontSize: 20,
+            iconWidget: Image.asset(AppAssets.squareEarth, width: 22, height: 22),
+            onPressed: () => _loadEarthquakeData('high5.xlsx', AppAssets.squareEarth),
+          ),
+        ],
       ),
     );
   }

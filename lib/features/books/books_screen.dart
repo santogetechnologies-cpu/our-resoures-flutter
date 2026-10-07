@@ -155,62 +155,59 @@ class _BooksScreenState extends State<BooksScreen> {
   Widget build(BuildContext context) {
     return MapShell(
       title: 'الموسوعات والكتب',
-      sidebarContent: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 60),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // =================================================================
-            // 1. الموسوعة التعليمية
-            // =================================================================
-            CustomButton(
-              text: 'الموسوعة التعليمية',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleMenu('educational'),
-            ),
-            if (_expandedMenu == 'educational')
-              ..._educationalEncyclopediaItems.map(_buildDummySubItem),
+      sidebarContent: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // =================================================================
+          // 1. الموسوعة التعليمية
+          // =================================================================
+          CustomButton(
+            text: 'الموسوعة التعليمية',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () => _toggleMenu('educational'),
+          ),
+          if (_expandedMenu == 'educational')
+            ..._educationalEncyclopediaItems.map(_buildDummySubItem),
 
-            const SizedBox(height: 6),
+          const SizedBox(height: 6),
 
-            // =================================================================
-            // 2. الموسوعة التخصصية
-            // =================================================================
-            CustomButton(
-              text: 'الموسوعة التخصصية',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleMenu('specialized'),
-            ),
-            if (_expandedMenu == 'specialized')
-              ..._specializedEncyclopediaItems.map(_buildDummySubItem),
+          // =================================================================
+          // 2. الموسوعة التخصصية
+          // =================================================================
+          CustomButton(
+            text: 'الموسوعة التخصصية',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () => _toggleMenu('specialized'),
+          ),
+          if (_expandedMenu == 'specialized')
+            ..._specializedEncyclopediaItems.map(_buildDummySubItem),
 
-            const SizedBox(height: 6),
+          const SizedBox(height: 6),
 
-            // =================================================================
-            // 3. موسوعة زمزم
-            // =================================================================
-            CustomButton(
-              text: 'موسوعة زمزم',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleMenu('zamzam'),
-            ),
-            if (_expandedMenu == 'zamzam')
-              ..._zamzamEncyclopediaItems.map(_buildDummySubItem),
+          // =================================================================
+          // 3. موسوعة زمزم
+          // =================================================================
+          CustomButton(
+            text: 'موسوعة زمزم',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () => _toggleMenu('zamzam'),
+          ),
+          if (_expandedMenu == 'zamzam')
+            ..._zamzamEncyclopediaItems.map(_buildDummySubItem),
 
-            const SizedBox(height: 6),
+          const SizedBox(height: 6),
 
-            // =================================================================
-            // 4. الكتب
-            // =================================================================
-            CustomButton(
-              text: 'الكتب',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleMenu('books'),
-            ),
-            if (_expandedMenu == 'books')
-              ..._booksItems.map(_buildDummySubItem),
-          ],
-        ),
+          // =================================================================
+          // 4. الكتب
+          // =================================================================
+          CustomButton(
+            text: 'الكتب',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () => _toggleMenu('books'),
+          ),
+          if (_expandedMenu == 'books')
+            ..._booksItems.map(_buildDummySubItem),
+        ],
       ),
     );
   }
