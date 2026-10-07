@@ -9,6 +9,7 @@ import '../water/water_formations_screen.dart';
 import '../tourism/tourism_screen.dart';
 import '../earthquake/earthquake_screen.dart';
 import '../oil_gas/oil_gas_screen.dart';
+import '../books/books_screen.dart';
 
 class FullscreenMenuScreen extends StatelessWidget {
   const FullscreenMenuScreen({super.key});
@@ -344,7 +345,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                   context: context,
                                   title: 'الموسوعات والكتب',
                                   height: 54,
-                                  onTap: () => AboutDialogs.showEncyclopedia(context),
+                                  onTap: () => _navigate(context, const BooksScreen()),
                                 ),
                               ),
                               const SizedBox(width: 24),
