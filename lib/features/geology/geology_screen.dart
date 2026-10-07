@@ -248,6 +248,9 @@ class _GeologyScreenState extends State<GeologyScreen> {
     );
   }
 
+  bool _geomorphologyExpanded = false;
+  bool _geologyExpanded = false;
+
   // ----------------------------------------------------
   // Section Button & Sub-item Builder Widgets
   // ----------------------------------------------------
@@ -326,33 +329,20 @@ class _GeologyScreenState extends State<GeologyScreen> {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-            child: Row(
-              children: [
-                Container(
-                  width: 7,
-                  height: 7,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryBrown,
-                    shape: BoxShape.circle,
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'NotoKufi',
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textBlack,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FittedBox(
-                    alignment: Alignment.centerRight,
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontFamily: 'NotoKufi',
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textBlack,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -376,28 +366,35 @@ class _GeologyScreenState extends State<GeologyScreen> {
             // ==========================================
             _buildMainSectionHeader(
               title: 'جيومورفولوجية المملكة',
-              onTap: _showGeomorphologyOverview,
+              onTap: () {
+                setState(() {
+                  _geomorphologyExpanded = !_geomorphologyExpanded;
+                });
+                _showGeomorphologyOverview();
+              },
             ),
-            _buildSubItemButton(
-              title: 'المرتفعات الغربية',
-              onTap: _showWesternHighlands,
-            ),
-            _buildSubItemButton(
-              title: 'الهضاب',
-              onTap: _showPlatelays,
-            ),
-            _buildSubItemButton(
-              title: 'التكوينات الرملية',
-              onTap: _showSandFormations,
-            ),
-            _buildSubItemButton(
-              title: 'الربع الخالي',
-              onTap: _showEmptyQuarter,
-            ),
-            _buildSubItemButton(
-              title: 'السهول الساحلية',
-              onTap: _showSwahel,
-            ),
+            if (_geomorphologyExpanded) ...[
+              _buildSubItemButton(
+                title: 'المرتفعات الغربية',
+                onTap: _showWesternHighlands,
+              ),
+              _buildSubItemButton(
+                title: 'الهضاب',
+                onTap: _showPlatelays,
+              ),
+              _buildSubItemButton(
+                title: 'التكوينات الرملية',
+                onTap: _showSandFormations,
+              ),
+              _buildSubItemButton(
+                title: 'الربع الخالي',
+                onTap: _showEmptyQuarter,
+              ),
+              _buildSubItemButton(
+                title: 'السهول الساحلية',
+                onTap: _showSwahel,
+              ),
+            ],
 
             const SizedBox(height: 10),
 
@@ -406,28 +403,35 @@ class _GeologyScreenState extends State<GeologyScreen> {
             // ==========================================
             _buildMainSectionHeader(
               title: 'جيولوجية المملكة',
-              onTap: _showIntroBrief,
+              onTap: () {
+                setState(() {
+                  _geologyExpanded = !_geologyExpanded;
+                });
+                _showIntroBrief();
+              },
             ),
-            _buildSubItemButton(
-              title: 'الدرع العربي',
-              onTap: _showArabianShield,
-            ),
-            _buildSubItemButton(
-              title: 'الرصيف القاري العربي',
-              onTap: _showArabianPlatform,
-            ),
-            _buildSubItemButton(
-              title: 'الحرات البركانية',
-              onTap: _showHarrat,
-            ),
-            _buildSubItemButton(
-              title: 'النشاط البركاني',
-              onTap: _showVolcanicActivity,
-            ),
-            _buildSubItemButton(
-              title: 'الزلازل في شبه الجزيرة العربية',
-              onTap: _showEarthquakes,
-            ),
+            if (_geologyExpanded) ...[
+              _buildSubItemButton(
+                title: 'الدرع العربي',
+                onTap: _showArabianShield,
+              ),
+              _buildSubItemButton(
+                title: 'الرصيف القاري العربي',
+                onTap: _showArabianPlatform,
+              ),
+              _buildSubItemButton(
+                title: 'الحرات البركانية',
+                onTap: _showHarrat,
+              ),
+              _buildSubItemButton(
+                title: 'النشاط البركاني',
+                onTap: _showVolcanicActivity,
+              ),
+              _buildSubItemButton(
+                title: 'الزلازل في شبه الجزيرة العربية',
+                onTap: _showEarthquakes,
+              ),
+            ],
           ],
         ),
       ),

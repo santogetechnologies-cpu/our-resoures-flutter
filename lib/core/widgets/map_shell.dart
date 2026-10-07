@@ -156,8 +156,12 @@ class _MapShellState extends State<MapShell> {
 
             return Stack(
               children: [
-                // Platform-specific 3D Globe Map (Web / Mobile)
-                Positioned.fill(
+                // Platform-specific 3D Globe Map (Web / Mobile) - only covers map viewport, not sidebar
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  right: effectiveSidebarWidth,
                   child: buildPlatformMapWidget(
                     viewId: _viewId,
                     initialLongitude: widget.initialLongitude,
