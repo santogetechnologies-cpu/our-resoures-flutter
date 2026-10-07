@@ -11,11 +11,9 @@ class BooksScreen extends StatefulWidget {
 }
 
 class _BooksScreenState extends State<BooksScreen> {
-  // Main Category expanded state: null, 'encyclopedias', 'books', 'research', 'reports'
-  String? _expandedCategory;
-
-  // Sub-category expanded states inside 'الموسوعات'
-  String? _expandedEncyclopedia;
+  // Expanded state for the 4 main dropdown items:
+  // 'educational', 'specialized', 'zamzam', 'books', or null
+  String? _expandedMenu;
 
   // ---------------------------------------------------------------------------
   // Data Lists for Sub-Buttons (DUMMY)
@@ -71,49 +69,37 @@ class _BooksScreenState extends State<BooksScreen> {
 
   // 3. موسوعة زمزم (15 items)
   final List<String> _zamzamEncyclopediaItems = const [
-    'عربي - Arabic',
-    'انجليزي - English',
-    'فرنسي - French',
-    'ملاوي - Malawi',
-    'تركي - Turkish',
-    'روسي - Russian',
-    'اوردو - Urdo',
-    'فارسي - Persian',
-    'اسباني - Spanish',
-    'هندي - Hindi',
-    'بنغالي - Bengali',
-    'صيني - Chinese',
-    'سواحلي - Swahili',
-    'ياباني - Japanese',
-    'عبري - Hebrew',
+    'عربي',
+    'انجليزي',
+    'فرنسي',
+    'ملاوي',
+    'تركي',
+    'روسي',
+    'اوردو',
+    'فارسي',
+    'اسباني',
+    'هندي',
+    'بنغالي',
+    'صيني',
+    'سواحلي',
+    'ياباني',
+    'عبري',
   ];
 
   // 4. الكتب (4 items)
   final List<String> _booksItems = const [
-    'الجيولوجيا العامه',
+    'الجيولوجيا العامة',
     'كروية الأرض',
     'الجيوفيزياء التطبيقية',
     'رحلة كفاح بين السروات وطويق',
   ];
 
-  void _toggleCategory(String categoryKey) {
+  void _toggleMenu(String menuKey) {
     setState(() {
-      if (_expandedCategory == categoryKey) {
-        _expandedCategory = null;
-        _expandedEncyclopedia = null;
+      if (_expandedMenu == menuKey) {
+        _expandedMenu = null;
       } else {
-        _expandedCategory = categoryKey;
-        _expandedEncyclopedia = null;
-      }
-    });
-  }
-
-  void _toggleEncyclopedia(String encKey) {
-    setState(() {
-      if (_expandedEncyclopedia == encKey) {
-        _expandedEncyclopedia = null;
-      } else {
-        _expandedEncyclopedia = encKey;
+        _expandedMenu = menuKey;
       }
     });
   }
@@ -121,8 +107,8 @@ class _BooksScreenState extends State<BooksScreen> {
   Widget _buildDummySubItem(String text) {
     return Container(
       width: double.infinity,
-      height: 44,
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 3.5),
+      height: 46,
+      margin: const EdgeInsets.symmetric(horizontal: 22, vertical: 3.5),
       decoration: BoxDecoration(
         color: AppColors.subMenuBtnBg,
         borderRadius: BorderRadius.circular(AppColors.borderRadius),
@@ -152,70 +138,10 @@ class _BooksScreenState extends State<BooksScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 16,
+                    fontSize: 16.5,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textBlack,
                   ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubSectionHeader({
-    required String title,
-    required bool isExpanded,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      width: double.infinity,
-      height: 52,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      decoration: BoxDecoration(
-        color: isExpanded ? AppColors.categoryBtnBg : AppColors.mainMenuBtnBg,
-        borderRadius: BorderRadius.circular(AppColors.borderRadius),
-        border: Border.all(color: Colors.white.withOpacity(0.9), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.10),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppColors.borderRadius),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontFamily: 'NotoKufi',
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textBlack,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Icon(
-                      isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                      size: 22,
-                      color: AppColors.textBlack,
-                    ),
-                  ],
                 ),
               ),
             ),
@@ -230,87 +156,59 @@ class _BooksScreenState extends State<BooksScreen> {
     return MapShell(
       title: 'الموسوعات والكتب',
       sidebarContent: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 50),
+        padding: const EdgeInsets.only(bottom: 60),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // =================================================================
-            // 1. الموسوعات (Encyclopedias)
+            // 1. الموسوعة التعليمية
             // =================================================================
             CustomButton(
-              text: 'الموسوعات',
+              text: 'الموسوعة التعليمية',
               styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleCategory('encyclopedias'),
+              onPressed: () => _toggleMenu('educational'),
             ),
-            if (_expandedCategory == 'encyclopedias') ...[
-              // 1.1 الموسوعة التعليمية
-              _buildSubSectionHeader(
-                title: 'الموسوعة التعليمية',
-                isExpanded: _expandedEncyclopedia == 'educational',
-                onTap: () => _toggleEncyclopedia('educational'),
-              ),
-              if (_expandedEncyclopedia == 'educational')
-                ..._educationalEncyclopediaItems.map(_buildDummySubItem),
-
-              // 1.2 الموسوعة التخصصية
-              _buildSubSectionHeader(
-                title: 'الموسوعة التخصصية',
-                isExpanded: _expandedEncyclopedia == 'specialized',
-                onTap: () => _toggleEncyclopedia('specialized'),
-              ),
-              if (_expandedEncyclopedia == 'specialized')
-                ..._specializedEncyclopediaItems.map(_buildDummySubItem),
-
-              // 1.3 موسوعة زمزم
-              _buildSubSectionHeader(
-                title: 'موسوعة زمزم',
-                isExpanded: _expandedEncyclopedia == 'zamzam',
-                onTap: () => _toggleEncyclopedia('zamzam'),
-              ),
-              if (_expandedEncyclopedia == 'zamzam')
-                ..._zamzamEncyclopediaItems.map(_buildDummySubItem),
-            ],
+            if (_expandedMenu == 'educational')
+              ..._educationalEncyclopediaItems.map(_buildDummySubItem),
 
             const SizedBox(height: 6),
 
             // =================================================================
-            // 2. الكتب (Books)
+            // 2. الموسوعة التخصصية
+            // =================================================================
+            CustomButton(
+              text: 'الموسوعة التخصصية',
+              styleType: ButtonStyleType.mainMenu,
+              onPressed: () => _toggleMenu('specialized'),
+            ),
+            if (_expandedMenu == 'specialized')
+              ..._specializedEncyclopediaItems.map(_buildDummySubItem),
+
+            const SizedBox(height: 6),
+
+            // =================================================================
+            // 3. موسوعة زمزم
+            // =================================================================
+            CustomButton(
+              text: 'موسوعة زمزم',
+              styleType: ButtonStyleType.mainMenu,
+              onPressed: () => _toggleMenu('zamzam'),
+            ),
+            if (_expandedMenu == 'zamzam')
+              ..._zamzamEncyclopediaItems.map(_buildDummySubItem),
+
+            const SizedBox(height: 6),
+
+            // =================================================================
+            // 4. الكتب
             // =================================================================
             CustomButton(
               text: 'الكتب',
               styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleCategory('books'),
+              onPressed: () => _toggleMenu('books'),
             ),
-            if (_expandedCategory == 'books')
+            if (_expandedMenu == 'books')
               ..._booksItems.map(_buildDummySubItem),
-
-            const SizedBox(height: 6),
-
-            // =================================================================
-            // 3. الأبحاث والأوراق العلمية (Research & Scientific Papers)
-            // =================================================================
-            CustomButton(
-              text: 'الأبحاث والأوراق العلمية',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleCategory('research'),
-            ),
-            if (_expandedCategory == 'research') ...[
-              _buildDummySubItem('لا توجد أبحاث حالياً'),
-            ],
-
-            const SizedBox(height: 6),
-
-            // =================================================================
-            // 4. التقارير والدراسات (Reports & Studies)
-            // =================================================================
-            CustomButton(
-              text: 'التقارير والدراسات',
-              styleType: ButtonStyleType.mainMenu,
-              onPressed: () => _toggleCategory('reports'),
-            ),
-            if (_expandedCategory == 'reports') ...[
-              _buildDummySubItem('لا توجد تقارير حالياً'),
-            ],
           ],
         ),
       ),
