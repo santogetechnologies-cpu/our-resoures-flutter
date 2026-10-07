@@ -328,7 +328,6 @@ class _MapShellState extends State<MapShell> {
                       ),
                     ),
                   ),
-                ),
 
                 // Loading overlay
                 if (widget.isLoading)
