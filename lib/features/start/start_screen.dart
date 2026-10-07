@@ -80,18 +80,20 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           errorBuilder: (c, e, s) => const SizedBox(width: 140),
                         ),
 
-                        // Center Arabic Title: ثرواتنا من أرضنا (Doubled font size with responsive scaling)
+                        // Center Arabic Title: المنصة التفاعلية للأرض والطبيعة والتراث (single line, scaled)
                         const Expanded(
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
-                                'ثرواتنا من أرضنا',
+                                'المنصة التفاعلية للأرض والطبيعة والتراث',
                                 textAlign: TextAlign.center,
+                                maxLines: 1,
+                                softWrap: false,
                                 style: TextStyle(
                                   fontFamily: 'NotoKufi',
-                                  fontSize: 84,
+                                  fontSize: 48,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF6B3A22),
                                   shadows: [

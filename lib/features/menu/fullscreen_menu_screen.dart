@@ -29,14 +29,14 @@ class FullscreenMenuScreen extends StatelessWidget {
     required BuildContext context,
     required String title,
     required VoidCallback onTap,
-    double height = 48,
+    double height = 54,
   }) {
     return Container(
       height: height,
       decoration: BoxDecoration(
         color: AppColors.categoryBtnBg,
         borderRadius: BorderRadius.circular(AppColors.borderRadius),
-        border: Border.all(color: Colors.white.withOpacity(0.85), width: 1.5),
+        border: Border.all(color: Colors.white.withOpacity(0.9), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.12),
@@ -51,7 +51,7 @@ class FullscreenMenuScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppColors.borderRadius),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             child: Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
@@ -60,7 +60,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 28,
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
                   ),
@@ -73,11 +73,12 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactBannerButton({
+  Widget _buildBottomNavButton({
     required BuildContext context,
+    required String title,
     required VoidCallback onTap,
-    double width = 360,
-    double height = 48,
+    double width = 210,
+    double height = 50,
   }) {
     return Container(
       width: width,
@@ -104,62 +105,12 @@ class FullscreenMenuScreen extends StatelessWidget {
             child: Center(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: const Text(
-                  'ثرواتنا من أرضنا',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'NotoKufi',
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFC62828), // Bold red text
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavButton({
-    required BuildContext context,
-    required String title,
-    required VoidCallback onTap,
-    double width = 200,
-    double height = 46,
-  }) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: AppColors.categoryBtnBg,
-        borderRadius: BorderRadius.circular(AppColors.borderRadius),
-        border: Border.all(color: Colors.white.withOpacity(0.85), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppColors.borderRadius),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
                 child: Text(
                   title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
                   ),
@@ -189,13 +140,13 @@ class FullscreenMenuScreen extends StatelessWidget {
 
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Top Header Bar (Enlarged by 40%: height 82px, text 56px, logos 110x70)
+                    // Top Header Bar
                     Container(
-                      height: 82,
+                      height: 78,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
                       decoration: BoxDecoration(
                         color: AppColors.categoryBtnBg,
@@ -211,16 +162,16 @@ class FullscreenMenuScreen extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          // Saudi Vision 2030 logo (enlarged by 40%)
+                          // Saudi Vision 2030 logo
                           Image.asset(
                             AppAssets.saudiVision,
                             width: 110,
-                            height: 70,
+                            height: 66,
                             fit: BoxFit.contain,
                             errorBuilder: (c, e, s) => const SizedBox(width: 110),
                           ),
 
-                          // Centered Title (Enlarged by 40% to 56px)
+                          // Centered Title
                           const Expanded(
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
@@ -229,7 +180,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'NotoKufi',
-                                  fontSize: 56, // Enlarged by 40%
+                                  fontSize: 52,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textBlack,
                                 ),
@@ -237,11 +188,11 @@ class FullscreenMenuScreen extends StatelessWidget {
                             ),
                           ),
 
-                          // KSU logo (enlarged by 40%)
+                          // KSU logo
                           Image.asset(
                             AppAssets.dLogo,
                             width: 110,
-                            height: 70,
+                            height: 66,
                             fit: BoxFit.contain,
                             errorBuilder: (c, e, s) => const SizedBox(width: 110),
                           ),
@@ -249,33 +200,32 @@ class FullscreenMenuScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 10),
-
-                    // Centered button for "ثرواتنا من أرضنا" in RED bold text
-                    _buildCompactBannerButton(
-                      context: context,
-                      width: 360,
-                      height: 48,
-                      onTap: () => AboutDialogs.showNaturalResources(context),
+                    // Non-clickable Subtitle: "ثرواتنا من أرضنا" (styled text below main header bar)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 2),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'ثرواتنا من أرضنا',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 34,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF8B221E), // Rich red text matching screenshot
+                            shadows: [
+                              Shadow(
+                                color: Colors.white,
+                                offset: Offset(0, 1),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
 
-                    const SizedBox(height: 10),
-
-                    // Main 2-Column Grid (10 Category Buttons with bold text and clean spacing)
-                    // In RTL:
-                    // Column 1 (Visual Right - Odd: 1, 3, 5, 7, 9):
-                    // 1: الاستشعار عن بعد وال GIS
-                    // 3: المعادن الاقتصادية ومواقعها
-                    // 5: المياه والأودية والسدود
-                    // 7: المحميات الطبيعية
-                    // 9: الموسوعات والكتب
-                    //
-                    // Column 2 (Visual Left - Even: 2, 4, 6, 8, 10):
-                    // 2: جيولوجية و جيومورفولوجية المملكة
-                    // 4: الطاقة المتجددة وتطبيقاتها
-                    // 6: القرى التراثية والمواقع الاثرية
-                    // 8: استراتيجية المخاطر الطبيعية
-                    // 10: قاعدة البيانات الزلزالية
+                    // Main 2-Column Grid (10 Category Buttons with increased height and proper alignment)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
@@ -289,7 +239,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'الاستشعار عن بعد وال GIS',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => AboutDialogs.showRemoteSensing(context),
                                 ),
                               ),
@@ -299,7 +249,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'جيولوجية و جيومورفولوجية المملكة',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => _navigate(context, const GeologyScreen()),
                                 ),
                               ),
@@ -315,7 +265,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'المعادن الاقتصادية ومواقعها',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => _navigate(context, const MaterialsScreen()),
                                 ),
                               ),
@@ -325,7 +275,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'الطاقة المتجددة وتطبيقاتها',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => _navigate(context, const OilGasScreen()),
                                 ),
                               ),
@@ -341,7 +291,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'المياه والأودية والسدود',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => _navigate(context, const WaterFormationsScreen()),
                                 ),
                               ),
@@ -351,7 +301,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'القرى التراثية والمواقع الاثرية',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => _navigate(context, const TourismScreen()),
                                 ),
                               ),
@@ -367,7 +317,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'المحميات الطبيعية',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => AboutDialogs.showNaturalReserves(context),
                                 ),
                               ),
@@ -377,7 +327,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'استراتيجية المخاطر الطبيعية',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => AboutDialogs.showHazards(context),
                                 ),
                               ),
@@ -393,7 +343,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'الموسوعات والكتب',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => AboutDialogs.showEncyclopedia(context),
                                 ),
                               ),
@@ -403,7 +353,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'قاعدة البيانات الزلزالية',
-                                  height: 48,
+                                  height: 54,
                                   onTap: () => _navigate(context, const EarthquakeScreen()),
                                 ),
                               ),
@@ -413,8 +363,6 @@ class FullscreenMenuScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 12),
-
                     // Bottom Navigation Row (3 Buttons):
                     // In RTL: Right = المصادر | Center = نبذة تعريفية | Left = صفحة البداية
                     Row(
@@ -423,24 +371,24 @@ class FullscreenMenuScreen extends StatelessWidget {
                         _buildBottomNavButton(
                           context: context,
                           title: 'المصادر',
-                          width: 200,
-                          height: 46,
+                          width: 210,
+                          height: 50,
                           onTap: () => AboutDialogs.showReferences(context),
                         ),
                         const SizedBox(width: 24),
                         _buildBottomNavButton(
                           context: context,
                           title: 'نبذة تعريفية',
-                          width: 200,
-                          height: 46,
+                          width: 210,
+                          height: 50,
                           onTap: () => AboutDialogs.showIntroduction(context),
                         ),
                         const SizedBox(width: 24),
                         _buildBottomNavButton(
                           context: context,
                           title: 'صفحة البداية',
-                          width: 200,
-                          height: 46,
+                          width: 210,
+                          height: 50,
                           onTap: () {
                             if (Navigator.of(context).canPop()) {
                               Navigator.of(context).pop();
