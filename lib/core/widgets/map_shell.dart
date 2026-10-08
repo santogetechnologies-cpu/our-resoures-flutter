@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -280,63 +281,82 @@ class _MapShellState extends State<MapShell> {
 
                           // Sidebar scrollable content (unified scroll view for all buttons)
                           Expanded(
-                            child: Scrollbar(
-                              controller: _sidebarScrollController,
-                              thumbVisibility: true,
-                              interactive: true,
-                              radius: const Radius.circular(8),
-                              thickness: 8.0,
-                              child: SingleChildScrollView(
-                                controller: _sidebarScrollController,
-                                physics: const BouncingScrollPhysics(
-                                  parent: AlwaysScrollableScrollPhysics(),
-                                ),
-                                padding: const EdgeInsets.only(bottom: 80),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    if (widget.onBriefPressed != null) ...[
-                                      Container(
-                                        width: double.infinity,
-                                        height: 70,
-                                        margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.mainMenuBtnBg,
-                                          borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                                          border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.12),
-                                              blurRadius: 6,
-                                              offset: const Offset(0, 3),
+                            child: Listener(
+                              onPointerSignal: (pointerSignal) {
+                                if (pointerSignal is PointerScrollEvent && _sidebarScrollController.hasClients) {
+                                  final double delta = pointerSignal.scrollDelta.dy;
+                                  final double newOffset = (_sidebarScrollController.offset + delta)
+                                      .clamp(0.0, _sidebarScrollController.position.maxScrollExtent);
+                                  _sidebarScrollController.jumpTo(newOffset);
+                                }
+                              },
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onVerticalDragUpdate: (details) {
+                                  if (_sidebarScrollController.hasClients) {
+                                    final double delta = details.primaryDelta ?? 0.0;
+                                    final double newOffset = (_sidebarScrollController.offset - delta)
+                                        .clamp(0.0, _sidebarScrollController.position.maxScrollExtent);
+                                    _sidebarScrollController.jumpTo(newOffset);
+                                  }
+                                },
+                                child: Scrollbar(
+                                  controller: _sidebarScrollController,
+                                  thumbVisibility: true,
+                                  interactive: true,
+                                  radius: const Radius.circular(8),
+                                  thickness: 8.0,
+                                  child: SingleChildScrollView(
+                                    controller: _sidebarScrollController,
+                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    padding: const EdgeInsets.only(bottom: 80),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        if (widget.onBriefPressed != null) ...[
+                                          Container(
+                                            width: double.infinity,
+                                            height: 70,
+                                            margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.mainMenuBtnBg,
+                                              borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                              border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.12),
+                                                  blurRadius: 6,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                                            onTap: widget.onBriefPressed,
-                                            child: Center(
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Text(
-                                                  widget.briefButtonText,
-                                                  style: const TextStyle(
-                                                    fontFamily: 'NotoKufi',
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: AppColors.textBlack,
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                                onTap: widget.onBriefPressed,
+                                                child: Center(
+                                                  child: FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      widget.briefButtonText,
+                                                      style: const TextStyle(
+                                                        fontFamily: 'NotoKufi',
+                                                        fontSize: 25,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: AppColors.textBlack,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ],
-                                    widget.sidebarContent,
-                                  ],
+                                        ],
+                                        widget.sidebarContent,
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
