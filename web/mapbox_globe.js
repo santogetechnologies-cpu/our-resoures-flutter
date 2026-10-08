@@ -367,12 +367,6 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     window.addEventListener('touchend', () => {
       _sidebarTouchStartY = null;
     }, { passive: true });
-
-    targetContainer.addEventListener('wheel', (e) => {
-      if (window.flutterModalOpen || isPointerOverSidebar(e)) {
-        e.stopPropagation();
-      }
-    }, { passive: true });
   }
 
   tryInit();

@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -289,26 +288,9 @@ class _MapShellState extends State<MapShell> {
 
                           // Sidebar scrollable content (unified scroll view for all buttons)
                           Expanded(
-                            child: Listener(
-                              onPointerSignal: (pointerSignal) {
-                                if (pointerSignal is PointerScrollEvent && _sidebarScrollController.hasClients) {
-                                  final double delta = pointerSignal.scrollDelta.dy;
-                                  final double newOffset = (_sidebarScrollController.offset + delta)
-                                      .clamp(0.0, _sidebarScrollController.position.maxScrollExtent);
-                                  _sidebarScrollController.jumpTo(newOffset);
-                                }
-                              },
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onVerticalDragUpdate: (details) {
-                                  if (_sidebarScrollController.hasClients) {
-                                    final double delta = details.primaryDelta ?? 0.0;
-                                    final double newOffset = (_sidebarScrollController.offset - delta)
-                                        .clamp(0.0, _sidebarScrollController.position.maxScrollExtent);
-                                    _sidebarScrollController.jumpTo(newOffset);
-                                  }
-                                },
-                                child: Scrollbar(
+                            child: Stack(
+                              children: [
+                                Scrollbar(
                                   controller: _sidebarScrollController,
                                   thumbVisibility: true,
                                   interactive: true,
@@ -317,7 +299,7 @@ class _MapShellState extends State<MapShell> {
                                   child: SingleChildScrollView(
                                     controller: _sidebarScrollController,
                                     physics: const AlwaysScrollableScrollPhysics(),
-                                    padding: const EdgeInsets.only(bottom: 80),
+                                    padding: const EdgeInsets.only(bottom: 90),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
@@ -366,7 +348,69 @@ class _MapShellState extends State<MapShell> {
                                     ),
                                   ),
                                 ),
-                              ),
+
+                                // Floating Scroll Navigation Buttons (Scroll Up & Scroll Down)
+                                Positioned(
+                                  left: 10,
+                                  bottom: 12,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.4),
+                                      borderRadius: BorderRadius.circular(24),
+                                      border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Material(
+                                          color: AppColors.solidBrown,
+                                          shape: const CircleBorder(),
+                                          child: InkWell(
+                                            customBorder: const CircleBorder(),
+                                            onTap: () {
+                                              if (_sidebarScrollController.hasClients) {
+                                                _sidebarScrollController.animateTo(
+                                                  (_sidebarScrollController.offset - 280)
+                                                      .clamp(0.0, _sidebarScrollController.position.maxScrollExtent),
+                                                  duration: const Duration(milliseconds: 250),
+                                                  curve: Curves.easeOut,
+                                                );
+                                              }
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.all(7),
+                                              child: Icon(Icons.arrow_upward_rounded, size: 22, color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Material(
+                                          color: AppColors.solidBrown,
+                                          shape: const CircleBorder(),
+                                          child: InkWell(
+                                            customBorder: const CircleBorder(),
+                                            onTap: () {
+                                              if (_sidebarScrollController.hasClients) {
+                                                _sidebarScrollController.animateTo(
+                                                  (_sidebarScrollController.offset + 280)
+                                                      .clamp(0.0, _sidebarScrollController.position.maxScrollExtent),
+                                                  duration: const Duration(milliseconds: 250),
+                                                  curve: Curves.easeOut,
+                                                );
+                                              }
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.all(7),
+                                              child: Icon(Icons.arrow_downward_rounded, size: 22, color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
