@@ -288,129 +288,63 @@ class _MapShellState extends State<MapShell> {
 
                           // Sidebar scrollable content (unified scroll view for all buttons)
                           Expanded(
-                            child: Stack(
-                              children: [
-                                Scrollbar(
-                                  controller: _sidebarScrollController,
-                                  thumbVisibility: true,
-                                  interactive: true,
-                                  radius: const Radius.circular(8),
-                                  thickness: 8.0,
-                                  child: SingleChildScrollView(
-                                    controller: _sidebarScrollController,
-                                    physics: const AlwaysScrollableScrollPhysics(),
-                                    padding: const EdgeInsets.only(bottom: 90),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                      children: [
-                                        if (widget.onBriefPressed != null) ...[
-                                          Container(
-                                            width: double.infinity,
-                                            height: 70,
-                                            margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.mainMenuBtnBg,
-                                              borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                                              border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.12),
-                                                  blurRadius: 6,
-                                                  offset: const Offset(0, 3),
-                                                ),
-                                              ],
+                            child: Scrollbar(
+                              controller: _sidebarScrollController,
+                              thumbVisibility: true,
+                              interactive: true,
+                              radius: const Radius.circular(8),
+                              thickness: 8.0,
+                              child: SingleChildScrollView(
+                                controller: _sidebarScrollController,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 60),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (widget.onBriefPressed != null) ...[
+                                      Container(
+                                        width: double.infinity,
+                                        height: 70,
+                                        margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.mainMenuBtnBg,
+                                          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                          border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.12),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
                                             ),
-                                            child: Material(
-                                              color: Colors.transparent,
-                                              child: InkWell(
-                                                borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                                                onTap: widget.onBriefPressed,
-                                                child: Center(
-                                                  child: FittedBox(
-                                                    fit: BoxFit.scaleDown,
-                                                    child: Text(
-                                                      widget.briefButtonText,
-                                                      style: const TextStyle(
-                                                        fontFamily: 'NotoKufi',
-                                                        fontSize: 25,
-                                                        fontWeight: FontWeight.w600,
-                                                        color: AppColors.textBlack,
-                                                      ),
-                                                    ),
+                                          ],
+                                        ),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                            onTap: widget.onBriefPressed,
+                                            child: Center(
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  widget.briefButtonText,
+                                                  style: const TextStyle(
+                                                    fontFamily: 'NotoKufi',
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppColors.textBlack,
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ],
-                                        widget.sidebarContent,
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                // Floating Scroll Navigation Buttons (Scroll Up & Scroll Down)
-                                Positioned(
-                                  left: 10,
-                                  bottom: 12,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.4),
-                                      borderRadius: BorderRadius.circular(24),
-                                      border: Border.all(color: Colors.white.withOpacity(0.4), width: 1),
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Material(
-                                          color: AppColors.solidBrown,
-                                          shape: const CircleBorder(),
-                                          child: InkWell(
-                                            customBorder: const CircleBorder(),
-                                            onTap: () {
-                                              if (_sidebarScrollController.hasClients) {
-                                                _sidebarScrollController.animateTo(
-                                                  (_sidebarScrollController.offset - 280)
-                                                      .clamp(0.0, _sidebarScrollController.position.maxScrollExtent),
-                                                  duration: const Duration(milliseconds: 250),
-                                                  curve: Curves.easeOut,
-                                                );
-                                              }
-                                            },
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(7),
-                                              child: Icon(Icons.arrow_upward_rounded, size: 22, color: Colors.white),
-                                            ),
-                                          ),
                                         ),
-                                        const SizedBox(height: 6),
-                                        Material(
-                                          color: AppColors.solidBrown,
-                                          shape: const CircleBorder(),
-                                          child: InkWell(
-                                            customBorder: const CircleBorder(),
-                                            onTap: () {
-                                              if (_sidebarScrollController.hasClients) {
-                                                _sidebarScrollController.animateTo(
-                                                  (_sidebarScrollController.offset + 280)
-                                                      .clamp(0.0, _sidebarScrollController.position.maxScrollExtent),
-                                                  duration: const Duration(milliseconds: 250),
-                                                  curve: Curves.easeOut,
-                                                );
-                                              }
-                                            },
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(7),
-                                              child: Icon(Icons.arrow_downward_rounded, size: 22, color: Colors.white),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                      ),
+                                    ],
+                                    widget.sidebarContent,
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ],
