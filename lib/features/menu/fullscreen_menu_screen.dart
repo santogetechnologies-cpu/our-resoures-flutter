@@ -30,7 +30,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     required BuildContext context,
     required String title,
     required VoidCallback onTap,
-    double height = 54,
+    double height = 64,
   }) {
     return Container(
       height: height,
@@ -247,7 +247,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'الاستشعار عن بعد وال GIS',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => AboutDialogs.showRemoteSensing(context),
                                 ),
                               ),
@@ -257,7 +257,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'جيولوجية و جيومورفولوجية المملكة',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => _navigate(context, const GeologyScreen()),
                                 ),
                               ),
@@ -273,7 +273,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'المعادن الاقتصادية ومواقعها',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => _navigate(context, const MaterialsScreen()),
                                 ),
                               ),
@@ -283,7 +283,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'الطاقة المتجددة وتطبيقاتها',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => _navigate(context, const OilGasScreen()),
                                 ),
                               ),
@@ -299,7 +299,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'المياه والأودية والسدود',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => _navigate(context, const WaterFormationsScreen()),
                                 ),
                               ),
@@ -309,7 +309,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'القرى التراثية والمواقع الاثرية',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => _navigate(context, const TourismScreen()),
                                 ),
                               ),
@@ -325,7 +325,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'المحميات الطبيعية',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => AboutDialogs.showNaturalReserves(context),
                                 ),
                               ),
@@ -335,7 +335,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'استراتيجية المخاطر الطبيعية',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => AboutDialogs.showHazards(context),
                                 ),
                               ),
@@ -351,7 +351,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'الموسوعات والكتب',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => _navigate(context, const BooksScreen()),
                                 ),
                               ),
@@ -361,7 +361,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildCategoryButton(
                                   context: context,
                                   title: 'قاعدة البيانات الزلزالية',
-                                  height: 54,
+                                  height: 64,
                                   onTap: () => _navigate(context, const EarthquakeScreen()),
                                 ),
                               ),
