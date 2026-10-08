@@ -285,7 +285,7 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
 
     function isPointerOverSidebar(e) {
       const w = window.innerWidth;
-      const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 355;
+      const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 380;
       const x = _getPointerX(e);
       return x !== undefined && x >= (w - sidebarWidth);
     }
@@ -326,8 +326,11 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     window.addEventListener('wheel', (e) => {
       if (isPointerOverSidebar(e)) {
         setGlobeInteractions(false);
+        let dy = e.deltaY;
+        if (e.deltaMode === 1) dy *= 32;
+        else if (e.deltaMode === 2) dy *= 320;
         if (typeof window.flutterSidebarScroll === 'function') {
-          window.flutterSidebarScroll(e.deltaY);
+          window.flutterSidebarScroll(dy);
         }
       } else {
         onPointerCheck(e);
