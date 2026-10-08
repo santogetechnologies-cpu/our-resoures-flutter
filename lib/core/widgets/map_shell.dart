@@ -134,10 +134,18 @@ class _MapShellState extends State<MapShell> {
     _currentLat = widget.initialLatitude;
     _viewId = widget.title.hashCode.abs().toString();
     _sidebarScrollController = ScrollController();
+    registerSidebarScrollCallback((deltaY) {
+      if (mounted && _sidebarScrollController.hasClients) {
+        final double target = (_sidebarScrollController.offset + deltaY)
+            .clamp(0.0, _sidebarScrollController.position.maxScrollExtent);
+        _sidebarScrollController.jumpTo(target);
+      }
+    });
   }
 
   @override
   void dispose() {
+    registerSidebarScrollCallback(null);
     _sidebarScrollController.dispose();
     super.dispose();
   }

@@ -12,6 +12,8 @@ void clearMarkersWeb(String domId) {}
 
 void setModalOpenWeb(bool isOpen) {}
 
+void registerSidebarScrollCallback(void Function(double deltaY)? callback) {}
+
 Widget buildPlatformMapWidget({
   required String viewId,
   required double initialLongitude,

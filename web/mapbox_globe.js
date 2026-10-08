@@ -269,17 +269,25 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     // ── Interaction Guard: Isolate Sidebar & Modals from Globe ───────────────
     // Prevent the globe from zooming, panning, or moving when the user scrolls
     // or interacts with the right-side sidebar menu or modal dialogs.
+    function _getPointerX(e) {
+      if (e.clientX !== undefined) return e.clientX;
+      if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+      if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
+      return undefined;
+    }
+
+    function _getPointerY(e) {
+      if (e.clientY !== undefined) return e.clientY;
+      if (e.touches && e.touches.length > 0) return e.touches[0].clientY;
+      if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientY;
+      return undefined;
+    }
+
     function isPointerOverSidebar(e) {
       const w = window.innerWidth;
       const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 355;
-      let clientX = e.clientX;
-      if (clientX === undefined && e.touches && e.touches.length > 0) {
-        clientX = e.touches[0].clientX;
-      }
-      if (clientX === undefined && e.changedTouches && e.changedTouches.length > 0) {
-        clientX = e.changedTouches[0].clientX;
-      }
-      return clientX !== undefined && clientX >= (w - sidebarWidth);
+      const x = _getPointerX(e);
+      return x !== undefined && x >= (w - sidebarWidth);
     }
 
     function setGlobeInteractions(enabled) {
@@ -304,6 +312,8 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       } catch (_) {}
     }
 
+    let _sidebarTouchStartY = null;
+
     const onPointerCheck = (e) => {
       const overSidebar = isPointerOverSidebar(e);
       setGlobeInteractions(!overSidebar);
@@ -311,9 +321,50 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
 
     window.addEventListener('mousemove', onPointerCheck, { passive: true });
     window.addEventListener('pointermove', onPointerCheck, { passive: true });
-    window.addEventListener('wheel', onPointerCheck, { passive: true });
-    window.addEventListener('touchstart', onPointerCheck, { passive: true });
-    window.addEventListener('touchmove', onPointerCheck, { passive: true });
+
+    // When mouse wheel is scrolled over the sidebar, dispatch directly to Flutter's sidebar scroll controller
+    window.addEventListener('wheel', (e) => {
+      if (isPointerOverSidebar(e)) {
+        setGlobeInteractions(false);
+        if (typeof window.flutterSidebarScroll === 'function') {
+          window.flutterSidebarScroll(e.deltaY);
+        }
+      } else {
+        onPointerCheck(e);
+      }
+    }, { passive: true });
+
+    // When touch is swiped over the sidebar, dispatch directly to Flutter's sidebar scroll controller
+    window.addEventListener('touchstart', (e) => {
+      if (isPointerOverSidebar(e)) {
+        setGlobeInteractions(false);
+        _sidebarTouchStartY = _getPointerY(e);
+      } else {
+        _sidebarTouchStartY = null;
+        onPointerCheck(e);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (_sidebarTouchStartY !== null && isPointerOverSidebar(e)) {
+        setGlobeInteractions(false);
+        const currentY = _getPointerY(e);
+        if (currentY !== undefined) {
+          const deltaY = _sidebarTouchStartY - currentY;
+          _sidebarTouchStartY = currentY;
+          if (typeof window.flutterSidebarScroll === 'function') {
+            window.flutterSidebarScroll(deltaY);
+          }
+        }
+      } else {
+        onPointerCheck(e);
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      _sidebarTouchStartY = null;
+    }, { passive: true });
+
     targetContainer.addEventListener('wheel', (e) => {
       if (window.flutterModalOpen || isPointerOverSidebar(e)) {
         e.stopPropagation();

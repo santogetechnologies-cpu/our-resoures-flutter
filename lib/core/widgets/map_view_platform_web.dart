@@ -53,6 +53,18 @@ void setModalOpenWeb(bool isOpen) {
   }
 }
 
+void registerSidebarScrollCallback(void Function(double deltaY)? callback) {
+  if (callback == null) {
+    js.context['flutterSidebarScroll'] = null;
+  } else {
+    js.context['flutterSidebarScroll'] = (dynamic deltaY) {
+      if (deltaY is num) {
+        callback(deltaY.toDouble());
+      }
+    };
+  }
+}
+
 Widget buildPlatformMapWidget({
   required String viewId,
   required double initialLongitude,
