@@ -283,11 +283,14 @@ class _MapShellState extends State<MapShell> {
                             child: Scrollbar(
                               controller: _sidebarScrollController,
                               thumbVisibility: true,
+                              interactive: true,
                               radius: const Radius.circular(8),
-                              thickness: 5.0,
+                              thickness: 8.0,
                               child: SingleChildScrollView(
                                 controller: _sidebarScrollController,
-                                physics: const AlwaysScrollableScrollPhysics(),
+                                physics: const BouncingScrollPhysics(
+                                  parent: AlwaysScrollableScrollPhysics(),
+                                ),
                                 padding: const EdgeInsets.only(bottom: 80),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,

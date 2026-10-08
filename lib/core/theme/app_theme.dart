@@ -59,6 +59,14 @@ class AppTheme {
           color: AppColors.textDark,
         ),
       ),
+      scrollbarTheme: ScrollbarThemeData(
+        thumbVisibility: MaterialStateProperty.all(true),
+        trackVisibility: MaterialStateProperty.all(false),
+        interactive: true,
+        thickness: MaterialStateProperty.all(8.0),
+        radius: const Radius.circular(8),
+        thumbColor: MaterialStateProperty.all(AppColors.solidBrown.withOpacity(0.7)),
+      ),
     );
   }
 }
