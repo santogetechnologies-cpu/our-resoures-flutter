@@ -27,14 +27,14 @@ void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String m
   final callbackKey = 'mapbox_marker_cb_${markerId}_$domId';
   _webMarkerCallbacks[callbackKey] = onTap; // ← keyed by full callbackKey
 
-  js.context[callbackKey] = (String id) {
+  js.context[callbackKey] = js.allowInterop((String id) {
     // JS passes markerId; reconstruct the full key to look up the callback.
     final key = 'mapbox_marker_cb_${id}_$domId';
     final cb = _webMarkerCallbacks[key];
     if (cb != null) {
       cb();
     }
-  };
+  });
 
   if (js.context.hasProperty('mapboxGlobeAddMarkerWeb')) {
     js.context.callMethod('mapboxGlobeAddMarkerWeb', [domId, lng, lat, iconUrl, markerId, callbackKey]);
@@ -57,11 +57,11 @@ void registerSidebarScrollCallback(void Function(double deltaY)? callback) {
   if (callback == null) {
     js.context['flutterSidebarScroll'] = null;
   } else {
-    js.context['flutterSidebarScroll'] = (dynamic deltaY) {
+    js.context['flutterSidebarScroll'] = js.allowInterop((dynamic deltaY) {
       if (deltaY is num) {
         callback(deltaY.toDouble());
       }
-    };
+    });
   }
 }
 

@@ -267,32 +267,8 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     }
 
     // ── Interaction Guard: Isolate Sidebar & Modals from Globe ───────────────
-    // Prevent the globe from zooming, panning, or moving when the user scrolls
-    // or interacts with the right-side sidebar menu or modal dialogs.
-    function _getPointerX(e) {
-      if (e.clientX !== undefined) return e.clientX;
-      if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
-      if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
-      return undefined;
-    }
-
-    function _getPointerY(e) {
-      if (e.clientY !== undefined) return e.clientY;
-      if (e.touches && e.touches.length > 0) return e.touches[0].clientY;
-      if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientY;
-      return undefined;
-    }
-
-    function isPointerOverSidebar(e) {
-      const w = window.innerWidth;
-      const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 380;
-      const x = _getPointerX(e);
-      return x !== undefined && x >= (w - sidebarWidth);
-    }
-
     function setGlobeInteractions(enabled) {
       if (!map) return;
-      // If a modal popup dialog is open anywhere on screen, force map to be inactive
       if (window.flutterModalOpen) {
         enabled = false;
       }
@@ -312,8 +288,6 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       } catch (_) {}
     }
 
-    let _sidebarTouchStartY = null;
-
     const onPointerCheck = (e) => {
       const overSidebar = isPointerOverSidebar(e);
       setGlobeInteractions(!overSidebar);
@@ -321,56 +295,73 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
 
     window.addEventListener('mousemove', onPointerCheck, { passive: true });
     window.addEventListener('pointermove', onPointerCheck, { passive: true });
-
-    // When mouse wheel is scrolled over the sidebar, dispatch directly to Flutter's sidebar scroll controller
-    window.addEventListener('wheel', (e) => {
-      if (isPointerOverSidebar(e)) {
-        setGlobeInteractions(false);
-        let dy = e.deltaY;
-        if (e.deltaMode === 1) dy *= 32;
-        else if (e.deltaMode === 2) dy *= 320;
-        if (typeof window.flutterSidebarScroll === 'function') {
-          window.flutterSidebarScroll(dy);
-        }
-      } else {
-        onPointerCheck(e);
-      }
-    }, { passive: true });
-
-    // When touch is swiped over the sidebar, dispatch directly to Flutter's sidebar scroll controller
-    window.addEventListener('touchstart', (e) => {
-      if (isPointerOverSidebar(e)) {
-        setGlobeInteractions(false);
-        _sidebarTouchStartY = _getPointerY(e);
-      } else {
-        _sidebarTouchStartY = null;
-        onPointerCheck(e);
-      }
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      if (_sidebarTouchStartY !== null && isPointerOverSidebar(e)) {
-        setGlobeInteractions(false);
-        const currentY = _getPointerY(e);
-        if (currentY !== undefined) {
-          const deltaY = _sidebarTouchStartY - currentY;
-          _sidebarTouchStartY = currentY;
-          if (typeof window.flutterSidebarScroll === 'function') {
-            window.flutterSidebarScroll(deltaY);
-          }
-        }
-      } else {
-        onPointerCheck(e);
-      }
-    }, { passive: true });
-
-    window.addEventListener('touchend', () => {
-      _sidebarTouchStartY = null;
-    }, { passive: true });
+    window.addEventListener('wheel', onPointerCheck, { passive: true });
   }
 
   tryInit();
 };
+
+// ── Global Sidebar Wheel & Touch Bridge for Flutter Web ────────────────────
+function _getPointerX(e) {
+  if (e.clientX !== undefined) return e.clientX;
+  if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+  if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
+  return undefined;
+}
+
+function _getPointerY(e) {
+  if (e.clientY !== undefined) return e.clientY;
+  if (e.touches && e.touches.length > 0) return e.touches[0].clientY;
+  if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientY;
+  return undefined;
+}
+
+function isPointerOverSidebar(e) {
+  const w = window.innerWidth;
+  const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 380;
+  const x = _getPointerX(e);
+  return x !== undefined && x >= (w - sidebarWidth);
+}
+
+let _sidebarTouchStartY = null;
+
+// Global wheel listener: always forward wheel scroll over the sidebar to Flutter
+window.addEventListener('wheel', (e) => {
+  if (isPointerOverSidebar(e)) {
+    let dy = e.deltaY;
+    if (e.deltaMode === 1) dy *= 32;
+    else if (e.deltaMode === 2) dy *= 320;
+    if (typeof window.flutterSidebarScroll === 'function') {
+      window.flutterSidebarScroll(dy);
+    }
+  }
+}, { passive: true });
+
+// Global touch listeners: forward touch swiping over the sidebar to Flutter
+window.addEventListener('touchstart', (e) => {
+  if (isPointerOverSidebar(e)) {
+    _sidebarTouchStartY = _getPointerY(e);
+  } else {
+    _sidebarTouchStartY = null;
+  }
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  if (_sidebarTouchStartY !== null && isPointerOverSidebar(e)) {
+    const currentY = _getPointerY(e);
+    if (currentY !== undefined) {
+      const deltaY = _sidebarTouchStartY - currentY;
+      _sidebarTouchStartY = currentY;
+      if (typeof window.flutterSidebarScroll === 'function') {
+        window.flutterSidebarScroll(deltaY);
+      }
+    }
+  }
+}, { passive: true });
+
+window.addEventListener('touchend', () => {
+  _sidebarTouchStartY = null;
+}, { passive: true });
 
 // ---------------------------------------------------------------------------
 // Modal State Bridge: Freezes map controls while modal dialogs are open
