@@ -42,6 +42,9 @@ flutter:
     - assets/maps/materials/
     - assets/maps/earthquake/
     - assets/books/educational/
+    - assets/books/specialized/
+    - assets/books/general_books/
+    - assets/books/zamzam/
 
   fonts:
     - family: NotoKufi

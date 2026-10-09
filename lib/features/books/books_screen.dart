@@ -105,6 +105,15 @@ class _BooksScreenState extends State<BooksScreen> {
     'التعدين والطاقة',
   ];
 
+  static const Map<String, String> _specializedBooksAssets = {
+    'تمهيد': 'assets/books/specialized/spec_book_01.pdf',
+    'تاريخ العلوم': 'assets/books/specialized/spec_book_02.pdf',
+    'الأرض والفضاء': 'assets/books/specialized/spec_book_03.pdf',
+    'المخاطر الطبيعية': 'assets/books/specialized/spec_book_04.pdf',
+    'البيئة والمياه': 'assets/books/specialized/spec_book_05.pdf',
+    'التعدين والطاقة': 'assets/books/specialized/spec_book_06.pdf',
+  };
+
   // 3. موسوعة زمزم (15 items)
   final List<String> _zamzamEncyclopediaItems = const [
     'عربي',
@@ -124,6 +133,24 @@ class _BooksScreenState extends State<BooksScreen> {
     'عبري',
   ];
 
+  static const Map<String, String> _zamzamBooksAssets = {
+    'عربي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'انجليزي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'فرنسي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'ملاوي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'تركي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'روسي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'اوردو': 'assets/books/zamzam/zamzam_ar.pdf',
+    'فارسي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'اسباني': 'assets/books/zamzam/zamzam_ar.pdf',
+    'هندي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'بنغالي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'صيني': 'assets/books/zamzam/zamzam_ar.pdf',
+    'سواحلي': 'assets/books/zamzam/zamzam_ar.pdf',
+    'ياباني': 'assets/books/zamzam/zamzam_ar.pdf',
+    'عبري': 'assets/books/zamzam/zamzam_ar.pdf',
+  };
+
   // 4. الكتب (4 items)
   final List<String> _booksItems = const [
     'الجيولوجيا العامة',
@@ -131,6 +158,13 @@ class _BooksScreenState extends State<BooksScreen> {
     'الجيوفيزياء التطبيقية',
     'رحلة كفاح بين السروات وطويق',
   ];
+
+  static const Map<String, String> _generalBooksAssets = {
+    'الجيولوجيا العامة': 'assets/books/general_books/book_01.pdf',
+    'كروية الأرض': 'assets/books/general_books/book_02.pdf',
+    'الجيوفيزياء التطبيقية': 'assets/books/general_books/book_03.pdf',
+    'رحلة كفاح بين السروات وطويق': 'assets/books/general_books/book_04.pdf',
+  };
 
   void _toggleMenu(String menuKey) {
     setState(() {
@@ -142,8 +176,7 @@ class _BooksScreenState extends State<BooksScreen> {
     });
   }
 
-  void _openEducationalBook(String title) {
-    final assetPath = _educationalBooksAssets[title];
+  void _openPdfBook(String title, String? assetPath) {
     if (assetPath != null) {
       PdfViewerDialog.show(
         context,
@@ -153,7 +186,7 @@ class _BooksScreenState extends State<BooksScreen> {
     }
   }
 
-  Widget _buildEducationalSubItem(String text) {
+  Widget _buildSubItem(String text, VoidCallback onTap) {
     return Container(
       width: double.infinity,
       height: 46,
@@ -174,54 +207,7 @@ class _BooksScreenState extends State<BooksScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppColors.borderRadius),
-          onTap: () => _openEducationalBook(text),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'NotoKufi',
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textBlack,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDummySubItem(String text) {
-    return Container(
-      width: double.infinity,
-      height: 46,
-      margin: const EdgeInsets.symmetric(horizontal: 22, vertical: 3.5),
-      decoration: BoxDecoration(
-        color: AppColors.subMenuBtnBg,
-        borderRadius: BorderRadius.circular(AppColors.borderRadius),
-        border: Border.all(color: Colors.white.withOpacity(0.85), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppColors.borderRadius),
-          onTap: () {
-            // Dummy button - no click action
-          },
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
             child: Center(
@@ -261,7 +247,12 @@ class _BooksScreenState extends State<BooksScreen> {
             onPressed: () => _toggleMenu('educational'),
           ),
           if (_expandedMenu == 'educational')
-            ..._educationalEncyclopediaItems.map(_buildEducationalSubItem),
+            ..._educationalEncyclopediaItems.map(
+              (text) => _buildSubItem(
+                text,
+                () => _openPdfBook(text, _educationalBooksAssets[text]),
+              ),
+            ),
 
           const SizedBox(height: 6),
 
@@ -274,7 +265,12 @@ class _BooksScreenState extends State<BooksScreen> {
             onPressed: () => _toggleMenu('specialized'),
           ),
           if (_expandedMenu == 'specialized')
-            ..._specializedEncyclopediaItems.map(_buildDummySubItem),
+            ..._specializedEncyclopediaItems.map(
+              (text) => _buildSubItem(
+                text,
+                () => _openPdfBook(text, _specializedBooksAssets[text]),
+              ),
+            ),
 
           const SizedBox(height: 6),
 
@@ -287,7 +283,12 @@ class _BooksScreenState extends State<BooksScreen> {
             onPressed: () => _toggleMenu('zamzam'),
           ),
           if (_expandedMenu == 'zamzam')
-            ..._zamzamEncyclopediaItems.map(_buildDummySubItem),
+            ..._zamzamEncyclopediaItems.map(
+              (text) => _buildSubItem(
+                text,
+                () => _openPdfBook('موسوعة زمزم - $text', _zamzamBooksAssets[text]),
+              ),
+            ),
 
           const SizedBox(height: 6),
 
@@ -300,7 +301,12 @@ class _BooksScreenState extends State<BooksScreen> {
             onPressed: () => _toggleMenu('books'),
           ),
           if (_expandedMenu == 'books')
-            ..._booksItems.map(_buildDummySubItem),
+            ..._booksItems.map(
+              (text) => _buildSubItem(
+                text,
+                () => _openPdfBook(text, _generalBooksAssets[text]),
+              ),
+            ),
         ],
       ),
     );
