@@ -17,6 +17,7 @@ dependencies:
   flutter_map: ^6.0.0
   mapbox_maps_flutter: ^2.3.0
   excel: ^4.0.0
+  syncfusion_flutter_pdfviewer: ^24.2.8
 
 dev_dependencies:
   flutter_test:
@@ -37,6 +38,7 @@ flutter:
     - assets/maps/water_formation/
     - assets/maps/materials/
     - assets/maps/earthquake/
+    - assets/books/educational/
 
   fonts:
     - family: NotoKufi

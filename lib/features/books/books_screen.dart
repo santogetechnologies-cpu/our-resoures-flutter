@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
+import '../../core/dialogs/pdf_viewer_dialog.dart';
 
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
@@ -16,10 +17,10 @@ class _BooksScreenState extends State<BooksScreen> {
   String? _expandedMenu;
 
   // ---------------------------------------------------------------------------
-  // Data Lists for Sub-Buttons (DUMMY)
+  // Data Lists for Sub-Buttons
   // ---------------------------------------------------------------------------
 
-  // 1. الموسوعة التعليمية (35 items)
+  // 1. الموسوعة التعليمية (34 items)
   final List<String> _educationalEncyclopediaItems = const [
     'تمهيد الموسوعة',
     'تقدير عمر الأرض',
@@ -56,6 +57,43 @@ class _BooksScreenState extends State<BooksScreen> {
     '300 سؤال وجواب في الجيوفيزياء التطبيقية',
     'تطبيقات الذكاء الاصطناعي في علوم الأرض',
   ];
+
+  static const Map<String, String> _educationalBooksAssets = {
+    'تمهيد الموسوعة': 'assets/books/educational/edu_book_01.pdf',
+    'تقدير عمر الأرض': 'assets/books/educational/edu_book_02.pdf',
+    'شكل الأرض وحركاتها': 'assets/books/educational/edu_book_03.pdf',
+    'الجاذبية الأرضية وتطبيقاتها': 'assets/books/educational/edu_book_04.pdf',
+    'التركيب الداخلي للأرض': 'assets/books/educational/edu_book_05.pdf',
+    'المعادن والتعدين': 'assets/books/educational/edu_book_06.pdf',
+    'المد والجزر': 'assets/books/educational/edu_book_07.pdf',
+    'موجات التسونامي': 'assets/books/educational/edu_book_08.pdf',
+    'الزلازل والتفجيرات': 'assets/books/educational/edu_book_09.pdf',
+    'تقييم مخاطر الزلازل': 'assets/books/educational/edu_book_10.pdf',
+    'البراكين وسبل مجابهتها': 'assets/books/educational/edu_book_11.pdf',
+    'جيولوجية القمر': 'assets/books/educational/edu_book_12.pdf',
+    'الأغلفة المحيطة بالأرض': 'assets/books/educational/edu_book_13.pdf',
+    'المشاكل البيئية وحلولها': 'assets/books/educational/edu_book_14.pdf',
+    'التغيرات المناخية والإحتباس الحراري': 'assets/books/educational/edu_book_15.pdf',
+    'التشجير التحديات والحلول': 'assets/books/educational/edu_book_16.pdf',
+    'الإنزلاقات والإنهيارات والفيضانات': 'assets/books/educational/edu_book_17.pdf',
+    'الامطار والسيول والسدود': 'assets/books/educational/edu_book_18.pdf',
+    'التصحر والجفاف': 'assets/books/educational/edu_book_19.pdf',
+    'مستقبل الطاقة في عالمنا': 'assets/books/educational/edu_book_20.pdf',
+    'الطاقة الحرارية الأرضية': 'assets/books/educational/edu_book_21.pdf',
+    'هل انتهى عصر النفط': 'assets/books/educational/edu_book_22.pdf',
+    'الجيوفيزياء النووية': 'assets/books/educational/edu_book_23.pdf',
+    'الجيولوجيا الطبية': 'assets/books/educational/edu_book_24.pdf',
+    'أنظمة الإنذار المبكر': 'assets/books/educational/edu_book_25.pdf',
+    'الدليل الى كتابة الرسائل الجامعية والنشر العلمي عربي': 'assets/books/educational/edu_book_26.pdf',
+    'الدليل الى كتابة الرسائل الجامعية والنشر العلمي إنجليزي': 'assets/books/educational/edu_book_27.pdf',
+    '321 سؤال وجواب في أصل وتطور الأرض': 'assets/books/educational/edu_book_28.pdf',
+    '358 سؤال وجواب في علم الصخور والجيوكيمياء والاستشعار عن بعد': 'assets/books/educational/edu_book_29.pdf',
+    '358 سؤال وجواب في الثروات الطبيعية': 'assets/books/educational/edu_book_30.pdf',
+    '380 سؤال وجواب في المخاطر الجيولوجية': 'assets/books/educational/edu_book_31.pdf',
+    '303 سؤال وجواب في علم الزلازل والزلزالية الهندسية': 'assets/books/educational/edu_book_32.pdf',
+    '300 سؤال وجواب في الجيوفيزياء التطبيقية': 'assets/books/educational/edu_book_33.pdf',
+    'تطبيقات الذكاء الاصطناعي في علوم الأرض': 'assets/books/educational/edu_book_34.pdf',
+  };
 
   // 2. الموسوعة التخصصية (6 items)
   final List<String> _specializedEncyclopediaItems = const [
@@ -102,6 +140,62 @@ class _BooksScreenState extends State<BooksScreen> {
         _expandedMenu = menuKey;
       }
     });
+  }
+
+  void _openEducationalBook(String title) {
+    final assetPath = _educationalBooksAssets[title];
+    if (assetPath != null) {
+      PdfViewerDialog.show(
+        context,
+        title: title,
+        assetPath: assetPath,
+      );
+    }
+  }
+
+  Widget _buildEducationalSubItem(String text) {
+    return Container(
+      width: double.infinity,
+      height: 46,
+      margin: const EdgeInsets.symmetric(horizontal: 22, vertical: 3.5),
+      decoration: BoxDecoration(
+        color: AppColors.subMenuBtnBg,
+        borderRadius: BorderRadius.circular(AppColors.borderRadius),
+        border: Border.all(color: Colors.white.withOpacity(0.85), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          onTap: () => _openEducationalBook(text),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'NotoKufi',
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textBlack,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildDummySubItem(String text) {
@@ -167,7 +261,7 @@ class _BooksScreenState extends State<BooksScreen> {
             onPressed: () => _toggleMenu('educational'),
           ),
           if (_expandedMenu == 'educational')
-            ..._educationalEncyclopediaItems.map(_buildDummySubItem),
+            ..._educationalEncyclopediaItems.map(_buildEducationalSubItem),
 
           const SizedBox(height: 6),
 
