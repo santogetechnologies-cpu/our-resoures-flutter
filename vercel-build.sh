@@ -10,9 +10,12 @@ if [ ! -d "/tmp/flutter" ]; then
 fi
 
 export PATH="/tmp/flutter/bin:$PATH"
+git config --global --add safe.directory /tmp/flutter 2>/dev/null || true
 
 echo "Flutter version:"
 flutter --version
+
+flutter config --no-analytics
 
 echo "Getting dependencies..."
 flutter pub get
