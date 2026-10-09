@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
@@ -40,6 +41,7 @@ class PdfViewerDialog extends StatefulWidget {
 
 class _PdfViewerDialogState extends State<PdfViewerDialog> {
   late PdfViewerController _pdfViewerController;
+  Uint8List? _pdfBytes;
   int _pageCount = 0;
   int _currentPage = 1;
   bool _isLoading = true;
@@ -49,6 +51,32 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   void initState() {
     super.initState();
     _pdfViewerController = PdfViewerController();
+    _loadPdfData();
+  }
+
+  Future<void> _loadPdfData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final ByteData data = await rootBundle.load(widget.assetPath);
+      final Uint8List bytes = data.buffer.asUint8List();
+      if (mounted) {
+        setState(() {
+          _pdfBytes = bytes;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'تعذر تحميل ملف الكتاب: $e';
+        });
+      }
+    }
   }
 
   @override
@@ -145,7 +173,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                     Text(
                       _pageCount > 0
                           ? 'الصفحة $_currentPage من $_pageCount'
-                          : 'جاري تحميل المستند...',
+                          : (_isLoading ? 'جاري قراءة وتحميل المستند...' : 'المستند جاهز'),
                       style: const TextStyle(
                         fontFamily: 'NotoKufi',
                         fontSize: 14,
@@ -198,86 +226,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                     ],
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: Stack(
-                    children: [
-                      if (_errorMessage != null)
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
-                                const SizedBox(height: 12),
-                                Text(
-                                  _errorMessage!,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontFamily: 'NotoKufi',
-                                    fontSize: 15,
-                                    color: AppColors.textDark,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      else
-                        SfPdfViewer.asset(
-                          widget.assetPath,
-                          controller: _pdfViewerController,
-                          canShowScrollHead: true,
-                          canShowScrollStatus: true,
-                          enableDoubleTapZooming: true,
-                          onDocumentLoaded: (PdfDocumentLoadedDetails details) {
-                            if (mounted) {
-                              setState(() {
-                                _pageCount = details.document.pages.count;
-                                _isLoading = false;
-                              });
-                            }
-                          },
-                          onPageChanged: (PdfPageChangedDetails details) {
-                            if (mounted) {
-                              setState(() {
-                                _currentPage = details.newPageNumber;
-                              });
-                            }
-                          },
-                          onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
-                            if (mounted) {
-                              setState(() {
-                                _isLoading = false;
-                                _errorMessage =
-                                    'تعذر فتح ملف الكتاب: ${details.description}';
-                              });
-                            }
-                          },
-                        ),
-                      if (_isLoading && _errorMessage == null)
-                        Container(
-                          color: const Color(0xFFFAF6EE).withOpacity(0.85),
-                          child: const Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircularProgressIndicator(color: AppColors.solidBrown),
-                                SizedBox(height: 14),
-                                Text(
-                                  'جاري تحميل وتجهيز الكتاب...',
-                                  style: TextStyle(
-                                    fontFamily: 'NotoKufi',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textDark,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                  child: _buildViewerContent(),
                 ),
               ),
 
@@ -309,6 +258,96 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildViewerContent() {
+    if (_isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: AppColors.solidBrown),
+            SizedBox(height: 14),
+            Text(
+              'جاري تحميل وتجهيز الكتاب...',
+              style: TextStyle(
+                fontFamily: 'NotoKufi',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+              const SizedBox(height: 12),
+              Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'NotoKufi',
+                  fontSize: 15,
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _loadPdfData,
+                icon: const Icon(Icons.refresh),
+                label: const Text('إعادة المحاولة'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.solidBrown,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_pdfBytes == null) {
+      return const SizedBox.shrink();
+    }
+
+    return SfPdfViewer.memory(
+      _pdfBytes!,
+      controller: _pdfViewerController,
+      canShowScrollHead: true,
+      canShowScrollStatus: true,
+      enableDoubleTapZooming: true,
+      onDocumentLoaded: (PdfDocumentLoadedDetails details) {
+        if (mounted) {
+          setState(() {
+            _pageCount = details.document.pages.count;
+          });
+        }
+      },
+      onPageChanged: (PdfPageChangedDetails details) {
+        if (mounted) {
+          setState(() {
+            _currentPage = details.newPageNumber;
+          });
+        }
+      },
+      onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+        if (mounted) {
+          setState(() {
+            _errorMessage = 'تعذر فتح ملف الكتاب: ${details.description}';
+          });
+        }
+      },
     );
   }
 }
