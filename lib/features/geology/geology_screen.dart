@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_assets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
-import '../../core/dialogs/app_brief_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
 import '../../core/dialogs/pdf_viewer_dialog.dart';
 
@@ -67,16 +65,10 @@ class _GeologyScreenState extends State<GeologyScreen> {
   // Geomorphology Dialogs & Actions
   // ----------------------------------------------------
   void _showGeomorphologyOverview() {
-    AppBriefDialog.show(
+    PdfViewerDialog.show(
       context,
-      title: 'جيومورفولوجية المملكة العربية السعودية',
-      description: 'تتميز تضاريس المملكة العربية السعودية بتنوع جيومورفولوجي واسع ناتج عن العمليات التكتونية وحركات الرفع والتعرية عبر العصور الجيولوجية.\n\n'
-          'وتنقسم التضاريس الجيومورفولوجية الرئيسية في المملكة إلى خمس وحدات كبرى:\n\n'
-          '1. المرتفعات الغربية: وتشمل جبال مدين والحجاز والسروات وتمتد بمحاذاة البحر الأحمر.\n'
-          '2. الهضاب: وتشمل هضبة نجد وهضاب الصمان وحسمة والحماد والوديان.\n'
-          '3. التكوينات الرملية: وتشمل صحراء النفود الكبير وصحراء الدهناء وصحراء الجافورة.\n'
-          '4. صحراء الربع الخالي: أكبر بحر رملي متصل في العالم بمساحة تقارب 650 ألف كم2.\n'
-          '5. السهول الساحلية: سهل تهامة في الغرب وسهول الخليج العربي المنبسطة في الشرق.',
+      title: 'جيومورفولوجية المملكة',
+      assetPath: 'assets/books/geology/geomorphology_intro.pdf',
     );
   }
 
@@ -193,16 +185,10 @@ class _GeologyScreenState extends State<GeologyScreen> {
   }
 
   void _showIntroBrief() {
-    AppBriefDialog.show(
+    PdfViewerDialog.show(
       context,
       title: 'جيولوجية المملكة',
-      bottomImageAsset: AppAssets.geologicMapArabianPeninsula,
-      description: 'تعود أقدم الصخور في المملكة إلى عصر ما قبل الكمبري، أي قبل حوالي 3 مليارات سنة. وهي تشكل أجزاء من الصفيحة العربية التي تشمل شبه الجزيرة العربية.\n\n'
-          'وباختصار تنقسم المملكة جيولوجياً إلى وحدات متميزة:\n'
-          '• الدرع العربي وهو يتبع دهر طلائع الحياة ويتمثل في التتابعات البركانية الرسوبية المتحولة التي يتداخل فيها الجرانيت والجابرو.\n'
-          '• الرصيف القاري العربي وهو يتبع دهر الحياة الظاهرة ويحتوي على تتابعات رسوبية فتاتية وجيرية ومتبخرات تميل بدرجات خفيفة نحو الشرق مبتعدة عن الدرع العربي.\n'
-          '• حرات العصر الثلاثي والرباعي البركانية وهي في الغالب تعلو صخور الدرع العربي.\n'
-          '• السهل الساحلي للبحر الأحمر والخليج العربي.',
+      assetPath: 'assets/books/geology/geology_intro.pdf',
     );
   }
 
