@@ -45,6 +45,7 @@ flutter:
     - assets/books/specialized/
     - assets/books/general_books/
     - assets/books/zamzam/
+    - assets/books/geology/
 
   fonts:
     - family: NotoKufi

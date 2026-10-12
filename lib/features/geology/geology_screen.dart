@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/dialogs/app_brief_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
+import '../../core/dialogs/pdf_viewer_dialog.dart';
 
 class GeologyScreen extends StatefulWidget {
   const GeologyScreen({super.key});
@@ -79,61 +80,118 @@ class _GeologyScreenState extends State<GeologyScreen> {
     );
   }
 
-  void _showWesternHighlands() {
-    _mapController?.flyTo(latitude: 19.5, longitude: 42.0, zoom: 6.2);
-    AppPopupDialog.show(
-      context,
-      title: 'المرتفعات الغربية',
-      imageAsset: AppAssets.arabianShield,
-      description: 'تمتد المرتفعات الغربية (جبال السروات والحجاز ومدين) على طول الساحل الشرقي للبحر الأحمر لمسافة تزيد عن 1500 كم من حدود الأردن شمالاً إلى اليمن جنوباً.\n\n'
-          '• جبال مدين في الشمال الغربي: وتتميز بجبالها الوعرة وتكويناتها الجرانيتية الحادة.\n'
-          '• جبال الحجاز في الوسط: متوسطة الارتفاع وتتخللها الأودية والحرات البركانية.\n'
-          '• جبال السروات في الجنوب: أعلى مناطق المملكة ارتفاعاً حيث تبلغ قمة جبل السودة حوالي 3000 متر فوق مستوى سطح البحر.\n\n'
-          'تنحدر هذه المرتفعات بشدة نحو الغرب باتجاه سهل تهامة، بينما تنحدر تدريجياً نحو الشرق لتتصل بهضاب نجد.',
-    );
-  }
-
-  void _showPlateaus() {
-    _mapController?.flyTo(latitude: 24.5, longitude: 45.0, zoom: 5.8);
-    AppPopupDialog.show(
-      context,
-      title: 'الهضاب في المملكة',
-      imageAsset: AppAssets.arabianPlatform,
-      description: 'تشغل الهضاب مساحات شاسعة من أراضي المملكة العربية السعودية، وتتدرج في الارتفاع من الغرب إلى الشرق:\n\n'
-          '• هضبة نجد: كبرى هضاب المملكة، تتألف من هضبة عالية نجد في الغرب وهضبة نجد السفلى في الشرق، وتخترقها حواف صخرية شهيرة مثل جبال طويق وجبال العارض.\n'
-          '• هضبة حسمة: في الشمال الغربي وتشتهر بتكويناتها الصخرية الرملية الرائعة في تبوك وديسة.\n'
-          '• هضبة الحِماد والحَجَرة: في أقصى الشمال.\n'
-          '• هضبة الصمان: هضبة جيرية منبسطة تمتد بمحاذاة الدهناء شرقاً باتجاه الخليج العربي.',
-    );
-  }
-
-  void _showSandFormations() {
-    _mapController?.flyTo(latitude: 27.5, longitude: 42.0, zoom: 5.8);
-    AppPopupDialog.show(
-      context,
-      title: 'التكوينات الرملية',
-      description: 'تغطي التكوينات الرملية حوالي ثلث مساحة المملكة وتتوزع على عدة بحار وكثبان رملية عملاقة:\n\n'
-          '• صحراء النَفود الكبير: في شمال المملكة، تبلغ مساحتها حوالي 65,000 كم2 وتتألف من كثبان طولية وعروق رملية حمراء غنية.\n'
-          '• صحراء الدَّهْناء: شريط رملي قوسي ضيق يمتد لأكثر من 1,200 كم ليربط بين النفود الكبير في الشمال والربع الخالي في الجنوب.\n'
-          '• صحراء الجافورة: تقع في المنطقة الشرقية بمحاذاة سواحل الخليج العربي وجنوب الأحساء.',
-    );
-  }
-
-  void _showEmptyQuarter() {
-    _mapController?.flyTo(latitude: 20.0, longitude: 50.0, zoom: 5.4);
-    AppPopupDialog.show(
-      context,
-      title: 'صحراء الربع الخالي',
-      description: 'يعد الربع الخالي أكبر صحراء رملية متصلة في العالم، بمساحة تقارب 650,000 كم2 يشغل الجزء الأكبر منها جنوب وجنوب شرقي المملكة العربية السعودية.\n\n'
-          '• يتميز بوجود كثبان رملية نجمية عملاقة يصل ارتفاع بعضها إلى أكثر من 250 متراً فوق القيعان.\n'
-          '• تشتمل بيئته على مساحات شاسعة من السباخ القارية والمطرية.\n'
-          '• يضم الربع الخالي أحواضاً رسوبية عميقة تحتوي على أضخم حقول النفط والغاز الطبيعي في العالم (مثل حقل الشيبة)، بالإضافة إلى خزانات مياه جوفية عميقة.',
-    );
-  }
-
   // ----------------------------------------------------
-  // Geology Dialogs & Actions
+  // Harrat Continuation Block (Matches attached image)
   // ----------------------------------------------------
+  Widget _buildHarratContinuationBlock() {
+    // Top Row (Right to Left in RTL):
+    final topRowKeys = [
+      'hart_unayyir-bgxfcy', // حرة الشاقة_لونيير
+      'hart_kishb-815dj1',    // حرة كشب
+      'hart_khaybar-d6449k',  // حرة خيبر
+      'hart_hadan-4qulnq',    // حرة حضن
+      'hart_awarad-5bksz1',   // حرة عويرض
+      'hart_alsarah-7t4hk2',  // حرة السراة
+      'hart_alhtaymh-1yw1sy', // حرة الهتيمة
+    ];
+
+    // Bottom Row (Right to Left in RTL):
+    final bottomRowKeys = [
+      'hart_nawsaf_albogom-1i8dcl', // حرة نواصف البقوم
+      'hart_rahat-2ojan9',          // حرة رهط
+      'hart_alharh-9osy8j',         // حرة الحرة
+      'sahal_thamah-8ryrba',        // حرات سهل تهامة
+    ];
+
+    Widget buildHarrahChip(String key) {
+      final item = _haratInfo[key];
+      if (item == null) return const SizedBox.shrink();
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            AppPopupDialog.show(
+              context,
+              title: item.title,
+              description: item.desc,
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6.5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFCF9F3),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: const Color(0xFFC7B19C),
+                width: 1.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 3,
+                  offset: const Offset(0, 1.5),
+                ),
+              ],
+            ),
+            child: Text(
+              item.title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'NotoKufi',
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF3E2D1D),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Divider(color: Color(0xFFC7B19C), thickness: 1.0),
+          const SizedBox(height: 4),
+          const Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'قائمة الحرات الرئيسية:',
+              style: TextStyle(
+                fontFamily: 'NotoKufi',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2E2218),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Top Row: 7 chips
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: topRowKeys.map(buildHarrahChip).toList(),
+          ),
+          const SizedBox(height: 8),
+          // Bottom Row: 4 chips
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: bottomRowKeys.map(buildHarrahChip).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showIntroBrief() {
     AppBriefDialog.show(
       context,
@@ -148,103 +206,99 @@ class _GeologyScreenState extends State<GeologyScreen> {
     );
   }
 
-  void _showArabianShield() {
-    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/arabian_shield.json');
-    _mapController?.flyTo(latitude: 23.5, longitude: 41.5, zoom: 6.0);
-    AppPopupDialog.show(
+  void _showWesternHighlands() {
+    _mapController?.flyTo(latitude: 19.5, longitude: 42.0, zoom: 6.2);
+    PdfViewerDialog.show(
       context,
-      title: 'الدرع العربي',
-      imageAsset: AppAssets.arabianShield,
-      description: 'يعتبر الدرع العربي في شبه الجزيرة العربية والدرع النوبي في مصر والسودان جزءً من كتلة شرق أفريقيا والمكونة قلب قارة جوندوانا الكبيرة في نهاية عصر ما قبل الكمبري، وقد انفصل الدرع العربي عن نظيره الدرع النوبي بواسطة أخدود البحر الأحمر.\n\n'
-          'يظهر الدرع العربي على شكل شبه منحرف تبلغ مساحته حوالي (660,000 كم2) حيث يمثل الجزء الغربي من الجزيرة العربية، ويتميز بتنوع المعادن الفلزية مثل الذهب والفضة والنحاس والزنك والرصاص والحديد.',
+      title: 'المرتفعات الغربية',
+      assetPath: 'assets/books/geology/western_highlands.pdf',
     );
   }
 
-  void _showArabianPlatform() {
-    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/arabian_platform.json');
-    _mapController?.flyTo(latitude: 24.5, longitude: 48.0, zoom: 5.8);
-    AppPopupDialog.show(
+  void _showPlateaus() {
+    _mapController?.flyTo(latitude: 24.5, longitude: 45.0, zoom: 5.8);
+    PdfViewerDialog.show(
       context,
-      title: 'الرصيف القاري العربي',
-      imageAsset: AppAssets.arabianPlatform,
-      description: 'يمثل الرصيف القاري العربي (الغطاء الرسوبي) الجزء الأكبر من أراضي المملكة العربية السعودية شرق الدرع العربي، ويشغل نحو ثلثي مساحة المملكة (حوالي 68%) وتقدر مساحته الإجمالية بـ 1,320,000 كم2.\n\n'
-          'ترسبت الصخور الرسوبية فوق صخور القاعدة القديمة وتتألف من صخور رملية وجيرية ومتبخرات، ويحتوي على أضخم المكامن الهيدروكربونية (النفط والغاز) وخزانات المياه الجوفية العميقة والمعادن الصناعية كالفوسفات والبوكسيت.',
+      title: 'الهضاب',
+      assetPath: 'assets/books/geology/plateaus.pdf',
     );
   }
 
-  void _showHarrat() {
-    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/harat.json');
-    _mapController?.flyTo(latitude: 25.0, longitude: 40.0, zoom: 6.5);
-    AppPopupDialog.show(
+  void _showSandFormations() {
+    _mapController?.flyTo(latitude: 27.5, longitude: 42.0, zoom: 5.8);
+    PdfViewerDialog.show(
       context,
-      title: 'الحرات البركانية',
-      imageAsset: AppAssets.harat,
-      description: 'الحرات البركانية عبارة عن هضاب بازلتية وتدفقات حمم بركانية تكونت خلال العصرين الثلاثي والرباعي نتيجة لانفتاح أخدود البحر الأحمر وانفصال الصفيحة العربية عن الصفيحة الإفريقية.\n\n'
-          'تغطي الحرات مساحة تزيد عن 80,000 كم2 في المملكة وتنتشر في غرب وشمال غرب البلاد (حرة رهط، خيبر، كشب، عويرض، الحرة، الشاقة وغيرها).',
-      customContent: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Divider(),
-          const Text(
-            'قائمة الحرات الرئيسية:',
-            style: TextStyle(fontFamily: 'NotoKufi', fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _haratInfo.values.map((h) {
-              return ActionChip(
-                backgroundColor: AppColors.mainMenuBtnBg,
-                label: Text(h.title, style: const TextStyle(fontFamily: 'NotoKufi', fontSize: 14)),
-                onPressed: () {
-                  AppPopupDialog.show(context, title: h.title, description: h.desc);
-                },
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+      title: 'التكوينات الرملية',
+      assetPath: 'assets/books/geology/sand_formations.pdf',
     );
   }
 
-  void _showVolcanicActivity() {
-    _mapController?.flyTo(latitude: 24.5, longitude: 39.8, zoom: 6.5);
-    AppPopupDialog.show(
+  void _showEmptyQuarter() {
+    _mapController?.flyTo(latitude: 20.0, longitude: 50.0, zoom: 5.4);
+    PdfViewerDialog.show(
       context,
-      title: 'النشاط البركاني',
-      imageAsset: AppAssets.harat,
-      description: 'شهدت شبه الجزيرة العربية نشاطاً بركانياً مكثفاً ارتبط بتصدع وانفتاح البحر الأحمر عبر ملايين السنين:\n\n'
-          '• سجل التاريخ ثوران بركان المدينة المنورة الشهير عام 1256م (654هـ) في حرة رهط الشرقية، حيث تدفقت الحمم لمسافة وصلت إلى مقربة من المدينة المنورة.\n'
-          '• في عام 2009م، شهدت حرة الشاقة (لونيير) نشاطاً زلزالياً وبركانياً وصعوداً للصهارة أدى إلى حدوث تشققات أرضية واسعة.\n'
-          '• تنتشر في المملكة المئات من الفوهات البركانية الخامدة مثل فوهة الوعبة وفوهات جبل القدر والبيضاء.',
-    );
-  }
-
-  void _showEarthquakes() {
-    _mapController?.flyTo(latitude: 24.0, longitude: 42.0, zoom: 5.5);
-    AppPopupDialog.show(
-      context,
-      title: 'الزلازل في شبه الجزيرة العربية',
-      imageAsset: AppAssets.earth,
-      description: 'يرتبط النشاط الزلزالي في شبه الجزيرة العربية بالحدود التكتونية الحركية للصفيحة العربية:\n\n'
-          '• خليج العقبة وشمال البحر الأحمر: منطقة نشطة زلزالياً نتيجة الصدع التحويلي للبحر الميت.\n'
-          '• محور انفتاح البحر الأحمر وخليج عدن: نشاط زلزالي متكرر مرافق لتوسع قاع البحر.\n'
-          '• الحرات البركانية الغربية: حدوث أسراب زلزالية بركانية مرافقة لحركة الصهارة والغازات في باطن الأرض.\n'
-          '• تتابع هيئة المساحة الجيولوجية السعودية عبر الشبكة الوطنية للرصد الزلزالي كافة الهزات بدقة عالية على مدار الساعة.',
+      title: 'الربع الخالي',
+      assetPath: 'assets/books/geology/empty_quarter.pdf',
     );
   }
 
   void _showSwahel() {
     _mapController?.setStyleFromAsset('assets/maps/saudi_geo/sahel.json');
     _mapController?.flyTo(latitude: 21.0, longitude: 40.0, zoom: 6.0);
-    AppPopupDialog.show(
+    PdfViewerDialog.show(
       context,
       title: 'السهول الساحلية',
-      imageAsset: AppAssets.swahel,
-      description: 'السهول الساحلية في المملكة العربية السعودية تضم السهل الساحلي للبحر الأحمر (سهل تهامة) في الغرب والسهول الساحلية للخليج العربي في الشرق.\n\n'
-          'سهل تهامة: يمتد بمحاذاة البحر الأحمر من خليج العقبة شمالاً حتى الحدود مع اليمن جنوباً، ويتراوح اتساعه من بضعة كيلومترات في الشمال إلى أكثر من 40 كم في جازان جنوباً.\n\n'
-          'سهول الخليج العربي: سهول منبسطة منخفضة تغطي الرمال والسباخ الساحلية أجزاء كبيرة منها وتتميز بوجود تكوينات المتبخرات والأحجار الجيرية البحرية الحديثة.',
+      assetPath: 'assets/books/geology/coastal_plains.pdf',
+    );
+  }
+
+  void _showArabianShield() {
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/arabian_shield.json');
+    _mapController?.flyTo(latitude: 23.5, longitude: 41.5, zoom: 6.0);
+    PdfViewerDialog.show(
+      context,
+      title: 'الدرع العربي',
+      assetPath: 'assets/books/geology/arabian_shield.pdf',
+    );
+  }
+
+  void _showArabianPlatform() {
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/arabian_platform.json');
+    _mapController?.flyTo(latitude: 24.5, longitude: 48.0, zoom: 5.8);
+    PdfViewerDialog.show(
+      context,
+      title: 'الرصيف القاري العربي',
+      assetPath: 'assets/books/geology/arabian_platform.pdf',
+    );
+  }
+
+  void _showHarrat() {
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/harat.json');
+    _mapController?.flyTo(latitude: 25.0, longitude: 40.0, zoom: 6.5);
+    PdfViewerDialog.show(
+      context,
+      title: 'الحرات البركانية',
+      assetPath: 'assets/books/geology/volcanic_harrat.pdf',
+      continuationWidget: _buildHarratContinuationBlock(),
+    );
+  }
+
+  void _showVolcanicActivity() {
+    _mapController?.flyTo(latitude: 24.5, longitude: 39.8, zoom: 6.5);
+    PdfViewerDialog.show(
+      context,
+      title: 'النشاط البركاني',
+      assetPath: 'assets/books/geology/volcanic_activity.pdf',
+    );
+  }
+
+  void _showEarthquakes() {
+    _mapController?.flyTo(latitude: 24.0, longitude: 42.0, zoom: 5.5);
+    PdfViewerDialog.show(
+      context,
+      title: 'الزلازل في شبه الجزيرة العربية',
+      assetPath: 'assets/books/geology/earthquakes.pdf',
+      continuationWidget: _buildHarratContinuationBlock(),
     );
   }
 

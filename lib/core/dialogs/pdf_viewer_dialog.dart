@@ -8,17 +8,20 @@ import '../widgets/map_view_platform.dart';
 class PdfViewerDialog extends StatefulWidget {
   final String title;
   final String assetPath;
+  final Widget? continuationWidget;
 
   const PdfViewerDialog({
     super.key,
     required this.title,
     required this.assetPath,
+    this.continuationWidget,
   });
 
   static Future<void> show(
     BuildContext context, {
     required String title,
     required String assetPath,
+    Widget? continuationWidget,
   }) async {
     setModalOpenWeb(true);
     try {
@@ -28,6 +31,7 @@ class PdfViewerDialog extends StatefulWidget {
         builder: (ctx) => PdfViewerDialog(
           title: title,
           assetPath: assetPath,
+          continuationWidget: continuationWidget,
         ),
       );
     } finally {
@@ -88,8 +92,12 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final dialogWidth = (size.width * 0.85).clamp(480.0, 1100.0);
-    final dialogHeight = (size.height * 0.92).clamp(400.0, 950.0);
+    final dialogWidth = widget.continuationWidget != null
+        ? (size.width * 0.92).clamp(520.0, 1180.0)
+        : (size.width * 0.85).clamp(480.0, 1100.0);
+    final dialogHeight = widget.continuationWidget != null
+        ? (size.height * 0.95).clamp(480.0, 980.0)
+        : (size.height * 0.92).clamp(400.0, 950.0);
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -229,6 +237,11 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                   child: _buildViewerContent(),
                 ),
               ),
+
+              if (widget.continuationWidget != null) ...[
+                const SizedBox(height: 10),
+                widget.continuationWidget!,
+              ],
 
               const SizedBox(height: 14),
 
