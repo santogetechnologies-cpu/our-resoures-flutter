@@ -284,7 +284,6 @@ class _GeologyScreenState extends State<GeologyScreen> {
       context,
       title: 'الزلازل في شبه الجزيرة العربية',
       assetPath: 'assets/books/geology/earthquakes.pdf',
-      continuationWidget: _buildHarratContinuationBlock(),
     );
   }
 
