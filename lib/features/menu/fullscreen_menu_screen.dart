@@ -231,15 +231,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       width: logoSize,
                                       height: logoSize,
                                       fit: BoxFit.contain,
-                                      errorBuilder: (c, e, s) {
-                                        debugPrint('ERROR_ALAMRY_LOGO: $e');
-                                        return Container(
-                                          width: logoSize,
-                                          height: logoSize,
-                                          color: Colors.red,
-                                          child: Text('Error: $e', style: const TextStyle(fontSize: 10, color: Colors.white)),
-                                        );
-                                      },
+                                      errorBuilder: (c, e, s) =>
+                                          const SizedBox.shrink(),
                                     ),
                                   ),
                                 ),
