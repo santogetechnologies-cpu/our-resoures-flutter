@@ -8,6 +8,7 @@ class AppAssets {
   static const String infoback = '$basePath/infoback.png';
 
   // Logos
+  static const String alamryLogo = '$basePath/alamry_logo.png';
   static const String saudiVision = '$basePath/saudi_vision.png';
   static const String dLogo = '$basePath/d_logo.png';
   static const String click = '$basePath/click.png';
@@ -38,7 +39,8 @@ class AppAssets {
   static const String harat = '$basePath/harat.jpg';
   static const String swahel = '$basePath/swahel.png';
   static const String earth = '$basePath/earth.jpg';
-  static const String geologicMapArabianPeninsula = '$basePath/geologic_map_arabian_peninsula.jpg';
+  static const String geologicMapArabianPeninsula =
+      '$basePath/geologic_map_arabian_peninsula.jpg';
 
   // Datasets
   static const String materialsXlsx = 'assets/data/materials.xlsx';
@@ -48,11 +50,13 @@ class AppAssets {
   static const String tourismDataJson = 'assets/data/tourism_data.json';
 
   // Earthquake data (using fast JSON)
-  static const String earthquakeHistorical = 'assets/earthquake/Histroical.json';
+  static const String earthquakeHistorical =
+      'assets/earthquake/Histroical.json';
   static const String earthquake4to5 = 'assets/earthquake/4 to 5.json';
   static const String earthquake5to6 = 'assets/earthquake/5 to 6.json';
   static const String earthquake6to7 = 'assets/earthquake/6 to 7.json';
-  static const String earthquake7andAbove = 'assets/earthquake/7 and above.json';
+  static const String earthquake7andAbove =
+      'assets/earthquake/7 and above.json';
 
   // GeoJSON / Maps
   static const String valleysDir = 'assets/maps/valleys';

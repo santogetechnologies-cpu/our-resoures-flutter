@@ -9,7 +9,8 @@ class StartScreen extends StatefulWidget {
   State<StartScreen> createState() => _StartScreenState();
 }
 
-class _StartScreenState extends State<StartScreen> with SingleTickerProviderStateMixin {
+class _StartScreenState extends State<StartScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _scaleAnimation;
 
@@ -34,7 +35,8 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   void _navigateToMenu() {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const FullscreenMenuScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const FullscreenMenuScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -56,7 +58,8 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
             Image.asset(
               AppAssets.wallpaper2,
               fit: BoxFit.cover,
-              errorBuilder: (c, e, s) => Container(color: const Color(0xFFF7F4EF)),
+              errorBuilder: (c, e, s) =>
+                  Container(color: const Color(0xFFF7F4EF)),
             ),
 
             // Top Header: Vision 2030 on Left, Title in Center, KSU on Right
@@ -64,7 +67,8 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   child: Directionality(
                     textDirection: TextDirection.ltr,
                     child: Row(
@@ -80,14 +84,14 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                           errorBuilder: (c, e, s) => const SizedBox(width: 140),
                         ),
 
-                        // Center Arabic Title: المنصة التفاعلية للأرض والطبيعة والتراث (single line, scaled)
+                        // Center Arabic Title: منصة العمري التفاعلية لعلوم الأرض والطبيعة (single line, scaled)
                         const Expanded(
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
-                                'المنصة التفاعلية للأرض والطبيعة والتراث',
+                                'منصة العمري التفاعلية لعلوم الأرض والطبيعة',
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 softWrap: false,

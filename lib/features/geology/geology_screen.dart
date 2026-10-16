@@ -185,6 +185,8 @@ class _GeologyScreenState extends State<GeologyScreen> {
   }
 
   void _showIntroBrief() {
+    _mapController?.setStyleFromAsset('assets/maps/saudi_geo/saudigeo.json');
+    _mapController?.flyTo(latitude: 24.694291, longitude: 47.189224, zoom: 4.3);
     PdfViewerDialog.show(
       context,
       title: 'جيولوجية المملكة',

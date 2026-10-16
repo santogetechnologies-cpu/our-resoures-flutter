@@ -164,6 +164,12 @@ class _MapboxWebWidgetState extends State<_MapboxWebWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return HtmlElementView(viewType: widget.domId);
+    return Focus(
+      canRequestFocus: false,
+      child: ExcludeSemantics(
+        excluding: true,
+        child: HtmlElementView(viewType: widget.domId),
+      ),
+    );
   }
 }

@@ -36,6 +36,127 @@ const ESRI_SATELLITE_GLOBE_STYLE = {
 };
 
 // ---------------------------------------------------------------------------
+// Mapbox Access Token & Style Transformer for Vector Overlays
+// ---------------------------------------------------------------------------
+const MAPBOX_TOKEN = 'sk.eyJ1IjoibXNoYXJpLWFsam9oYW5pIiwiYSI6ImNscDRodndqczB4NzEya21pdXNjNDJ6MjUifQ.cm9WGcmnAXTlF0a-BdfgTA';
+
+function sanitizeExpr(val) {
+  if (Array.isArray(val)) {
+    if (val[0] === 'step' && Array.isArray(val[1]) && val[1][0] === 'pitch') return true;
+    if (val[0] === 'pitch' || val[0] === 'distance-from-center' || val[0] === 'measure-light') return true;
+    return val.map(sanitizeExpr);
+  }
+  if (typeof val === 'object' && val !== null) {
+    const res = {};
+    for (const k in val) {
+      res[k] = sanitizeExpr(val[k]);
+    }
+    return res;
+  }
+  return val;
+}
+
+function transformMapboxStyle(styleInput) {
+  let styleObj = styleInput;
+  if (typeof styleObj === 'string') {
+    try {
+      styleObj = JSON.parse(styleObj);
+    } catch (e) {
+      console.warn('[Globe] Failed to parse style JSON:', e);
+      return ESRI_SATELLITE_GLOBE_STYLE;
+    }
+  }
+  if (!styleObj || !styleObj.version) {
+    return ESRI_SATELLITE_GLOBE_STYLE;
+  }
+
+  let style;
+  try {
+    style = JSON.parse(JSON.stringify(styleObj));
+  } catch (_) {
+    style = styleObj;
+  }
+
+  // Transform sources so MapLibre can load Mapbox vector and raster tiles directly
+  style.sources = style.sources || {};
+  Object.keys(style.sources).forEach(key => {
+    const src = style.sources[key];
+    if (!src) return;
+
+    if (src.type === 'raster') {
+      const isMapboxSat = (src.url && src.url.includes('mapbox.satellite')) ||
+                          key.includes('mapbox.satellite') ||
+                          (src.tiles && src.tiles.some(t => t.includes('mapbox.satellite')));
+      if (isMapboxSat) {
+        delete src.url;
+        src.tiles = ['https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.webp?access_token=' + MAPBOX_TOKEN];
+        src.tileSize = 256;
+      } else if (!src.tiles) {
+        delete src.url;
+        src.tiles = [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        ];
+        src.tileSize = 256;
+      }
+    } else if (src.type === 'raster-dem') {
+      if (src.url && src.url.startsWith('mapbox://')) {
+        const demId = src.url.replace('mapbox://', '');
+        delete src.url;
+        src.tiles = ['https://api.mapbox.com/v4/' + demId + '/{z}/{x}/{y}.webp?access_token=' + MAPBOX_TOKEN];
+        src.encoding = 'mapbox';
+      }
+    } else if (src.type === 'vector') {
+      if (src.url && src.url.startsWith('mapbox://')) {
+        const tileset = src.url.replace('mapbox://', '');
+        delete src.url;
+        src.tiles = ['https://api.mapbox.com/v4/' + tileset + '/{z}/{x}/{y}.vector.pbf?access_token=' + MAPBOX_TOKEN];
+      }
+    }
+  });
+
+  // Clean layers and sanitize Mapbox v3 unsupported expressions (e.g. pitch culling)
+  if (Array.isArray(style.layers)) {
+    style.layers.forEach((layer, idx) => {
+      delete layer.slot;
+      if (layer.filter) {
+        layer.filter = sanitizeExpr(layer.filter);
+      }
+      if (layer.paint) {
+        layer.paint = sanitizeExpr(layer.paint);
+      }
+      if (layer.layout) {
+        layer.layout = sanitizeExpr(layer.layout);
+      }
+    });
+  }
+
+  // Remove Mapbox v3 specific top-level fields not supported by MapLibre
+  delete style.lights;
+  delete style.projection;
+  delete style.draft;
+  delete style.visibility;
+  delete style.protected;
+  delete style.created;
+  delete style.modified;
+  delete style.owner;
+  delete style.terrain;
+  delete style.fog;
+
+  // Transform glyphs
+  if (style.glyphs && style.glyphs.startsWith('mapbox://fonts/')) {
+    style.glyphs = 'https://api.mapbox.com/fonts/v1/' + style.glyphs.replace('mapbox://fonts/', '') + '?access_token=' + MAPBOX_TOKEN;
+  }
+
+  // Transform sprite
+  if (style.sprite && style.sprite.startsWith('mapbox://sprites/')) {
+    style.sprite = 'https://api.mapbox.com/styles/v1/' + style.sprite.replace('mapbox://sprites/', '') + '/sprite?access_token=' + MAPBOX_TOKEN;
+  }
+
+  return style;
+}
+
+// ---------------------------------------------------------------------------
 // Resolve Flutter Web asset path  (Flutter dev server doubles the "assets/" prefix)
 // Input:  "assets/assets/images/x.png"  → "assets/assets/images/x.png"
 // Input:  "assets/images/x.png"         → "assets/assets/images/x.png"
@@ -151,12 +272,119 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
 }
 
 // ---------------------------------------------------------------------------
+// Disable GPU PBO readback error measurement loop on globe projection
+// MapLibre's ProjectionErrorMeasurement runs a GPU readback loop every 6 frames
+// which triggers ANGLE buffer fence warnings & "WebGL: too many errors" in Chromium.
+// ---------------------------------------------------------------------------
+function disableGlobeReadbackErrorMeasurement(map) {
+  try {
+    const proj = map && map.style && map.style.projection;
+    const vp = proj && (proj._verticalPerspectiveProjection ||
+      (proj.currentProjection && proj.currentProjection.name === 'vertical-perspective' ? proj.currentProjection : null));
+    if (vp) {
+      if (vp._errorMeasurement) {
+        try { vp._errorMeasurement.destroy(); } catch (_) {}
+        vp._errorMeasurement = null;
+      }
+      vp.updateGPUdependent = function() {};
+      const proto = Object.getPrototypeOf(vp);
+      if (proto && proto.updateGPUdependent) {
+        proto.updateGPUdependent = function() {};
+      }
+    }
+  } catch (_) {}
+}
+
+// ---------------------------------------------------------------------------
+// Accessibility: prevent canvas from retaining focus inside Flutter platform views
+// ---------------------------------------------------------------------------
+function setupCanvasA11y(map, targetContainer) {
+  const canvas = map && map.getCanvas && map.getCanvas();
+  if (canvas) {
+    canvas.removeAttribute('tabindex');
+    try {
+      Object.defineProperty(canvas, 'tabIndex', {
+        get: () => -1,
+        set: () => {},
+        configurable: true
+      });
+    } catch (_) {
+      canvas.tabIndex = -1;
+    }
+    canvas.addEventListener('focus', () => {
+      try { canvas.blur(); } catch (_) {}
+      if (document.activeElement === canvas && document.body) {
+        document.body.focus();
+      }
+    }, true);
+    canvas.addEventListener('pointerdown', () => {
+      if (document.activeElement === canvas) {
+        try { canvas.blur(); } catch (_) {}
+      }
+    }, true);
+  }
+  if (targetContainer) {
+    targetContainer.removeAttribute('tabindex');
+    targetContainer.tabIndex = -1;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Marker Icons: Provide immediate crisp fallback marker image for MapLibre
+// ---------------------------------------------------------------------------
+function createMarkerImageData() {
+  const width = 24;
+  const height = 36;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(12, 12, 10, Math.PI, 0, false);
+  ctx.bezierCurveTo(22, 18, 12, 34, 12, 34);
+  ctx.bezierCurveTo(12, 34, 2, 18, 2, 12);
+  ctx.closePath();
+  ctx.fillStyle = '#C89D3C'; // Gold
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(12, 12, 4, 0, 2 * Math.PI);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  ctx.restore();
+
+  const imgData = ctx.getImageData(0, 0, width, height);
+  return {
+    width: width,
+    height: height,
+    data: imgData.data
+  };
+}
+
+function registerDefaultMarkerImages(map) {
+  if (!map) return;
+  const defaultIds = ['marker', 'default-marker', 'pin', 'marker-15'];
+  defaultIds.forEach(id => {
+    try {
+      if (!map.hasImage(id)) {
+        map.addImage(id, createMarkerImageData(), { pixelRatio: 2 });
+      }
+    } catch (_) {}
+  });
+}
+
+// ---------------------------------------------------------------------------
 // initMapboxGlobeWeb
 //   viewId       – the DOM id of the container element (domId from Dart)
 //   containerEl  – the actual HTMLElement (passed from Dart via js interop)
 //   lng, lat, zoom – initial camera
 // ---------------------------------------------------------------------------
-window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat, initialZoom) {
+window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat, initialZoom, initialStyleJson) {
   let lng = initialLng, lat = initialLat, zoom = initialZoom;
   let targetContainer = null;
 
@@ -211,9 +439,11 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       delete window.mapboxGlobeInstances[viewId];
     }
 
+    const activeStyle = initialStyleJson ? transformMapboxStyle(initialStyleJson) : ESRI_SATELLITE_GLOBE_STYLE;
+
     const map = new maplibregl.Map({
       container:          targetContainer,
-      style:              ESRI_SATELLITE_GLOBE_STYLE,
+      style:              activeStyle,
       center:             [lng || 47.189224, lat || 24.694291],
       zoom:               zoom || 3.8,
       renderWorldCopies:  false,
@@ -222,24 +452,55 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     });
 
     try { map.doubleClickZoom.disable(); } catch (_) {}
+    try { map.keyboard.disable(); } catch (_) {}
+
+    setupCanvasA11y(map, targetContainer);
+    map.on('load', () => setupCanvasA11y(map, targetContainer));
+    map.on('render', () => setupCanvasA11y(map, targetContainer));
+
+    targetContainer.addEventListener('pointerdown', () => {
+      const canvas = map.getCanvas && map.getCanvas();
+      if (canvas && document.activeElement === canvas) {
+        try { canvas.blur(); } catch (_) {}
+      }
+    });
+
+    map.on('styleimagemissing', (e) => {
+      const id = e.id;
+      if (map.hasImage && map.hasImage(id)) return;
+
+      // Provide immediate fallback image synchronously so MapLibre never logs an error
+      try {
+        map.addImage(id, createMarkerImageData(), { pixelRatio: 2 });
+      } catch (_) {}
+
+      // Asynchronously load matching SVG asset if present
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          if (map.hasImage(id)) map.removeImage(id);
+          map.addImage(id, img);
+        } catch (_) {}
+      };
+      img.src = resolveAssetUrl(`assets/maps/saudi_geo/sprite_images/${id}.svg`);
+    });
 
     map.on('style.load', () => {
+      registerDefaultMarkerImages(map);
+      setupCanvasA11y(map, targetContainer);
       // Globe projection (MapLibre v5 API)
-      try { map.setProjection({ type: 'globe' }); } catch (e) {
+      try {
+        map.setProjection({ type: 'globe' });
+        disableGlobeReadbackErrorMeasurement(map);
+      } catch (e) {
         console.warn('[Globe] setProjection:', e);
       }
+      disableGlobeReadbackErrorMeasurement(map);
       try { map.doubleClickZoom.disable(); } catch (_) {}
-      // Atmosphere
-      try {
-        map.setFog({
-          'range':          [0.5, 10],
-          'color':          'rgb(186,210,235)',
-          'high-color':     'rgb(36,92,223)',
-          'horizon-blend':  0.05,
-          'space-color':    'rgb(11,11,25)',
-          'star-intensity': 0.6
-        });
-      } catch (_) {}
+      if (map.setTerrain) {
+        try { map.setTerrain(null); } catch (_) {}
+      }
       map.resize();
 
       // ── Flush any markers that arrived before the map was ready ──
@@ -247,6 +508,10 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       const pending = window.mapboxGlobePendingCbs[viewId] || [];
       pending.forEach(fn => fn(map));
       delete window.mapboxGlobePendingCbs[viewId];
+    });
+
+    map.once('render', () => {
+      disableGlobeReadbackErrorMeasurement(map);
     });
 
     map.on('error', e => {
@@ -407,40 +672,24 @@ window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
   try {
-    const parsed = JSON.parse(styleJsonStr || '');
-    if (parsed && parsed.version) {
-      // Remove mapbox:// sources
-      Object.keys(parsed.sources || {}).forEach(k => {
-        const s = parsed.sources[k];
-        const hasMapboxUrl   = s.url   && s.url.startsWith('mapbox://');
-        const hasMapboxTiles = s.tiles && s.tiles.some(t => t.startsWith('mapbox://'));
-        if (hasMapboxUrl || hasMapboxTiles) delete parsed.sources[k];
-      });
-      // Remove layers referencing deleted sources
-      if (parsed.layers) {
-        const ok = new Set(Object.keys(parsed.sources || {}));
-        parsed.layers = parsed.layers.filter(l => !l.source || ok.has(l.source));
+    const transformed = transformMapboxStyle(styleJsonStr);
+    map.setStyle(transformed, { diff: false });
+    map.once('style.load', () => {
+      registerDefaultMarkerImages(map);
+      setupCanvasA11y(map);
+      try {
+        map.setProjection({ type: 'globe' });
+        disableGlobeReadbackErrorMeasurement(map);
+      } catch (_) {}
+      disableGlobeReadbackErrorMeasurement(map);
+      if (map.setTerrain) {
+        try { map.setTerrain(null); } catch (_) {}
       }
-      // If nothing is left after stripping, use base satellite
-      if (!parsed.sources || !Object.keys(parsed.sources).length) {
-        parsed.sources = ESRI_SATELLITE_GLOBE_STYLE.sources;
-        parsed.layers  = ESRI_SATELLITE_GLOBE_STYLE.layers;
-      }
-      map.setStyle(parsed);
-      map.once('style.load', () => {
-        try { map.setProjection({ type: 'globe' }); } catch (_) {}
-        try {
-          map.setFog({
-            'range': [0.5,10], 'color': 'rgb(186,210,235)',
-            'high-color': 'rgb(36,92,223)', 'horizon-blend': 0.05,
-            'space-color': 'rgb(11,11,25)', 'star-intensity': 0.6
-          });
-        } catch (_) {}
-      });
-    }
+      map.resize();
+    });
   } catch (e) {
-    console.warn('[Globe] setStyle fallback:', e);
-    try { map.setStyle(ESRI_SATELLITE_GLOBE_STYLE); } catch (_) {}
+    console.warn('[Globe] setStyle error:', e);
+    try { map.setStyle(ESRI_SATELLITE_GLOBE_STYLE, { diff: false }); } catch (_) {}
   }
 };
 
