@@ -304,23 +304,23 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     // Row 2 (3 & 4)
                                     Row(
                                       children: [
-                                        // Right (3): المعادن الاقتصادية ومواقعها
+                                        // Right (3): الصخور والمعادن الإقتصادية
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
                                             title:
-                                                'المعادن الاقتصادية ومواقعها',
+                                                'الصخور والمعادن الإقتصادية',
                                             height: 64,
                                             onTap: () => _navigate(context,
                                                 const MaterialsScreen()),
                                           ),
                                         ),
                                         const SizedBox(width: 24),
-                                        // Left (4): الطاقة المتجددة وتطبيقاتها
+                                        // Left (4): البترول والغاز
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
-                                            title: 'الطاقة المتجددة وتطبيقاتها',
+                                            title: 'البترول والغاز',
                                             height: 64,
                                             onTap: () => _navigate(
                                                 context, const OilGasScreen()),
@@ -333,23 +333,22 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     // Row 3 (5 & 6)
                                     Row(
                                       children: [
-                                        // Right (5): المياه والأودية والسدود
+                                        // Right (5): مصادر المياه
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
-                                            title: 'المياه والأودية والسدود',
+                                            title: 'مصادر المياه',
                                             height: 64,
                                             onTap: () => _navigate(context,
                                                 const WaterFormationsScreen()),
                                           ),
                                         ),
                                         const SizedBox(width: 24),
-                                        // Left (6): القرى التراثية والمواقع الاثرية
+                                        // Left (6): السياحة والآثار
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
-                                            title:
-                                                'القرى التراثية والمواقع الاثرية',
+                                            title: 'السياحة والآثار',
                                             height: 64,
                                             onTap: () => _navigate(
                                                 context, const TourismScreen()),

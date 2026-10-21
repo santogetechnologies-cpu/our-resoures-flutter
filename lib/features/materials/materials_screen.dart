@@ -550,7 +550,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
   @override
   Widget build(BuildContext context) {
     return MapShell(
-      title: 'المعادن الإقتصادية',
+      title: 'الصخور والمعادن الإقتصادية',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
       initialStyleAsset: 'assets/maps/materials/allMaterials.json',
