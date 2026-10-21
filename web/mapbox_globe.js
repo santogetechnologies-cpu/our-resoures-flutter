@@ -5,6 +5,28 @@ window.mapboxGlobeMarkers    = window.mapboxGlobeMarkers    || {};
 window.mapboxGlobePendingCbs = window.mapboxGlobePendingCbs || {};   // queued marker calls
 
 // ---------------------------------------------------------------------------
+// RTL Text Plugin for MapLibre GL JS (Shapes and joins Arabic/RTL text)
+// ---------------------------------------------------------------------------
+function ensureRTLTextPlugin() {
+  if (typeof maplibregl !== 'undefined' && maplibregl.setRTLTextPlugin) {
+    try {
+      if (maplibregl.getRTLTextPluginStatus() === 'unavailable') {
+        maplibregl.setRTLTextPlugin(
+          'https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.2.3/mapbox-gl-rtl-text.min.js',
+          function (err) {
+            if (err) console.error('[MapLibre RTL Text Plugin Error]:', err);
+          },
+          true
+        );
+      }
+    } catch (e) {
+      console.warn('[MapLibre RTL Text Plugin Init]:', e);
+    }
+  }
+}
+ensureRTLTextPlugin();
+
+// ---------------------------------------------------------------------------
 // Satellite + Labels base style (ArcGIS / Esri — fully public, no token)
 // ---------------------------------------------------------------------------
 const ESRI_SATELLITE_GLOBE_STYLE = {
@@ -425,6 +447,8 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     if (!targetContainer || typeof maplibregl === 'undefined') {
       return setTimeout(tryInit, 80);
     }
+
+    ensureRTLTextPlugin();
 
     // Style container to fill its slot
     Object.assign(targetContainer.style, {
