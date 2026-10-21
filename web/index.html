@@ -24,6 +24,25 @@
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
 
+  <!-- RTL Text Plugin for Arabic & BiDi support on MapLibre maps -->
+  <script>
+    if (window.maplibregl && maplibregl.setRTLTextPlugin) {
+      try {
+        if (maplibregl.getRTLTextPluginStatus() === 'unavailable') {
+          maplibregl.setRTLTextPlugin(
+            'https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.2.3/mapbox-gl-rtl-text.min.js',
+            function (err) {
+              if (err) console.error('[MapLibre RTL Text Plugin Error]:', err);
+            },
+            true
+          );
+        }
+      } catch (e) {
+        console.warn('[MapLibre RTL Text Plugin Init]:', e);
+      }
+    }
+  </script>
+
   <!-- 3D Globe Web Bridge -->
   <script src="mapbox_globe.js"></script>
 
