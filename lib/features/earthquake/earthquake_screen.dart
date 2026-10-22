@@ -164,6 +164,7 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
             text: 'الزلازل التاريخية (112م - 1899م)',
             styleType: ButtonStyleType.mainMenu,
             fontSize: 22,
+            iconWidget: Image.asset(AppAssets.squareEarth, width: 22, height: 22),
             onPressed: () => _loadEarthquakeData('Histroical.xlsx', AppAssets.squareEarth),
           ),
 
@@ -173,35 +174,44 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
             styleType: ButtonStyleType.mainMenu,
             fontSize: 22,
             onPressed: () {
-              // Informational button matching Android activity_earthquake.xml
+              // Header button matching Android activity_earthquake.xml
             },
           ),
 
-          // Magnitude <= 3
+          // Magnitude 4 - 4.99
           CustomButton(
-            text: '< 3',
+            text: 'زلازل مقدارها 4 - 4.99 درجة',
             styleType: ButtonStyleType.subMenu,
-            fontSize: 20,
+            fontSize: 18,
             iconWidget: Image.asset(AppAssets.smallEarth, width: 22, height: 22),
-            onPressed: () => _loadEarthquakeData('under3.xlsx', AppAssets.smallEarth),
+            onPressed: () => _loadEarthquakeData('4 to 5.xlsx', AppAssets.smallEarth),
           ),
 
-          // Magnitude 3.0 - 5.0
+          // Magnitude 5 - 5.99
           CustomButton(
-            text: '3.0 - 5.0',
+            text: 'زلازل مقدارها 5 - 5.99 درجة',
             styleType: ButtonStyleType.subMenu,
-            fontSize: 20,
+            fontSize: 18,
             iconWidget: Image.asset(AppAssets.mediumEarth, width: 22, height: 22),
-            onPressed: () => _loadEarthquakeData('between3_5.xlsx', AppAssets.mediumEarth),
+            onPressed: () => _loadEarthquakeData('5 to 6.xlsx', AppAssets.mediumEarth),
           ),
 
-          // Magnitude >= 5.0
+          // Magnitude 6 - 6.99
           CustomButton(
-            text: '5.0 >',
+            text: 'زلازل مقدارها 6 - 6.99 درجة',
             styleType: ButtonStyleType.subMenu,
-            fontSize: 20,
-            iconWidget: Image.asset(AppAssets.squareEarth, width: 22, height: 22),
-            onPressed: () => _loadEarthquakeData('high5.xlsx', AppAssets.squareEarth),
+            fontSize: 18,
+            iconWidget: Image.asset(AppAssets.largEarth, width: 22, height: 22),
+            onPressed: () => _loadEarthquakeData('6 to 7.xlsx', AppAssets.largEarth),
+          ),
+
+          // Magnitude >= 7.0
+          CustomButton(
+            text: 'زلازل مقدارها أعلى من 7 درجات',
+            styleType: ButtonStyleType.subMenu,
+            fontSize: 18,
+            iconWidget: Image.asset(AppAssets.extraLargEarth, width: 22, height: 22),
+            onPressed: () => _loadEarthquakeData('7 and above.xlsx', AppAssets.extraLargEarth),
           ),
         ],
       ),
