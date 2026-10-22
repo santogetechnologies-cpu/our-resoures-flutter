@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -54,123 +55,124 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
   List<DamLocation> _dams = [];
   final Map<String, DamLocation> _annotationDamMap = {};
 
-  final Map<String, ({String path, Color color, String nameAr, double length})> _valleys = {
-    'Wadi_Aba_Al_Qu': (path: 'assets/maps/valleys/Wadi_Aba_Al_Qu.geojson', color: const Color(0xFF1AA33F), nameAr: 'وادي أبا القور', length: 120.0),
-    'Wadi_Aba_Ar_Ruwath': (path: 'assets/maps/valleys/Wadi_Aba_Ar_Ruwath.geojson', color: const Color(0xFFA31F1A), nameAr: 'وادي أبا الروث', length: 85.0),
-    'Wadi_Al_Ahsabah': (path: 'assets/maps/valleys/Wadi_Al_Ahsabah.geojson', color: const Color(0xFFA3411A), nameAr: 'وادي الأحسبة', length: 110.0),
-    'Wadi_Al_Akhda': (path: 'assets/maps/valleys/Wadi_Al_Akhda.geojson', color: const Color(0xFF73A31A), nameAr: 'وادي الآخضر', length: 95.0),
-    'Wadi_Al_Amq': (path: 'assets/maps/valleys/Wadi_Al_Amq.geojson', color: const Color(0xFF3CA31A), nameAr: 'وادي العمق', length: 130.0),
-    'Wadi_Al_Batin': (path: 'assets/maps/valleys/Wadi_Al_Batin.geojson', color: const Color(0xFF1AA333), nameAr: 'وادي الباطن', length: 240.0),
-    'Wadi_Al_Farshah': (path: 'assets/maps/valleys/Wadi_Al_Farshah.geojson', color: const Color(0xFF1AA333), nameAr: 'وادي الفرشة', length: 70.0),
-    'Wadi_Al_Gharr': (path: 'assets/maps/valleys/Wadi_Al_Gharr.geojson', color: const Color(0xFF1AA375), nameAr: 'وادي الغار', length: 90.0),
-    'Wadi_al_Ghinah': (path: 'assets/maps/valleys/Wadi_al_Ghinah.geojson', color: const Color(0xFF1AA375), nameAr: 'وادي الغينة', length: 65.0),
-    'Wadi_Al_Hamal': (path: 'assets/maps/valleys/Wadi_Al_Hamal.geojson', color: const Color(0xFF1A93A3), nameAr: 'وادي الحمل', length: 140.0),
-    'Wadi_Al_Hamd': (path: 'assets/maps/valleys/Wadi_Al_Hamd.geojson', color: const Color(0xFF1A75A3), nameAr: 'وادي الحمض', length: 465.0),
-    'Wadi_Al_Hinu': (path: 'assets/maps/valleys/Wadi_Al_Hinu.geojson', color: const Color(0xFF1A45A3), nameAr: 'وادي الحنو', length: 75.0),
-    'Wadi_Al_Jarir': (path: 'assets/maps/valleys/Wadi_Al_Jarir.geojson', color: const Color(0xFF251AA3), nameAr: 'وادي الجرير', length: 260.0),
-    'Wadi_Al_Jizil': (path: 'assets/maps/valleys/Wadi_Al_Jizil.geojson', color: const Color(0xFF5C30C2), nameAr: 'وادي الجزل', length: 280.0),
-    'Wadi_al_Judwal': (path: 'assets/maps/valleys/Wadi_al_Judwal.geojson', color: const Color(0xFF641CA3), nameAr: 'وادي الجدول', length: 55.0),
-    'Wadi_Al_Khurmah': (path: 'assets/maps/valleys/Wadi_Al_Khurmah.geojson', color: const Color(0xFF7D1CA3), nameAr: 'وادي الخرمة', length: 210.0),
-    'Wadi_Al_Lith': (path: 'assets/maps/valleys/Wadi_Al_Lith.geojson', color: const Color(0xFFA31C9C), nameAr: 'وادي الليث', length: 160.0),
-    'Wadi_Al_Makhit': (path: 'assets/maps/valleys/Wadi_Al_Makhit.geojson', color: const Color(0xFFA31C7B), nameAr: 'وادي المخيط', length: 80.0),
-    'Wadi_Al_Maqran': (path: 'assets/maps/valleys/Wadi_Al_Maqran.geojson', color: const Color(0xFFA31C5F), nameAr: 'وادي المقرن', length: 90.0),
-    'Wadi_Al_Mira': (path: 'assets/maps/valleys/Wadi_Al_Mira.geojson', color: const Color(0xFFA31C40), nameAr: 'وادي الميرة', length: 115.0),
-    'Wadi_al_Qimra': (path: 'assets/maps/valleys/Wadi_al_Qimra.geojson', color: const Color(0xFFA31C29), nameAr: 'وادي القمرة', length: 60.0),
-    'Wadi_Ar_Raka': (path: 'assets/maps/valleys/Wadi_Ar_Raka.geojson', color: const Color(0xFF7D803B), nameAr: 'وادي الركاء', length: 175.0),
-    'Wadi_Ar_Risha': (path: 'assets/maps/valleys/Wadi_Ar_Risha.geojson', color: const Color(0xFF61803B), nameAr: 'وادي الريشة', length: 70.0),
-    'Wadi_Ar_Rumah': (path: 'assets/maps/valleys/Wadi_Ar_Rumah.geojson', color: const Color(0xFF42803B), nameAr: 'وادي الرمة', length: 600.0),
-    'Wadi_Arar': (path: 'assets/maps/valleys/Wadi_Arar.geojson', color: const Color(0xFF3B8050), nameAr: 'وادي عرعر', length: 165.0),
-    'Wadi_As_Sahba': (path: 'assets/maps/valleys/Wadi_As_Sahba.geojson', color: const Color(0xFF3B8063), nameAr: 'وادي السهباء', length: 220.0),
-    'Wadi_As_surrah': (path: 'assets/maps/valleys/Wadi_As_surrah.geojson', color: const Color(0xFF3B7B80), nameAr: 'وادي السرة', length: 145.0),
-    'Wadi_Ash_Shu_bah': (path: 'assets/maps/valleys/Wadi_Ash_Shu_bah.geojson', color: const Color(0xFF3B6B80), nameAr: 'وادي الشعبة', length: 190.0),
-    'Wadi_Baysh': (path: 'assets/maps/valleys/Wadi_Baysh.geojson', color: const Color(0xFF3B5480), nameAr: 'وادي بيش', length: 180.0),
-    'Wadi_Bishah': (path: 'assets/maps/valleys/Wadi_Bishah.geojson', color: const Color(0xFF3B3C80), nameAr: 'وادي بيشة', length: 450.0),
-    'Wadi_Bitat': (path: 'assets/maps/valleys/Wadi_Bitat.geojson', color: const Color(0xFF513B80), nameAr: 'وادي بطاط', length: 65.0),
-    'Wadi_Damad': (path: 'assets/maps/valleys/Wadi_Damad.geojson', color: const Color(0xFF673B80), nameAr: 'وادي ضمد', length: 125.0),
-    'Wadi_Dawqah': (path: 'assets/maps/valleys/Wadi_Dawqah.geojson', color: const Color(0xFF7E3B80), nameAr: 'وادي دوقة', length: 95.0),
-    'Wadi_Fajr': (path: 'assets/maps/valleys/Wadi_Fajr.geojson', color: const Color(0xFF803B69), nameAr: 'وادي فجر', length: 215.0),
-    'Wadi_Hali': (path: 'assets/maps/valleys/Wadi_Hali.geojson', color: const Color(0xFF803B4F), nameAr: 'وادي حلي', length: 160.0),
-    'Wadi_Hamir': (path: 'assets/maps/valleys/Wadi_Hamir.geojson', color: const Color(0xFFDB6353), nameAr: 'وادي حامض', length: 110.0),
-    'Wadi_Hanifah': (path: 'assets/maps/valleys/Wadi_Hanifah.geojson', color: const Color(0xFF9ADB53), nameAr: 'وادي حنيفة', length: 120.0),
-    'Wadi_Hirjab': (path: 'assets/maps/valleys/Wadi_Hirjab.geojson', color: const Color(0xFF63DB53), nameAr: 'وادي هرجاب', length: 140.0),
-    'Wadi_Hubuna': (path: 'assets/maps/valleys/Wadi_Hubuna.geojson', color: const Color(0xFF53DB85), nameAr: 'وادي حبونا', length: 150.0),
-    'Wadi_Itwad': (path: 'assets/maps/valleys/Wadi_Itwad.geojson', color: const Color(0xFF53DBC9), nameAr: 'وادي عتود', length: 105.0),
-    'Wadi_Najran': (path: 'assets/maps/valleys/Wadi_Najran.geojson', color: const Color(0xFF539ADB), nameAr: 'وادي نجران', length: 190.0),
-    'Wadi_Nayyal': (path: 'assets/maps/valleys/Wadi_Nayyal.geojson', color: const Color(0xFF6A53DB), nameAr: 'وادي نيال', length: 85.0),
-    'Wadi_Qatan': (path: 'assets/maps/valleys/Wadi_Qatan.geojson', color: const Color(0xFF9A53DB), nameAr: 'وادي قطن', length: 90.0),
-    'Wadi_Ranyah': (path: 'assets/maps/valleys/Wadi_Ranyah.geojson', color: const Color(0xFFCB53DB), nameAr: 'وادي رنية', length: 350.0),
-    'Wadi_Rash': (path: 'assets/maps/valleys/Wadi_Rash.geojson', color: const Color(0xFFDB53BC), nameAr: 'وادي رش', length: 95.0),
-    'Wadi_Shuwayhat': (path: 'assets/maps/valleys/Wadi_Shuwayhat.geojson', color: const Color(0xFFDB538E), nameAr: 'وادي شويحط', length: 70.0),
-    'Wadi_Tabalah': (path: 'assets/maps/valleys/Wadi_Tabalah.geojson', color: const Color(0xFF8EDB53), nameAr: 'وادي تبالة', length: 180.0),
-    'Wadi_Tathlith': (path: 'assets/maps/valleys/Wadi_Tathlith.geojson', color: const Color(0xFFDB8E53), nameAr: 'وادي تثليث', length: 650.0),
-    'Wadi_Tayyah': (path: 'assets/maps/valleys/Wadi_Tayyah.geojson', color: const Color(0xFF53DBAA), nameAr: 'وادي تية', length: 75.0),
-    'Wadi_Turbah': (path: 'assets/maps/valleys/Wadi_Turbah.geojson', color: const Color(0xFF5367DB), nameAr: 'وادي تربة', length: 400.0),
-    'Wadi_Yiba': (path: 'assets/maps/valleys/Wadi_Yiba.geojson', color: const Color(0xFFC753DB), nameAr: 'وادي يبة', length: 150.0),
+final Map<String, ({String path, Color color, String nameAr, double length})> _valleys = {
+    'Wadi_Aba_Al_Qu': (path: 'assets/maps/valleys/Wadi_Aba_Al_Qu.geojson', color: const Color(0xFF1AA33F), nameAr: 'وادي أبا القور', length: 203.1),
+    'Wadi_Aba_Ar_Ruwath': (path: 'assets/maps/valleys/Wadi_Aba_Ar_Ruwath.geojson', color: const Color(0xFFA31F1A), nameAr: 'وادي أبا الرواث', length: 173.8),
+    'Wadi_Al_Ahsabah': (path: 'assets/maps/valleys/Wadi_Al_Ahsabah.geojson', color: const Color(0xFFA3411A), nameAr: 'وادي الأحسبة', length: 69.1),
+    'Wadi_Al_Akhda': (path: 'assets/maps/valleys/Wadi_Al_Akhda.geojson', color: const Color(0xFF73A31A), nameAr: 'وادي الأخضر', length: 172.8),
+    'Wadi_Al_Amq': (path: 'assets/maps/valleys/Wadi_Al_Amq.geojson', color: const Color(0xFF3CA31A), nameAr: 'وادي العمق', length: 117.2),
+    'Wadi_Al_Batin': (path: 'assets/maps/valleys/Wadi_Al_Batin.geojson', color: const Color(0xFF1AA333), nameAr: 'وادي الباطن', length: 373),
+    'Wadi_Al_Farshah': (path: 'assets/maps/valleys/Wadi_Al_Farshah.geojson', color: const Color(0xFF1AA333), nameAr: 'وادي الفرشة', length: 123.9),
+    'Wadi_Al_Gharr': (path: 'assets/maps/valleys/Wadi_Al_Gharr.geojson', color: const Color(0xFF1AA375), nameAr: 'وادي الغر', length: 178.3),
+    'Wadi_al_Ghinah': (path: 'assets/maps/valleys/Wadi_al_Ghinah.geojson', color: const Color(0xFF1AA375), nameAr: 'وادي الغينة', length: 120.4),
+    'Wadi_Al_Hamal': (path: 'assets/maps/valleys/Wadi_Al_Hamal.geojson', color: const Color(0xFF1A93A3), nameAr: 'وادي الحمل', length: 163.4),
+    'Wadi_Al_Hamd': (path: 'assets/maps/valleys/Wadi_Al_Hamd.geojson', color: const Color(0xFF1A75A3), nameAr: 'وادي الحمض', length: 402),
+    'Wadi_Al_Hinu': (path: 'assets/maps/valleys/Wadi_Al_Hinu.geojson', color: const Color(0xFF1A45A3), nameAr: 'وادي الحنو', length: 111.4),
+    'Wadi_Al_Jarir': (path: 'assets/maps/valleys/Wadi_Al_Jarir.geojson', color: const Color(0xFF251AA3), nameAr: 'وادي الجرير', length: 256.1),
+    'Wadi_Al_Jizil': (path: 'assets/maps/valleys/Wadi_Al_Jizil.geojson', color: const Color(0xFF5C30C2), nameAr: 'وادي الجزل', length: 273.9),
+    'Wadi_al_Judwal': (path: 'assets/maps/valleys/Wadi_al_Judwal.geojson', color: const Color(0xFF641CA3), nameAr: 'وادي الجدول', length: 160.2),
+    'Wadi_Al_Khurmah': (path: 'assets/maps/valleys/Wadi_Al_Khurmah.geojson', color: const Color(0xFF7D1CA3), nameAr: 'وادي الخرمة', length: 209.4),
+    'Wadi_Al_Lith': (path: 'assets/maps/valleys/Wadi_Al_Lith.geojson', color: const Color(0xFFA31C9C), nameAr: 'وادي الليث', length: 115.6),
+    'Wadi_Al_Makhit': (path: 'assets/maps/valleys/Wadi_Al_Makhit.geojson', color: const Color(0xFFA31C7B), nameAr: 'وادي المخيط', length: 166.7),
+    'Wadi_Al_Maqran': (path: 'assets/maps/valleys/Wadi_Al_Maqran.geojson', color: const Color(0xFFA31C5F), nameAr: 'وادي المقرن', length: 127.7),
+    'Wadi_Al_Mira': (path: 'assets/maps/valleys/Wadi_Al_Mira.geojson', color: const Color(0xFFA31C40), nameAr: 'وادي المراء', length: 159.3),
+    'Wadi_al_Qimra': (path: 'assets/maps/valleys/Wadi_al_Qimra.geojson', color: const Color(0xFFA31C29), nameAr: 'وادي القمراء', length: 195.3),
+    'Wadi_Ar_Raka': (path: 'assets/maps/valleys/Wadi_Ar_Raka.geojson', color: const Color(0xFF7D803B), nameAr: 'وادي الركا', length: 270.9),
+    'Wadi_Ar_Risha': (path: 'assets/maps/valleys/Wadi_Ar_Risha.geojson', color: const Color(0xFF61803B), nameAr: 'وادي الرشاء', length: 205.4),
+    'Wadi_Ar_Rumah': (path: 'assets/maps/valleys/Wadi_Ar_Rumah.geojson', color: const Color(0xFF42803B), nameAr: 'وادي الرمة', length: 452.3),
+    'Wadi_Arar': (path: 'assets/maps/valleys/Wadi_Arar.geojson', color: const Color(0xFF3B8050), nameAr: 'وادي عرعر', length: 193.6),
+    'Wadi_As_Sahba': (path: 'assets/maps/valleys/Wadi_As_Sahba.geojson', color: const Color(0xFF3B8063), nameAr: 'وادي السهباء', length: 422),
+    'Wadi_As_surrah': (path: 'assets/maps/valleys/Wadi_As_surrah.geojson', color: const Color(0xFF3B7B80), nameAr: 'وادي السرة', length: 249.6),
+    'Wadi_Ash_Shu-bah': (path: 'assets/maps/valleys/Wadi_Ash_Shu-bah.geojson', color: const Color(0xFF3B6B80), nameAr: 'وادي الشعبة', length: 287.8),
+    'Wadi_Baysh': (path: 'assets/maps/valleys/Wadi_Baysh.geojson', color: const Color(0xFF3B5480), nameAr: 'وادي بيش', length: 169.6),
+    'Wadi_Bishah': (path: 'assets/maps/valleys/Wadi_Bishah.geojson', color: const Color(0xFF3B3C80), nameAr: 'وادي بيشة', length: 493.8),
+    'Wadi_Bitat': (path: 'assets/maps/valleys/Wadi_Bitat.geojson', color: const Color(0xFF513B80), nameAr: 'وادي بطاط', length: 29.9),
+    'Wadi_Damad': (path: 'assets/maps/valleys/Wadi_Damad.geojson', color: const Color(0xFF673B80), nameAr: 'وادي ضمد', length: 111.8),
+    'Wadi_Dawqah': (path: 'assets/maps/valleys/Wadi_Dawqah.geojson', color: const Color(0xFF7E3B80), nameAr: 'وادي دوقة', length: 93.2),
+    'Wadi_Fajr': (path: 'assets/maps/valleys/Wadi_Fajr.geojson', color: const Color(0xFF803B69), nameAr: 'وادي فجر', length: 287.6),
+    'Wadi_Hali': (path: 'assets/maps/valleys/Wadi_Hali.geojson', color: const Color(0xFF803B4F), nameAr: 'وادي حلي', length: 181.6),
+    'Wadi_Hamir': (path: 'assets/maps/valleys/Wadi_Hamir.geojson', color: const Color(0xFFDB6353), nameAr: 'وادي حامر', length: 138.2),
+    'Wadi_Hanifah': (path: 'assets/maps/valleys/Wadi_Hanifah.geojson', color: const Color(0xFF9ADB53), nameAr: 'وادي حنيفة', length: 188.8),
+    'Wadi_Hirjab': (path: 'assets/maps/valleys/Wadi_Hirjab.geojson', color: const Color(0xFF63DB53), nameAr: 'وادي هرجاب', length: 134.9),
+    'Wadi_Hubuna': (path: 'assets/maps/valleys/Wadi_Hubuna.geojson', color: const Color(0xFF53DB85), nameAr: 'وادي حبونا', length: 159.4),
+    'Wadi_Itwad': (path: 'assets/maps/valleys/Wadi_Itwad.geojson', color: const Color(0xFF53DBC9), nameAr: 'وادي عتود', length: 98.6),
+    'Wadi_Najran': (path: 'assets/maps/valleys/Wadi_Najran.geojson', color: const Color(0xFF539ADB), nameAr: 'وادي نجران', length: 138.2),
+    'Wadi_Nayyal': (path: 'assets/maps/valleys/Wadi_Nayyal.geojson', color: const Color(0xFF6A53DB), nameAr: 'وادي نيال', length: 173.8),
+    'Wadi_Qatan': (path: 'assets/maps/valleys/Wadi_Qatan.geojson', color: const Color(0xFF9A53DB), nameAr: 'وادي قطن', length: 108),
+    'Wadi_Ranyah': (path: 'assets/maps/valleys/Wadi_Ranyah.geojson', color: const Color(0xFFCB53DB), nameAr: 'وادي رنية', length: 395.1),
+    'Wadi_Rash': (path: 'assets/maps/valleys/Wadi_Rash.geojson', color: const Color(0xFFDB53BC), nameAr: 'وادي راش', length: 33.4),
+    'Wadi_Shuwayhat': (path: 'assets/maps/valleys/Wadi_Shuwayhat.geojson', color: const Color(0xFFDB538E), nameAr: 'وادي شويحط', length: 133.7),
+    'Wadi_Tabalah': (path: 'assets/maps/valleys/Wadi_Tabalah.geojson', color: const Color(0xFFDB5353), nameAr: 'وادي تبالة', length: 126.3),
+    'Wadi_Tarif': (path: 'assets/maps/valleys/Wadi_Tarif.geojson', color: const Color(0xFF197D05), nameAr: 'وادي طريف', length: 125),
+    'Wadi_Tarj': (path: 'assets/maps/valleys/Wadi_Tarj.geojson', color: const Color(0xFF057D6F), nameAr: 'وادي ترج', length: 173.1),
+    'Wadi_Tathlith': (path: 'assets/maps/valleys/Wadi_Tathlith.geojson', color: const Color(0xFF05337D), nameAr: 'وادي تثليث', length: 376),
+    'Wadi_Turubah': (path: 'assets/maps/valleys/Wadi_Turubah.geojson', color: const Color(0xFF35057D), nameAr: 'وادي تربة', length: 177.7),
+    'Wadi_Yabah': (path: 'assets/maps/valleys/Wadi_Yabah.geojson', color: const Color(0xFF7D054B), nameAr: 'وادي يبة', length: 139.9),
   };
 
-  final Map<String, ({String nameAr, String desc})> _mainFormations = {
+final Map<String, ({String nameAr, String desc})> _mainFormations = {
     'saq': (
       nameAr: 'تكوين الساق',
-      desc: 'يمتد تكوين الساق من جنوب الأردن عبر منطقة تبوك وحائل والقصيم حتى قرب الزلفي، ويتكون أساساً من الحجر الرملي المسامي عالي النفاذية ويعد من أهم الخزانات الجوفية العميقة العذبة في المملكة ويستغل بشكل واسع في المشاريع الزراعية والبلدية.'
-    ),
-    'wajid': (
-      nameAr: 'تكوين الوجيد',
-      desc: 'ينكشف تكوين الوجيد في جنوب وجنوب غرب المملكة (وادي الدواسر، نجران، الربع الخالي) ويتكون من الحجر الرملي القاري والبحري ويتميز باحتياطيات مائية هائلة ذات نوعية ممتازة ويعتبر المصدر الرئيسي للمياه في المناطق الجنوبية.'
+      desc: 'يمتد من شمال غرب المملكة ( الحدود الأردنية',
     ),
     'tabuk': (
       nameAr: 'تكوين تبوك',
-      desc: 'يمتد تكوين تبوك في شمال غرب وشمال المملكة من الأردن حتى منطقة القصيم ويتألف من تتابعات من صخور الحجر الرملي والغرين والصلصال، ويعتبر من الخزانات الإنتاجية الهامة للمياه الجوفية.'
+      desc: 'يمتد تكوين تبوك جنوب وشرق الحدود الاردنية والى وادي الرمة جنوبا , حيث تبلغ مساحتة 100 الف كيلومتر مربع , كما ينفصل التكوين عن بعضة البعض بالحزام الرملي لصحراء النفوذ الكبرى , هذا ويظهر تكوين تبوك الى الغرب من النفوذ الكبير في ثلاث مناطق وهي تبوك والطويل والجوف , وتستفيد منه المناطق السابقة في تكوين الساق عدا منطقة السر. تـرجع مجموعـة تبوك إلى العصرين الأوردو فيشي المتوسط / السيلوري ، وتـتكون المجمـوعـة من ثلاث وحدات من الصخور الرملية المتبادلـة مع ثلاث وحدات من الصخور الطفلية. ويـبلغ متوسط سمك الوحدات الرملية الحاملـة للمياه في هذه المجموعـة حوالي 200 متر وإن كان سمك المجمـوعـة يتجاوز الألف متر في بعض الأماكن. ويغطي الجزء المنكشف منها مساحة تقدر بأكثر من مائة ألف كيلو متر مربع ، ومياه تلك المجموعـة جيدة إذ تتراوح ملوحتها بين 400 إلى 600 ملليجرام / لتر في المتوسـط وتزداد الملوحـة في الاتجاه الجنوبي، وتعتمد مناطق تبوك والقصيم على مياه تلك المكامن بالإضافـة إلى مياه مكمن متكون ساق. ويختلف سمك تكوين تبوك من منطقة لاخرى تبعا لوجود جميع اجزائه او بعضا منها، ويبلغ سمكة 1070 م ويوجد منكشفه في مناطق تبوك وتيماء وحائل والقصيم ويعتبر من أغنى التكوينات الحاملة للماء بالمملكة . ويبلغ عمر المياه في متكون تبوك اكثر من ثلاثين الف سنة وتم تقدير المخزون بحوالي 1300 مليون متر مكعب.',
+    ),
+    'wajid': (
+      nameAr: 'تكوين الوجيد',
+      desc: 'يوجد في جنوب ووسط المملكة، وتستفيد منه منطقة وادي الدواسر.  يمتد مابين وادي نجران وشرورة في الجنوب و وادي الدواسر في الشمال لمسافة 300 كم ولا يزيد عرضة عن 100 كم , ويتكون من الاحجار الرملية ذات الحبيبات الخشنة والناعمة ترجع إلى حقب الحياة القديمة ’ كما تقع الصخور الرملية لتكوين الوجيد على الصخور النارية والمتحولة ويتراوح سمك تكوين الوجيد من 200 إلى 900 متر . تغطي صخوره مساحـة في جنوب غربي المملكة تقدر بحوالي عشرين ألف كيلو متر مربع، بسمك متوسط في حدود 400 متر، وإن كان ذلك السمك يزداد تدريجيا كلما اتجهنا شرقاً ليصل إلى قرابـة الألف متر. وتتراوح أعماق مياهه من 100 إلى 1100 متر كما يقدر عمر مياهه بحوالي 300 ألف سنـة أو أكثر. وتقل الملوحـة في مياه تكوين الوجيد عن 1000 ملليجرام / لتر، وقدرت كمية مياه الأمطار التي تغذي المتكون بنحو 500 مليون متر مكعب سنوياً. وتستغل مياه الوجيد في وادي الدواسـر منذ 1966م حيث تندفن صخوره تحت متكونات أحدث عمراً بين وادي الدواسـر ووادي نجران، وتندفع شرقاً تحت الأجزاء الغربيـة من الربع الخالي إلى مسافـة كبيرة محتفظـة بتركيبها الرملي، مما يزيد في إمكانيـة تلك المكامن المائـية التي تشبـه مياهها في خواصها الكيميائية والطبيـعية مياه مكمن متكون ساق.',
     ),
     'minjur': (
       nameAr: 'تكوين المنجور',
-      desc: 'ينكشف في وسط المملكة بمحاذاة جبال طويق ويتكون من الحجر الرملي الفتاتي الخشن، وهو خزان مياه جوفية عميق هام جداً يغذي منطقة الرياض والمحافظات المجاورة بمياه صالحة بعد المعالجة.'
+      desc: 'يقع تكوين المنجور وسط المملكة والى الشرق من تكوين الساق وتبلغ مساحتة نحو 6500 كيلومتر مربع , وهو يتكون من الاحجار الرملية ذات الاصل القاري المتعددة الطبقات وتوجد عليها طبقات رقيقة من الصخور الجيرية والطفل والجبس . وهو يعتبر من التكوينات العميقة نسبياً حيث يوجد على أعماق تصل لأكثر من 1800م،  وتستفيد منه منطقة الرياض وسدير والوشم والخرج والأفلاج والسليل. يرجع متكون المنجور في العمر إلى الترياسي المتأخر / الجوراسي المبكر ويتكون من الرمل الخشن عالي المسامية والنفاذيـة، ولذلك فهو مشبع بالمياه. وقد درست عينات من مياهه من بئر الشميسي في الرياض فوجد أن عمرها يرجع إلى ما بين 35 و 40 ألف سنـة، بينما يرجـع عمر متكون ضرما إلى الجوراسي المتوسط ويغلب على تركيبـه الطفل والطفل الكلسي والحجر الجيري، وتتحول تلك الصخور في الجزء الجنوبي من المملكة إلى صخور رملية مما يسمح بتشبعها بالمياه فتشكل مع متكون المنجور- الذي تعلوه بصورة لا توافقية- خزاناً مائياً واحداً يطلق عليه مكمن المنجور / ضرما وذلك جـنوب خط عـرض °20 شمالاً، وتتراوح نسبـة الأمـلاح في مياه ذلك الخزان المائي بين 400 و 1500 ملليجرام / لتر. وتزداد الملوحـة باتجاه الشرق وكذلك مع زيادة العمق. وتبلغ مساحة منكشف المنجور حوالي 2500 كيلومتر مربع كما تصل سماكـة التكوين إلى 400 متر تشمل طبقتين حاملتين للمياه تحت السطحيـة. يعتبر المنجور واحد من الخزانات الجوفية المهمة ذات المياه الغزيرة في المملكة حيث تخترقه الكثير جدا من الابار في منطقة الرياض وما حولها وهو ذو مسامية ونفاذية عالية جدا. وتختلف خصائصه الهيدروليكية بدرجة كبيرة من مكان لاخر يتغذى المنجور بواسطة هطول الامطار على منكشفه وقدرت كمية التغذية بحوالي 85 مليون متر مكعب سنويا على امتداد منكشفه.',
+    ),
+    'biyadh': (
+      nameAr: 'تكوين البياض',
+      desc: 'يمتد تكوين البياض على شكل شريط هلالي من وادي الدواسر جنوبا حتى وادي العتش شمالا لمسافة 650 كلم ويبلغ عرض منكشفة 50 كلم في وادي الدواسر. وتوجد اجزاءه المحصورة المغطاه بمختلف الرسوبيات في المنطقة الشرقية والشمالية الشرقيه والربع الخالي وتمتد داخل حدود قطر والكويت والعراق، ومعظم اجزائه المحصورة مغطاه بالاحجار الرمليه لتكوين الوسيع وفي معظم المناطق خاصة في المنكشفات لا يمكن الفصل بين البياض والوسيع حيث يكونان وحدة مائية واحدة، يحد البياض من الأسفل تكوين البويب المكون من الاحجار الجيرية مع الاحجار الرملية والطفل. تكوين البياض قاري الاصل من العصر الطباشيري الاسفل ويتكون اساسا من حبيبات الرمل والاحجار الرملية مع طبقات رقيقة من الطفل والمارل والدلومايت والحجر الحديدي وتتغير السحنة في اتجاه الشرق من احجار رملية الى رمليه طفلية الى احجار جيريه. يبلغ اقصى سمك للمتكون 625 متر ويقل سمكة كلما اتجهنا شمالا. نوعية الياه في المتكون مالحة الى شديدة الملوحة وتبلغ كمية الاملاح الذائبة قرب المنكشف حوالي 1500 ملجم/لتر بينما تصل الى اكثر من 6000 ملجم/لتر في المنطقة الشرقية، اما في منطقه الخرج فان المياه ذ ات نوعيه جيده وتبلغ الاملاح الذائبه حوالي 550 -900 ملجم / لتر. يستغل تكوين البياض في مناطق الخرج ووادي السهبا ووادي نساح وخريص.',
     ),
     'wasii': (
       nameAr: 'تكوين الوسيع',
-      desc: 'تكوين رملي طباشيري يمتد لمسافات شاسعة عبر وسط وشرق المملكة، ويعد من أغنى الخزانات الجوفية بالمياه في وسط وشرق البلاد ويدعم إمدادات المياه لمنطقة الرياض والمنطقة الشرقية.'
+      desc: 'تتألف صخور تكوين الوسيع ، من صخور رملية رقيقة نسبيا ، وطفل وعدسات من الكربونات . ويمتد منكشف الوسيع حوالي 1450 كم من الربع الخالي في اتجاه الشمال على شكل قوس ضخم يمر تحت الطرف الغربي من النفود الكبير . يوجد منكشف الوسيع في شكل مقطع كامل في خشم الوسيع الواقع شمال وادي السهبا ، يمتد منكشف الوسيع مسافة 1460 كم على شكل شريط هلالي من شمال وادي الدواسر حتى النفوذ الكبير بالشمال حيث يختفى تحت كثبانه ثم يظهر على سطح الارض ثانية وينكشف بالقرب من سكاكا حيث يعرف بحجر رمل سكاكا، ويعلوه احجار جيرية تابعة لتكوين العرمة. يشكل متكونا البياض والوسيع وحدة مائية واحدة ويعتبر من خرانات المياة الجوفية الممتازة في المملكة . متكون الوسيع قاري الاصل ترسب في العصر الطباشيري الاوسط ويتكون من حبيبات رملية غير متماسكه متوسطة الى خشنة. يتراوح سمك التكوين بين 200 و230 م  ويزداد سمكه تجاه الشمال حتى يبلغ 285 م بالقرب من سكاكا.  ويبلغ اقصى سمك له في الجنوب 600 م تحت الربع الخالي. يغذى المتكون مع متكون البياض منطقة الرياض و حفر.الباطن وقدر مجموع ما يستخرج من هذه التكوين بواقع 75 مليون متر مكعب. يقدر حجم المخزون في تكون الوسيع تقريبا حوالي 57000 مليون متر مكعب. قدرت كمية التغذية السنوية للتكوين من مياه الامطار والسيول حوالي 419 مليون متر مكعب. تغذي طبقة الوسيع - البياض جبال طويق , ويقدر عمر الماء عند المنكشف بالقرب من خريص بنحو 16 الف سنة ويرجع متكونا البياض والوسيع إلى العصر الطباشيري المبكر والمتوسط،. وعلى الرغم من ذلك فإن كلا المتكونين يغلب عليهما الصخور الرملية عالية المسامية والنفاذيـة، التي يمتد ظاهرها لمسافات كبيرة تتعدى الألف كيلومتر في الطول وعشرات الكيلومترات في العرض، ولذا فكلاهما مشبع بالمياه، وغالباً ما يتصل الخزانان ليكونا مكمناً مائياً واحداً يعرف بـاسم مكمن البياض - الوسيع، الذي يعتبر من أوفر مكامن المياه بالمملكة، وتتراوح نسبـة الأملاح في مياه هذا المكمن المائي بين 550 و 6000 ملليجرام / لتر. ويقدر عمر المياه عند المنكشف بالقرب من خريص بنحو 16 ألف سنـة.',
     ),
     'radmaa': (
       nameAr: 'تكوين أم الرضمة',
-      desc: 'تكوين جيري ودولوميتي بحري من العصر الباليوسيني يمتد عبر المنطقة الشرقية والحدود الشمالية، ويتميز بنفاذية كربوناتية كارستية عالية وإنتاجية وفيرة لمشاريع الري والصناعة.'
+      desc: ' يمتد من الحدود العراقية والاردنية في الشمال الى جنوب وادي الدواسر لمسافة 1200 كم ، ويتكون من الحجر الحبيبي الطباشيري والدولومايت وبعض الطفل الذي ينتمي الى الاصل الحجري , ويتفاوت سمك التكوين بشكل عام من الغرب الى الشرق ومن الشمال الى الجنوب , وتختلف نوعية مياهه تبعاً لبعده عن المناطق الساحلية. وتستفيد منه الظهران وشدقم والخبر والدمام وحرض وبعض المناطق في الإحساء ووادي المياه.  يتبع متكون أم رضمة عصري الباليوسين المتأخر / الإيوسين المبكر ويتكون أساساً من صخور جيريـة تتحول بدورها إلى صخور رملية في الأجزاء الجنوبية الغربية من أرض المملكة. ويمتد ظاهر متكون أم رضمة في حزام يبلغ طوله 1200 كيلومتر، ويتراوح عرضه بين  60 و  120 كيلومتراً (من وادي الدواسر جنوباً إلى الحدود الشمالية للمملكة',
     ),
     'dammam': (
       nameAr: 'تكوين الدمام',
-      desc: 'تكوين جيري إيوسيني يغطي مساحات واسعة في شرق المملكة ويحتوي على طبقات مياه جوفية رئيسية تستغل في الواحات والمناطق الزراعية والساحلية في الأحساء والقطيف والدمام.'
+      desc: 'يمتد تكوين الدمام في مناطق متفرقة حول ساحل الخليج العربي , و يتكون من خمسة طبقات ( صخور ذات اصل بحري',
     ),
     'neojen': (
       nameAr: 'تكوين النيوجين',
-      desc: 'مجموعة تكاوين فتاتية وكربوناتية حديثة تشمل تكاوين الهفوف والدام والغار، وتعتبر من أهم الخزانات الضحلة في شرق المملكة ذات التغذية المباشرة وتغذي واحات الأحساء والساحل الشرقي.'
+      desc: 'ينتشر هذا التكوين في شرق المملكة بدءاً من وادي الدواسر جنوباً إلى وادي السرحان شمالاً , وهو يمتد ايضا تحت رمال الربع الخالي , ويتكون هذا التكوين من رسوبيات العصر الرباعي من الحجر الجيري وهو ذو اصل بحري ، وتعتمد الزراعة في وادي المياه ومنطقة الإحساء بشكل رئيس على هذا التكوين حيث تستمد معظم العيون الموجودة هناك مياهها منه. ينقسم التكوين إلى أربع طبقات وهي :متكون الهدروخ ويتكون من الطفل الطيني الأخضر وحجر الرمل الغريني الجيري والمارل الرمادي وبعض الجبس وحجر الجير الرملي، وهو يرتكز دون توافق على متكون الدمام ويبلغ سمكه حوال 85 كم، وعمره يتبع المبوسين المبكر. متكون الدام ويتكون من حجر الجير الرملي والمارل والطفل وقليل من حجر الرمل، ويعلو متكون الهدروخ وسمكه حوالي 90 م ويتبع عصر الميوسين الأوسط .متكون الهفوف ويتركب من حجر رملي ومارل رملي وحجر جيري رملي وكونجلوميرات ويصل سمكه إلى 95 م ويعلو متكون الدام، ويتبع عصر الميوسين المتأخر والبليوسين. متكون الخرج ويتركب من حجر الجير والجبس وطبقات من الكونجلوميرات والحصى والرمل الجبسي، ويصل سمكه إلى 28 م ويتبع عصر البليوسين. يزيد سمك هذه المتكونات عن 250 م في المنطقة الشرقية ويقل كلما اتجهنا إلى الغرب. ويعد تكوين النيوجين من التكوينات الهامة في منطقة الهفوف إذ يختزن كميات من كبيرة من المياه ومعظم مياه العيون والآبار في الإحساء تأتي من متكون النيوجين. تحوي هذه المكامن بين طبقاتها الكثير من أسطح التـعرية التي زادت من مساميتها ونفاذيتها الثانويتين فأصبحت تشكل أهم الخزانات المائيـة في منطقـة الأحساء حيث تتدفق العيون وتكثر الآبار. والخزان المائي في صخور هـذه المجموعـة هو في غالبيتـه خزان غير حبـيس، وإن كانت المياه تُحبَس في بعض أجزائه حبساً موضعياً نظراً لوجود بعض الراقات غير المنفذة بين تتـابع طبقاتـه. وتختلف نـوعيـة مياه خزانات صخور النيوجين من مكان إلى آخر باختلاف تركيب الصخور التي تحتويها، ويتراوح مجموع الأملاح المذابـة فيها بين 1000 و 4000 ملليجرام / لتر. وتقدر كمية التغذية بحوالي 328 مليون متر مكعب سنوياً.',
     ),
   };
 
   final Map<String, ({String nameAr, String desc})> _subFormations = {
-    'jilh': (
-      nameAr: 'تكوين الجله',
-      desc: 'تكوين ترياسي يتكون من الحجر الرملي والجبس والدولوميت، يحتوي على مياه متوسطة الملوحة تستغل في بعض المناطق الزراعية في وسط المملكة.'
-    ),
-    'darmaa': (
-      nameAr: 'تكوين ضرما',
-      desc: 'تكوين جوراسي من الحجر الرملي والجيري والصلصال، يضم طبقات مائية محلية هامة في منطقة الرياض والمحافظات الغربية المحيطة بها.'
+    'joof': (
+      nameAr: 'تكوين الجوف',
+      desc: 'يتبع عصر الديفوني السفلى وتتكون طبقاته من صخور الطفل الغريني وحجر الرمل وحجر الجير والدلوميت. ويقع فوق متكون تبوك. وينكشف شمال شرق النفود ويمتد حتى الأردن. ويبلغ طول المنكشف 100 كم، ويحتفظ هذا التكوين بكميات متوسطة من الماء. يستغل المتكون في منطقة الجوف، ويبلغ معامل النقولية له 95 م /يوم، وملوحة مياهه 1200 ملجم/لتر. تغلب الصخور الرملية ذات الحبيبات الناعمة والمتوسطة على محتويات تكوين الجوف ويبلغ سمكه في المنطقة بين سكاكا وعرعر 431 متر إلا أن سمكه يصل في سكاكا إلى 700 متر وتتراوح إنتاجيته من المياه بين 16 – 24 لتر / ثانية كما تختلف الناقلية في الخزان حيث تتراوح بين 0.0011 و 0.002 م/ ثانية ويصل تركيز الأملاح في مياهه بالجوف إلى 700 ملجم/لتر.',
     ),
     'khuf': (
       nameAr: 'تكوين الخف',
-      desc: 'تكوين برمي كربوناتي ومتبخراتي يمتد في باطن الأرض في وسط وشرق المملكة، ويحتوي على مياه عميقة مالحة إلى متوسطة الملوحة ومكامن غاز هيدروكربونية عملاقة.'
+      desc: 'يتبع عصر البرمي العلوي ويتركب أساساً من حجر الرمل وحجر الجير والطفل، وينكشف على طول حزام ضيق يحاذي الحافة الشرقية للدرع العربي ويبلغ سمكه حوالي 171 م. يغطي الخف تكوين الساق في القصيم وصخور الدرع العربي في الوسط. تتراوح نوعية مياهه ما بين 2000 – 3000 ملجم/لتر في القويعية، وتستغل مياهه في مناطق الدوادمي والقويعية والقصيم ووادي الدواسر.',
     ),
-    'joof': (
-      nameAr: 'تكوين الجوف',
-      desc: 'تكوين ديفوني من الحجر الرملي والجيري في شمال المملكة (منطقة الجوف)، ويعد مصدراً مائياً هاماً للزراعة في حوض الجوف وسكاكا.'
+    'jilh': (
+      nameAr: 'تكوين الجله',
+      desc: 'يتبع العصر الترياسي ويتكون من الأحجار الرملية والطفل وبعض الأحجار الجيرية، ويمتد منكشفه على هيئة شريط ضيق عرضه يتراوح بين 8 الى 12 كم ويعلو الجله تكوين المنجور ويعلوه طفل سدير. يصل سمك الجله إلى 326 م. حفرت عدة آبار في مدينة الرياض تخترق منكتشف الجله إلا أن مياهها رديئة حيث بلغت ملوحته أكثر من 6000 ملجم/لتر في القصيم.',
     ),
-    'biyadh': (
-      nameAr: 'تكوين البياض',
-      desc: 'أحجار رملية طباشيرية تقع أسفل تكوين الوسيع وتتكامل معه هيدرولوجياً كخزان مائي عظيم الإنتاجية في وسط وشرق المملكة.'
+    'darmaa': (
+      nameAr: 'تكوين ضرماء',
+      desc: 'يتبع الجوراسي الأوسط ويتكون من حجر الجير والطفل وتتغير سحنته إلى حجر رملي كلما اتجهنا إلى الشمال أو الجنوب. يمتد منكشفه لمسافة 900 كم، ويصل سمك التكوين إلى 375 م. وهو يعلو متكون مرات ويسفل متكون طويق، ويعتبر من التكاوين المائية الجيدة حينما تسود السحنة الرملية. يستغل المتكون في وادي الدواسر والزلفى وتتراوح ملوحة مياهه بين 400-500 ملجم/لتر.',
     ),
     'skaka': (
       nameAr: 'تكوين سكاكا',
-      desc: 'أحجار رملية طباشيرية تعلو تكوين الجوف في منطقة سكاكا بالجوف وتمتاز بمياه عذبة جيدة الاستغلال للأغراض الزراعية والبلدية.'
+      desc: 'يتبع العصر الكريتاوي (الطباشيري',
     ),
     'aruma': (
       nameAr: 'تكوين العرمه',
-      desc: 'يتبع هذا التكوين العصر الكريتاوي العلوي ويوجد تحت تكوين أم رضه وفوق الوسيع. ينكشف لمسافة 1600 كم من وادي الدواسر جنوباً حتى الحدود العراقية، ويتكون من الدلوميت والطفل مع بعض حجر الرمل ويصل سمكه إلى 142 م. ويعتبر من التكاوين الجيدة وهو على اتصال بتكوين أم رضمه ولكنه أقل أهمية منه. مياه العرمة جيدة وتستغل في منطقة حفر الباطن وفي أجزاء من المنطقة الشرقية وفي رفحة وبدنه وتتراوح ملوحة مياهه بين 850 – 2100 ملجم / لتر.'
+      desc: 'يتبع هذا التكوين العصر الكريتاوي العلوي ويوجد تحت تكوين أم رضه وفوق الوسيع. ينكشف لمسافة 1600 كم من وادي الدواسر جنوباً حتى الحدود العراقية، ويتكون من الدلوميت والطفل مع بعض حجر الرمل ويصل سمكه إلى 142 م. ويعتبر من التكاوين الجيدة وهو على اتصال بتكوين أم رضمه ولكنه أقل أهمية منه. مياه العرمة جيدة وتستغل في منطقة حفر الباطن وفي أجزاء من المنطقة الشرقية وفي رفحة وبدنه وتتراوح ملوحة مياهه بين 850 – 2100 ملجم / لتر.',
     ),
   };
 
@@ -210,6 +212,23 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
   }
 
   Future<void> _showDamsOnMap() async {
+    if (kIsWeb && _mapController != null) {
+      _mapController!.clearWebMarkers();
+      for (final dam in _dams) {
+        if (dam.latitude > 0.0 && dam.longitude > 0.0) {
+          _mapController!.addWebMarker(
+            latitude: dam.latitude,
+            longitude: dam.longitude,
+            iconAsset: AppAssets.droplet,
+            id: '${dam.latitude}_${dam.longitude}',
+            onTap: () => _showDamPopup(dam),
+          );
+        }
+      }
+      _mapController?.flyTo(latitude: 20.275332, longitude: 41.438495, zoom: 6.3);
+      return;
+    }
+
     if (_mapController?.pointAnnotationManager == null) return;
     final manager = _mapController!.pointAnnotationManager!;
     await manager.deleteAll();
@@ -219,16 +238,18 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
       final ByteData byteData = await rootBundle.load(AppAssets.droplet);
       final Uint8List imageBytes = byteData.buffer.asUint8List();
 
-      final validDams = _dams.where((d) => d.latitude > 0 && d.longitude > 0).toList();
-      final optionsList = validDams.map((dam) {
+      final optionsList = _dams
+          .where((d) => d.latitude > 0.0 && d.longitude > 0.0)
+          .map((dam) {
         return PointAnnotationOptions(
           geometry: Point(coordinates: Position(dam.longitude, dam.latitude)),
           image: imageBytes,
-          iconSize: 0.25,
+          iconSize: 0.35,
         );
       }).toList();
 
       final annotations = await manager.createMulti(optionsList);
+      final validDams = _dams.where((d) => d.latitude > 0.0 && d.longitude > 0.0).toList();
       for (int i = 0; i < annotations.length && i < validDams.length; i++) {
         final ann = annotations[i];
         if (ann != null) {
@@ -252,7 +273,7 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
   }
 
   void _showDamPopup(DamLocation dam) {
-    if (_mapController != null) {
+    if (_mapController != null && dam.latitude > 0.0 && dam.longitude > 0.0) {
       _mapController!.flyTo(
         latitude: dam.latitude,
         longitude: dam.longitude,
@@ -391,7 +412,11 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
                   _subFormationsExpanded = false;
                   _showDamsOnMap();
                 } else {
-                  _mapController?.pointAnnotationManager?.deleteAll();
+                  if (kIsWeb) {
+                    _mapController?.clearWebMarkers();
+                  } else {
+                    _mapController?.pointAnnotationManager?.deleteAll();
+                  }
                 }
               });
             },
