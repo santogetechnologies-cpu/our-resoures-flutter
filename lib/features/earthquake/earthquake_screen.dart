@@ -37,6 +37,7 @@ class EarthquakeScreen extends StatefulWidget {
 class _EarthquakeScreenState extends State<EarthquakeScreen> {
   MapShellController? _mapController;
   bool _isLoading = false;
+  bool _modernEarthExpanded = true;
   final Map<String, EarthquakePoint> _annotationEarthquakeMap = {};
 
   Future<void> _loadEarthquakeData(String dataFile, String iconAsset) async {
@@ -174,45 +175,49 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
             styleType: ButtonStyleType.mainMenu,
             fontSize: 22,
             onPressed: () {
-              // Header button matching Android activity_earthquake.xml
+              setState(() {
+                _modernEarthExpanded = !_modernEarthExpanded;
+              });
             },
           ),
 
-          // Magnitude 4 - 4.99
-          CustomButton(
-            text: 'زلازل مقدارها 4 - 4.99 درجة',
-            styleType: ButtonStyleType.subMenu,
-            fontSize: 18,
-            iconWidget: Image.asset(AppAssets.smallEarth, width: 22, height: 22),
-            onPressed: () => _loadEarthquakeData('4 to 5.xlsx', AppAssets.smallEarth),
-          ),
+          if (_modernEarthExpanded) ...[
+            // Magnitude 4 - 4.99
+            CustomButton(
+              text: 'زلازل مقدارها 4 - 4.99 درجة',
+              styleType: ButtonStyleType.subMenu,
+              fontSize: 18,
+              iconWidget: Image.asset(AppAssets.smallEarth, width: 22, height: 22),
+              onPressed: () => _loadEarthquakeData('4 to 5.xlsx', AppAssets.smallEarth),
+            ),
 
-          // Magnitude 5 - 5.99
-          CustomButton(
-            text: 'زلازل مقدارها 5 - 5.99 درجة',
-            styleType: ButtonStyleType.subMenu,
-            fontSize: 18,
-            iconWidget: Image.asset(AppAssets.mediumEarth, width: 22, height: 22),
-            onPressed: () => _loadEarthquakeData('5 to 6.xlsx', AppAssets.mediumEarth),
-          ),
+            // Magnitude 5 - 5.99
+            CustomButton(
+              text: 'زلازل مقدارها 5 - 5.99 درجة',
+              styleType: ButtonStyleType.subMenu,
+              fontSize: 18,
+              iconWidget: Image.asset(AppAssets.mediumEarth, width: 22, height: 22),
+              onPressed: () => _loadEarthquakeData('5 to 6.xlsx', AppAssets.mediumEarth),
+            ),
 
-          // Magnitude 6 - 6.99
-          CustomButton(
-            text: 'زلازل مقدارها 6 - 6.99 درجة',
-            styleType: ButtonStyleType.subMenu,
-            fontSize: 18,
-            iconWidget: Image.asset(AppAssets.largEarth, width: 22, height: 22),
-            onPressed: () => _loadEarthquakeData('6 to 7.xlsx', AppAssets.largEarth),
-          ),
+            // Magnitude 6 - 6.99
+            CustomButton(
+              text: 'زلازل مقدارها 6 - 6.99 درجة',
+              styleType: ButtonStyleType.subMenu,
+              fontSize: 18,
+              iconWidget: Image.asset(AppAssets.largEarth, width: 22, height: 22),
+              onPressed: () => _loadEarthquakeData('6 to 7.xlsx', AppAssets.largEarth),
+            ),
 
-          // Magnitude >= 7.0
-          CustomButton(
-            text: 'زلازل مقدارها أعلى من 7 درجات',
-            styleType: ButtonStyleType.subMenu,
-            fontSize: 18,
-            iconWidget: Image.asset(AppAssets.extraLargEarth, width: 22, height: 22),
-            onPressed: () => _loadEarthquakeData('7 and above.xlsx', AppAssets.extraLargEarth),
-          ),
+            // Magnitude >= 7.0
+            CustomButton(
+              text: 'زلازل مقدارها أعلى من 7 درجات',
+              styleType: ButtonStyleType.subMenu,
+              fontSize: 18,
+              iconWidget: Image.asset(AppAssets.extraLargEarth, width: 22, height: 22),
+              onPressed: () => _loadEarthquakeData('7 and above.xlsx', AppAssets.extraLargEarth),
+            ),
+          ],
         ],
       ),
     );
