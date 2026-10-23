@@ -10,9 +10,16 @@ void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String m
 
 void clearMarkersWeb(String domId) {}
 
+void addGeoJsonLineLayerWeb(String domId, String sourceId, String layerId,
+    String geoJsonString, String colorHex, double lineWidth) {}
+
+void clearGeoJsonLineLayersWeb(
+    String domId, List<String> layerIds, List<String> sourceIds) {}
+
 void setModalOpenWeb(bool isOpen) {}
 
 void registerSidebarScrollCallback(void Function(double deltaY)? callback) {}
+
 
 Widget buildPlatformMapWidget({
   required String viewId,

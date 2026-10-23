@@ -85,6 +85,54 @@ class MapShellController {
       clearMarkersWeb(webDomId!);
     }
   }
+
+  /// Adds a GeoJSON line layer to the map (for valley lines).
+  /// [sourceId] & [layerId] must be unique per valley.
+  /// [geoJsonString] is the raw GeoJSON content.
+  /// [colorHex] e.g. '#1aa33f'.
+  Future<void> addGeoJsonLineLayer({
+    required String sourceId,
+    required String layerId,
+    required String geoJsonString,
+    required String colorHex,
+    double lineWidth = 3.0,
+  }) async {
+    if (kIsWeb && webDomId != null) {
+      addGeoJsonLineLayerWeb(webDomId!, sourceId, layerId, geoJsonString, colorHex, lineWidth);
+    } else if (mapboxMap != null) {
+      try {
+        final style = mapboxMap!.style;
+        // Remove existing layer/source if present
+        try { await style.removeStyleLayer(layerId); } catch (_) {}
+        try { await style.removeStyleSource(sourceId); } catch (_) {}
+        await style.addSource(GeoJsonSource(id: sourceId, data: geoJsonString));
+        await style.addLayer(LineLayer(
+          id: layerId,
+          sourceId: sourceId,
+          lineColorExpression: ['literal', colorHex],
+          lineWidth: lineWidth,
+          lineCap: LineCap.ROUND,
+          lineJoin: LineJoin.ROUND,
+        ));
+      } catch (e) {
+        debugPrint('addGeoJsonLineLayer error: $e');
+      }
+    }
+  }
+
+  /// Removes all GeoJSON line layers/sources by their IDs.
+  Future<void> clearGeoJsonLineLayers(List<String> layerIds, List<String> sourceIds) async {
+    if (kIsWeb && webDomId != null) {
+      clearGeoJsonLineLayersWeb(webDomId!, layerIds, sourceIds);
+    } else if (mapboxMap != null) {
+      for (final id in layerIds) {
+        try { await mapboxMap!.style.removeStyleLayer(id); } catch (_) {}
+      }
+      for (final id in sourceIds) {
+        try { await mapboxMap!.style.removeStyleSource(id); } catch (_) {}
+      }
+    }
+  }
 }
 
 class MapShell extends StatefulWidget {

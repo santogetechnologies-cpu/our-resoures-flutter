@@ -51,7 +51,6 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
   bool _mainFormationsExpanded = false;
   bool _subFormationsExpanded = false;
   bool _isLoading = false;
-  bool _valleyLinesLoaded = false;
 
   List<DamLocation> _dams = [];
   final Map<String, DamLocation> _annotationDamMap = {};
@@ -213,6 +212,10 @@ final Map<String, ({String nameAr, String desc})> _mainFormations = {
   }
 
   Future<void> _showDamsOnMap() async {
+    await _clearValleyLines();
+    await _mapController?.setStyleFromAsset('assets/maps/saudi_geo/sahel.json');
+    await Future.delayed(const Duration(milliseconds: 200));
+
     if (kIsWeb && _mapController != null) {
       _mapController!.clearWebMarkers();
       for (final dam in _dams) {
@@ -296,45 +299,50 @@ final Map<String, ({String nameAr, String desc})> _mainFormations = {
     );
   }
 
+  Future<void> _clearValleyLines() async {
+    final layerIds = _valleys.keys.toList();
+    final sourceIds = _valleys.keys.map((k) => 'source-$k').toList();
+    await _mapController?.clearGeoJsonLineLayers(layerIds, sourceIds);
+  }
+
   // Draws all 52 valley GeoJSON lines on a sahel base map.
-  // Mobile: injects GeoJSON sources + line layers via Mapbox style API.
-  // Web: loads sahel base map only (web layer injection not yet supported).
   Future<void> _addAllValleyLines() async {
-    if (kIsWeb) {
-      _mapController?.clearWebMarkers();
-      await _mapController?.setStyleFromAsset('assets/maps/saudi_geo/sahel.json');
-      return;
-    }
-    final map = _mapController?.mapboxMap;
-    if (map == null) return;
     setState(() => _isLoading = true);
     try {
-      final sahelJson = await rootBundle.loadString('assets/maps/saudi_geo/sahel.json');
-      await map.style.setStyleJSON(sahelJson);
+      if (kIsWeb) {
+        _mapController?.clearWebMarkers();
+      } else {
+        await _mapController?.pointAnnotationManager?.deleteAll();
+      }
+      await _mapController?.setStyleFromAsset('assets/maps/saudi_geo/sahel.json');
+      _mapController?.flyTo(latitude: 24.694291, longitude: 47.189224, zoom: 4.3);
+
+      await Future.delayed(const Duration(milliseconds: 300));
+
       for (final entry in _valleys.entries) {
         final key = entry.key;
         final valley = entry.value;
         try {
           final geoJsonStr = await rootBundle.loadString(valley.path);
-          final sourceId = 'valley-source-$key';
+          final sourceId = 'source-$key';
+          final layerId = key;
           final cv = valley.color.value;
           final r = ((cv >> 16) & 0xFF).toRadixString(16).padLeft(2, '0');
           final g = ((cv >> 8) & 0xFF).toRadixString(16).padLeft(2, '0');
           final b = (cv & 0xFF).toRadixString(16).padLeft(2, '0');
           final colorHex = '#$r$g$b';
-          await map.style.addStyleSource(
-            sourceId,
-            '{"type":"geojson","data":$geoJsonStr}',
-          );
-          await map.style.addStyleLayer(
-            '{"id":"$key","type":"line","source":"$sourceId","paint":{"line-color":"$colorHex","line-width":3},"layout":{"line-cap":"round","line-join":"round"}}',
-            null,
+
+          await _mapController?.addGeoJsonLineLayer(
+            sourceId: sourceId,
+            layerId: layerId,
+            geoJsonString: geoJsonStr,
+            colorHex: colorHex,
+            lineWidth: 3.0,
           );
         } catch (e) {
           debugPrint('Valley layer $key error: $e');
         }
       }
-      if (mounted) setState(() => _valleyLinesLoaded = true);
     } catch (e) {
       debugPrint('_addAllValleyLines error: $e');
     } finally {
@@ -398,23 +406,47 @@ final Map<String, ({String nameAr, String desc})> _mainFormations = {
     }
   }
 
-  void _showFormationPopup(String key, String title, String desc) {
-    final styleAsset = 'assets/maps/water_formation/$key.json';
-    _mapController?.setStyleFromAsset(styleAsset);
-    _mapController?.flyTo(latitude: 25.0, longitude: 44.0, zoom: 5.5);
+  Future<void> _showFormationPopup(String key, String title, String desc) async {
+    if (kIsWeb) {
+      _mapController?.clearWebMarkers();
+    } else {
+      await _mapController?.pointAnnotationManager?.deleteAll();
+    }
+    await _clearValleyLines();
 
-    AppPopupDialog.show(
-      context,
-      title: title,
-      description: desc,
-    );
+    final styleAsset = 'assets/maps/water_formation/$key.json';
+    await _mapController?.setStyleFromAsset(styleAsset);
+    _mapController?.flyTo(latitude: 24.694291, longitude: 47.189224, zoom: 4.8);
+
+    if (mounted) {
+      AppPopupDialog.show(
+        context,
+        title: title,
+        description: desc,
+      );
+    }
+  }
+
+  Future<void> _onBriefPressed() async {
+    setState(() {
+      _valleysExpanded = false;
+      _damsExpanded = false;
+      _mainFormationsExpanded = false;
+      _subFormationsExpanded = false;
+    });
+    await _clearValleyLines();
+    await _mapController?.setStyleFromAsset('assets/maps/water_formation/allformations.json');
+    _mapController?.flyTo(latitude: 24.694291, longitude: 47.189224, zoom: 4.3);
+    if (mounted) {
+      WaterInfographicDialog.show(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MapShell(
       title: 'مصادر المياه',
-      onBriefPressed: () => WaterInfographicDialog.show(context),
+      onBriefPressed: _onBriefPressed,
       briefButtonText: 'مقدمة ',
       initialStyleAsset: 'assets/maps/water_formation/allformations.json',
       isLoading: _isLoading,
@@ -432,7 +464,6 @@ final Map<String, ({String nameAr, String desc})> _mainFormations = {
                   _damsExpanded = false;
                   _mainFormationsExpanded = false;
                   _subFormationsExpanded = false;
-                  _valleyLinesLoaded = false;
                   _addAllValleyLines();
                 }
               });

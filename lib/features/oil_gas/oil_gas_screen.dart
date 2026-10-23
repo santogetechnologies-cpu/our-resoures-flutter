@@ -285,10 +285,13 @@ class _OilGasScreenState extends State<OilGasScreen> {
       controller.clearWebMarkers();
       for (final field in allFields) {
         if (field.latitude > 0 && field.longitude > 0) {
+          final icon = field.isRenewable
+              ? AppAssets.markerIcon
+              : (field.isGas ? AppAssets.gasMarker : AppAssets.oilMarker);
           controller.addWebMarker(
             latitude: field.latitude,
             longitude: field.longitude,
-            iconAsset: field.isGas ? AppAssets.gasMarker : AppAssets.oilMarker,
+            iconAsset: icon,
             id: '${field.latitude}_${field.longitude}',
             onTap: () {
               _selectField(field);
@@ -309,14 +312,20 @@ class _OilGasScreenState extends State<OilGasScreen> {
       final ByteData gasByteData = await rootBundle.load(AppAssets.gasMarker);
       final Uint8List gasBytes = gasByteData.buffer.asUint8List();
 
+      final ByteData renewableByteData = await rootBundle.load(AppAssets.markerIcon);
+      final Uint8List renewableBytes = renewableByteData.buffer.asUint8List();
+
       final List<PointAnnotationOptions> optionsList = [];
 
       for (final field in allFields) {
         if (field.latitude > 0 && field.longitude > 0) {
+          final imageBytes = field.isRenewable
+              ? renewableBytes
+              : (field.isGas ? gasBytes : oilBytes);
           optionsList.add(
             PointAnnotationOptions(
               geometry: Point(coordinates: Position(field.longitude, field.latitude)),
-              image: field.isGas ? gasBytes : oilBytes,
+              image: imageBytes,
               iconSize: 0.3,
             ),
           );
@@ -383,6 +392,7 @@ class _OilGasScreenState extends State<OilGasScreen> {
       title: 'حقول البترول والغاز',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
+      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       onMapCreated: (c) {
         _mapController = c;
         _loadMarkers(c);

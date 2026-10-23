@@ -753,3 +753,54 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
     readyMap => _doAddMarker(readyMap, viewId, lng, lat, iconUrl, markerId, callbackName)
   );
 };
+
+// ---------------------------------------------------------------------------
+// Add GeoJSON line layer (for valley lines)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJsonString, colorHex, lineWidth) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map) return;
+
+  function _doAdd() {
+    try {
+      // Remove existing layer/source if present
+      if (map.getLayer(layerId)) map.removeLayer(layerId);
+      if (map.getSource(sourceId)) map.removeSource(sourceId);
+
+      let geoJson;
+      try { geoJson = JSON.parse(geoJsonString); } catch(e) { console.error('GeoJSON parse error:', e); return; }
+
+      map.addSource(sourceId, { type: 'geojson', data: geoJson });
+      map.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': colorHex,
+          'line-width': lineWidth
+        }
+      });
+    } catch(e) {
+      console.error('addGeoJsonLineLayer error:', e);
+    }
+  }
+
+  if (map.isStyleLoaded()) {
+    _doAdd();
+  } else {
+    map.once('style.load', _doAdd);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Clear GeoJSON line layers (e.g. when switching away from Valleys)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeClearGeoJsonLineLayers = function(viewId, layerIdsStr, sourceIdsStr) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map || !map.isStyleLoaded()) return;
+  const layerIds = layerIdsStr ? layerIdsStr.split(',') : [];
+  const sourceIds = sourceIdsStr ? sourceIdsStr.split(',') : [];
+  layerIds.forEach(id => { try { if (id && map.getLayer(id)) map.removeLayer(id); } catch(_) {} });
+  sourceIds.forEach(id => { try { if (id && map.getSource(id)) map.removeSource(id); } catch(_) {} });
+};

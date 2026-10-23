@@ -448,8 +448,8 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
             AppPopupDialog.show(
               context,
               title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
-              description: 'الموقع: ${loc.region}\n'
-                  'المنطقة الإدارية: ${loc.locationName}\n'
+              description: 'الموقع الجغرافي: ${loc.locationName}\n'
+                  'المنطقة الإدارية: ${loc.region}\n'
                   'خط الطول شرقاً: ${loc.longitude}\n'
                   'خط العرض شمالاً: ${loc.latitude}',
             );
@@ -494,8 +494,8 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
               AppPopupDialog.show(
                 context,
                 title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
-                description: 'الموقع: ${loc.region}\n'
-                    'المنطقة الإدارية: ${loc.locationName}\n'
+                description: 'الموقع الجغرافي: ${loc.locationName}\n'
+                    'المنطقة الإدارية: ${loc.region}\n'
                     'خط الطول شرقاً: ${loc.longitude}\n'
                     'خط العرض شمالاً: ${loc.latitude}',
               );
