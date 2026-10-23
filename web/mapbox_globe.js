@@ -203,6 +203,7 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   // MapLibre's Marker attaches translate(X, Y) to `el`. We must NEVER modify `el.style.transform`.
   const el = document.createElement('div');
   el.className = 'mapbox-custom-marker';
+  el.setAttribute('data-marker-id', markerId);
   el.style.cssText = 'pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-select:none;';
 
   // Inner container for styling, shadow, and scale animations
@@ -543,6 +544,38 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       if (s && s !== 401 && s !== 404) console.warn('[Globe] error:', e);
     });
 
+    // ── Setup click listener for formation polygons & valleys on map ───────────────
+    map.on('click', e => {
+      if (window.flutterModalOpen) return;
+      try {
+        const formationLayers = [
+          "Saq_Formation-657oal",
+          "Tabuk_Formation-767mbq",
+          "Wajid_Formation-0m41k3",
+          "Minjur_Formation-cp2j29",
+          "Biyadh_Formation-ciunt8",
+          "Wasia_Formation-8gn6np",
+          "Umm_er_radhuma_Formation-31a0hp",
+          "Dammam_Formation-8o2pjs",
+          "Neogene_Formation-98k03q",
+          "Aruma_Formation-4kp806",
+          "Jauf_Formation-3102c9"
+        ];
+        const activeLayers = formationLayers.filter(l => map.getLayer(l));
+        if (activeLayers.length > 0) {
+          const features = map.queryRenderedFeatures(e.point, { layers: activeLayers });
+          if (features && features.length > 0) {
+            const f = features[0];
+            const layerKey = f.sourceLayer || (f.layer && f.layer.id);
+            if (layerKey && typeof window.onFormationPolygonClicked === 'function') {
+              window.onFormationPolygonClicked(layerKey);
+              return;
+            }
+          }
+        }
+      } catch (_) {}
+    });
+
     window.mapboxGlobeInstances[viewId] = map;   // also set immediately for resize calls
     window.mapboxGlobeMarkers[viewId]   = [];
 
@@ -781,6 +814,20 @@ window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJ
           'line-width': lineWidth
         }
       });
+
+      // Valley line click & cursor interactions
+      map.on('click', layerId, function(e) {
+        if (window.flutterModalOpen) return;
+        if (typeof window.onValleyLineClicked === 'function') {
+          window.onValleyLineClicked(layerId);
+        }
+      });
+      map.on('mouseenter', layerId, function() {
+        if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', layerId, function() {
+        map.getCanvas().style.cursor = '';
+      });
     } catch(e) {
       console.error('addGeoJsonLineLayer error:', e);
     }
@@ -791,6 +838,67 @@ window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJ
   } else {
     map.once('style.load', _doAdd);
   }
+};
+
+// ---------------------------------------------------------------------------
+// Update Valley line colors: selected valley is RED (#FF0000), others are BLUE (#0000FF)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeUpdateValleyColors = function(viewId, selectedValleyKey) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map || !map.isStyleLoaded()) return;
+
+  const valleyNames = [
+    "Wadi_Aba_Al_Qu", "Wadi_Aba_Ar_Ruwath", "Wadi_Al_Ahsabah", "Wadi_Al_Akhda",
+    "Wadi_Al_Amq", "Wadi_Al_Batin", "Wadi_Al_Farshah", "Wadi_Al_Gharr",
+    "Wadi_al_Ghinah", "Wadi_Al_Hamal", "Wadi_Al_Hamd", "Wadi_Al_Hinu",
+    "Wadi_Al_Jarir", "Wadi_Al_Jizil", "Wadi_al_Judwal", "Wadi_Al_Khurmah",
+    "Wadi_Al_Lith", "Wadi_Al_Makhit", "Wadi_Al_Maqran", "Wadi_Al_Mira",
+    "Wadi_al_Qimra", "Wadi_Ar_Raka", "Wadi_Ar_Risha", "Wadi_Ar_Rumah",
+    "Wadi_Arar", "Wadi_As_Sahba", "Wadi_As_surrah", "Wadi_Ash_Shu-bah",
+    "Wadi_Baysh", "Wadi_Bishah", "Wadi_Bitat", "Wadi_Damad",
+    "Wadi_Dawqah", "Wadi_Fajr", "Wadi_Hali", "Wadi_Hamir",
+    "Wadi_Hanifah", "Wadi_Hirjab", "Wadi_Hubuna", "Wadi_Itwad",
+    "Wadi_Najran", "Wadi_Nayyal", "Wadi_Qatan", "Wadi_Ranyah",
+    "Wadi_Rash", "Wadi_Shuwayhat", "Wadi_Tabalah", "Wadi_Tarif",
+    "Wadi_Tarj", "Wadi_Tathlith", "Wadi_Turubah", "Wadi_Yabah"
+  ];
+
+  valleyNames.forEach(function(vName) {
+    try {
+      if (map.getLayer(vName)) {
+        const isSelected = (vName === selectedValleyKey);
+        map.setPaintProperty(vName, 'line-color', isSelected ? '#FF0000' : '#0000FF');
+        map.setPaintProperty(vName, 'line-width', isSelected ? 4.5 : 3.0);
+      }
+    } catch (_) {}
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Update Dam marker icons: selected dam is RED (red_droplet), others are BLUE (droplet)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeUpdateDamMarkers = function(viewId, selectedDamName) {
+  const redIconUrl = resolveAssetUrl('assets/images/red_droplet.png');
+  const blueIconUrl = resolveAssetUrl('assets/images/droplet.png');
+
+  const markers = window.mapboxGlobeMarkers[viewId] || [];
+  markers.forEach(function(m) {
+    try {
+      const el = m.getElement();
+      if (!el) return;
+      const markerId = el.getAttribute('data-marker-id');
+      const img = el.querySelector('img');
+      if (img && markerId) {
+        if (markerId === selectedDamName) {
+          img.src = redIconUrl;
+          img.style.filter = 'drop-shadow(0 0 8px rgba(255,0,0,0.8))';
+        } else {
+          img.src = blueIconUrl;
+          img.style.filter = 'none';
+        }
+      }
+    } catch (_) {}
+  });
 };
 
 // ---------------------------------------------------------------------------

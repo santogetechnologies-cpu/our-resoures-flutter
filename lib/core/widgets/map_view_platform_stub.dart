@@ -16,6 +16,14 @@ void addGeoJsonLineLayerWeb(String domId, String sourceId, String layerId,
 void clearGeoJsonLineLayersWeb(
     String domId, List<String> layerIds, List<String> sourceIds) {}
 
+void updateValleyColorsWeb(String domId, String selectedValleyKey) {}
+
+void updateDamMarkersWeb(String domId, String selectedDamName) {}
+
+void registerFormationPolygonCallback(void Function(String layerKey)? callback) {}
+
+void registerValleyLineCallback(void Function(String layerKey)? callback) {}
+
 void setModalOpenWeb(bool isOpen) {}
 
 void registerSidebarScrollCallback(void Function(double deltaY)? callback) {}

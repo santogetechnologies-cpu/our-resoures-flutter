@@ -63,6 +63,42 @@ void clearGeoJsonLineLayersWeb(
   }
 }
 
+void updateValleyColorsWeb(String domId, String selectedValleyKey) {
+  if (js.context.hasProperty('mapboxGlobeUpdateValleyColors')) {
+    js.context.callMethod('mapboxGlobeUpdateValleyColors', [domId, selectedValleyKey]);
+  }
+}
+
+void updateDamMarkersWeb(String domId, String selectedDamName) {
+  if (js.context.hasProperty('mapboxGlobeUpdateDamMarkers')) {
+    js.context.callMethod('mapboxGlobeUpdateDamMarkers', [domId, selectedDamName]);
+  }
+}
+
+void registerFormationPolygonCallback(void Function(String layerKey)? callback) {
+  if (callback == null) {
+    js.context['onFormationPolygonClicked'] = null;
+  } else {
+    js.context['onFormationPolygonClicked'] = (dynamic key) {
+      if (key is String) {
+        callback(key);
+      }
+    };
+  }
+}
+
+void registerValleyLineCallback(void Function(String layerKey)? callback) {
+  if (callback == null) {
+    js.context['onValleyLineClicked'] = null;
+  } else {
+    js.context['onValleyLineClicked'] = (dynamic key) {
+      if (key is String) {
+        callback(key);
+      }
+    };
+  }
+}
+
 void setModalOpenWeb(bool isOpen) {
   if (js.context.hasProperty('setModalOpenWeb')) {
     js.context.callMethod('setModalOpenWeb', [isOpen]);

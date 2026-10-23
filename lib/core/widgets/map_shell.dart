@@ -106,10 +106,12 @@ class MapShellController {
         try { await style.removeStyleLayer(layerId); } catch (_) {}
         try { await style.removeStyleSource(sourceId); } catch (_) {}
         await style.addSource(GeoJsonSource(id: sourceId, data: geoJsonString));
+        final hexClean = colorHex.replaceFirst('#', '');
+        final int colorInt = int.parse('FF$hexClean', radix: 16);
         await style.addLayer(LineLayer(
           id: layerId,
           sourceId: sourceId,
-          lineColorExpression: ['literal', colorHex],
+          lineColor: colorInt,
           lineWidth: lineWidth,
           lineCap: LineCap.ROUND,
           lineJoin: LineJoin.ROUND,
@@ -117,6 +119,36 @@ class MapShellController {
       } catch (e) {
         debugPrint('addGeoJsonLineLayer error: $e');
       }
+    }
+  }
+
+  /// Updates valley lines colors: selected is red (#FF0000), others are blue (#0000FF).
+  Future<void> updateValleyColors(List<String> valleyKeys, String selectedValleyKey) async {
+    if (kIsWeb && webDomId != null) {
+      updateValleyColorsWeb(webDomId!, selectedValleyKey);
+    } else if (mapboxMap != null) {
+      final style = mapboxMap!.style;
+      for (final key in valleyKeys) {
+        try {
+          final isSelected = (key == selectedValleyKey);
+          final colorInt = isSelected ? 0xFFFF0000 : 0xFF0000FF;
+          await style.updateLayer(LineLayer(
+            id: key,
+            sourceId: 'source-$key',
+            lineColor: colorInt,
+            lineWidth: isSelected ? 4.5 : 3.0,
+            lineCap: LineCap.ROUND,
+            lineJoin: LineJoin.ROUND,
+          ));
+        } catch (_) {}
+      }
+    }
+  }
+
+  /// Updates dam marker icons on web (red for selected, blue for others).
+  void updateDamMarkersWebOnly(String selectedDamName) {
+    if (kIsWeb && webDomId != null) {
+      updateDamMarkersWeb(webDomId!, selectedDamName);
     }
   }
 
