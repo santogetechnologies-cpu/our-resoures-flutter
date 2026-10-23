@@ -203,11 +203,12 @@ class _MapboxWebWidgetState extends State<_MapboxWebWidget> {
     // Give DOM element time to attach before initializing Mapbox GL JS
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       String? styleJson;
-      if (widget.initialStyleAsset != null && widget.initialStyleAsset!.isNotEmpty) {
-        try {
-          styleJson = await rootBundle.loadString(widget.initialStyleAsset!);
-        } catch (_) {}
-      }
+      final styleAsset = (widget.initialStyleAsset != null && widget.initialStyleAsset!.isNotEmpty)
+          ? widget.initialStyleAsset!
+          : 'assets/maps/saudi_geo/sahel.json';
+      try {
+        styleJson = await rootBundle.loadString(styleAsset);
+      } catch (_) {}
 
       final targetDiv = _registeredWebDivs[widget.domId];
 

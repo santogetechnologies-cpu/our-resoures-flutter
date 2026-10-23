@@ -1,7 +1,7 @@
 // 3D Globe Web Bridge for Flutter Web (MapLibre GL JS v5 — Token-Free)
 
-window.mapboxGlobeInstances  = window.mapboxGlobeInstances  || {};
-window.mapboxGlobeMarkers    = window.mapboxGlobeMarkers    || {};
+window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
+window.mapboxGlobeMarkers = window.mapboxGlobeMarkers || {};
 window.mapboxGlobePendingCbs = window.mapboxGlobePendingCbs || {};   // queued marker calls
 
 // ---------------------------------------------------------------------------
@@ -41,10 +41,21 @@ const ESRI_SATELLITE_GLOBE_STYLE = {
       ],
       tileSize: 256,
       attribution: '© Esri, Maxar, Earthstar Geographics'
+    },
+    'esri-labels': {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256
     }
   },
   layers: [
-    { id: 'imagery', type: 'raster', source: 'esri-world-imagery', minzoom: 0, maxzoom: 19 }
+    { id: 'imagery', type: 'raster', source: 'esri-world-imagery', minzoom: 0, maxzoom: 19 },
+    {
+      id: 'labels', type: 'raster', source: 'esri-labels',
+      minzoom: 0, maxzoom: 19, paint: { 'raster-opacity': 0.85 }
+    }
   ]
 };
 
@@ -98,8 +109,8 @@ function transformMapboxStyle(styleInput) {
 
     if (src.type === 'raster') {
       const isMapboxSat = (src.url && src.url.includes('mapbox.satellite')) ||
-                          key.includes('mapbox.satellite') ||
-                          (src.tiles && src.tiles.some(t => t.includes('mapbox.satellite')));
+        key.includes('mapbox.satellite') ||
+        (src.tiles && src.tiles.some(t => t.includes('mapbox.satellite')));
       if (isMapboxSat) {
         delete src.url;
         src.tiles = ['https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.webp?access_token=' + MAPBOX_TOKEN];
@@ -147,6 +158,19 @@ function transformMapboxStyle(styleInput) {
       }
       if (layer.layout) {
         layer.layout = sanitizeExpr(layer.layout);
+        // Enforce Arabic language across all map layers
+        if (layer.layout['text-field']) {
+          const tf = layer.layout['text-field'];
+          if (typeof tf === 'string') {
+            if (tf === '{name}' || tf === '{name_en}') {
+              layer.layout['text-field'] = '{name_ar}';
+            }
+          } else if (Array.isArray(tf)) {
+            if (tf[0] === 'get' && (tf[1] === 'name' || tf[1] === 'name_en')) {
+              layer.layout['text-field'] = ['coalesce', ['get', 'name_ar'], ['get', 'name']];
+            }
+          }
+        }
       }
     });
   }
@@ -187,7 +211,7 @@ function resolveAssetUrl(url) {
   if (/^(https?:|data:|blob:)/.test(url)) return url;
   let clean = url.replace(/^\.?\//, '');
   if (clean.startsWith('assets/assets/')) return clean;
-  if (clean.startsWith('assets/'))        return 'assets/' + clean;
+  if (clean.startsWith('assets/')) return 'assets/' + clean;
   return 'assets/assets/' + clean;
 }
 
@@ -222,12 +246,12 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   // Resilient fallback chain: resolved → raw → assets/raw → dot
   const fallbacks = [iconUrl, 'assets/' + iconUrl, 'assets/assets/' + iconUrl];
   let fbIdx = 0;
-  img.onerror = function() {
+  img.onerror = function () {
     if (fbIdx < fallbacks.length) {
       const next = fallbacks[fbIdx++];
       if (next !== this.src) { this.src = next; return; }
       fbIdx++;
-      if (fbIdx <= fallbacks.length) { this.src = fallbacks[fbIdx-1]; return; }
+      if (fbIdx <= fallbacks.length) { this.src = fallbacks[fbIdx - 1]; return; }
     }
     // Gold dot fallback
     inner.innerHTML =
@@ -304,16 +328,16 @@ function disableGlobeReadbackErrorMeasurement(map) {
       (proj.currentProjection && proj.currentProjection.name === 'vertical-perspective' ? proj.currentProjection : null));
     if (vp) {
       if (vp._errorMeasurement) {
-        try { vp._errorMeasurement.destroy(); } catch (_) {}
+        try { vp._errorMeasurement.destroy(); } catch (_) { }
         vp._errorMeasurement = null;
       }
-      vp.updateGPUdependent = function() {};
+      vp.updateGPUdependent = function () { };
       const proto = Object.getPrototypeOf(vp);
       if (proto && proto.updateGPUdependent) {
-        proto.updateGPUdependent = function() {};
+        proto.updateGPUdependent = function () { };
       }
     }
-  } catch (_) {}
+  } catch (_) { }
 }
 
 // ---------------------------------------------------------------------------
@@ -326,21 +350,21 @@ function setupCanvasA11y(map, targetContainer) {
     try {
       Object.defineProperty(canvas, 'tabIndex', {
         get: () => -1,
-        set: () => {},
+        set: () => { },
         configurable: true
       });
     } catch (_) {
       canvas.tabIndex = -1;
     }
     canvas.addEventListener('focus', () => {
-      try { canvas.blur(); } catch (_) {}
+      try { canvas.blur(); } catch (_) { }
       if (document.activeElement === canvas && document.body) {
         document.body.focus();
       }
     }, true);
     canvas.addEventListener('pointerdown', () => {
       if (document.activeElement === canvas) {
-        try { canvas.blur(); } catch (_) {}
+        try { canvas.blur(); } catch (_) { }
       }
     }, true);
   }
@@ -395,7 +419,7 @@ function registerDefaultMarkerImages(map) {
       if (!map.hasImage(id)) {
         map.addImage(id, createMarkerImageData(), { pixelRatio: 2 });
       }
-    } catch (_) {}
+    } catch (_) { }
   });
 }
 
@@ -405,12 +429,12 @@ function registerDefaultMarkerImages(map) {
 //   containerEl  – the actual HTMLElement (passed from Dart via js interop)
 //   lng, lat, zoom – initial camera
 // ---------------------------------------------------------------------------
-window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat, initialZoom, initialStyleJson) {
+window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLat, initialZoom, initialStyleJson) {
   let lng = initialLng, lat = initialLat, zoom = initialZoom;
   let targetContainer = null;
 
   if (containerEl && (typeof HTMLElement !== 'undefined') &&
-      (containerEl instanceof HTMLElement || containerEl.nodeType === 1)) {
+    (containerEl instanceof HTMLElement || containerEl.nodeType === 1)) {
     targetContainer = containerEl;
   } else if (typeof containerEl === 'number') {
     // Old 5-arg call (no containerEl)
@@ -458,24 +482,24 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
 
     // Destroy existing instance
     if (window.mapboxGlobeInstances[viewId]) {
-      try { window.mapboxGlobeInstances[viewId].remove(); } catch (_) {}
+      try { window.mapboxGlobeInstances[viewId].remove(); } catch (_) { }
       delete window.mapboxGlobeInstances[viewId];
     }
 
     const activeStyle = initialStyleJson ? transformMapboxStyle(initialStyleJson) : ESRI_SATELLITE_GLOBE_STYLE;
 
     const map = new maplibregl.Map({
-      container:          targetContainer,
-      style:              activeStyle,
-      center:             [lng || 47.189224, lat || 24.694291],
-      zoom:               zoom || 3.8,
-      renderWorldCopies:  false,
+      container: targetContainer,
+      style: activeStyle,
+      center: [lng || 47.189224, lat || 24.694291],
+      zoom: zoom || 3.8,
+      renderWorldCopies: false,
       attributionControl: false,
-      doubleClickZoom:    false
+      doubleClickZoom: false
     });
 
-    try { map.doubleClickZoom.disable(); } catch (_) {}
-    try { map.keyboard.disable(); } catch (_) {}
+    try { map.doubleClickZoom.disable(); } catch (_) { }
+    try { map.keyboard.disable(); } catch (_) { }
 
     setupCanvasA11y(map, targetContainer);
     map.on('load', () => setupCanvasA11y(map, targetContainer));
@@ -484,7 +508,7 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
     targetContainer.addEventListener('pointerdown', () => {
       const canvas = map.getCanvas && map.getCanvas();
       if (canvas && document.activeElement === canvas) {
-        try { canvas.blur(); } catch (_) {}
+        try { canvas.blur(); } catch (_) { }
       }
     });
 
@@ -495,7 +519,7 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       // Provide immediate fallback image synchronously so MapLibre never logs an error
       try {
         map.addImage(id, createMarkerImageData(), { pixelRatio: 2 });
-      } catch (_) {}
+      } catch (_) { }
 
       // Asynchronously load matching SVG asset if present
       const img = new Image();
@@ -504,7 +528,7 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
         try {
           if (map.hasImage(id)) map.removeImage(id);
           map.addImage(id, img);
-        } catch (_) {}
+        } catch (_) { }
       };
       img.src = resolveAssetUrl(`assets/maps/saudi_geo/sprite_images/${id}.svg`);
     });
@@ -520,9 +544,9 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
         console.warn('[Globe] setProjection:', e);
       }
       disableGlobeReadbackErrorMeasurement(map);
-      try { map.doubleClickZoom.disable(); } catch (_) {}
+      try { map.doubleClickZoom.disable(); } catch (_) { }
       if (map.setTerrain) {
-        try { map.setTerrain(null); } catch (_) {}
+        try { map.setTerrain(null); } catch (_) { }
       }
       map.resize();
 
@@ -571,18 +595,18 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
             }
           }
         }
-      } catch (_) {}
+      } catch (_) { }
     });
 
     window.mapboxGlobeInstances[viewId] = map;   // also set immediately for resize calls
-    window.mapboxGlobeMarkers[viewId]   = [];
+    window.mapboxGlobeMarkers[viewId] = [];
 
     // Progressive resize
     [50, 150, 300, 600, 1200, 2000].forEach(d =>
-      setTimeout(() => { try { map.resize(); } catch (_) {} }, d)
+      setTimeout(() => { try { map.resize(); } catch (_) { } }, d)
     );
     if (typeof ResizeObserver !== 'undefined') {
-      new ResizeObserver(() => { try { map.resize(); } catch (_) {} })
+      new ResizeObserver(() => { try { map.resize(); } catch (_) { } })
         .observe(targetContainer);
     }
 
@@ -605,7 +629,7 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
           if (map.touchZoomRotate && map.touchZoomRotate.isEnabled()) map.touchZoomRotate.disable();
           if (map.doubleClickZoom && map.doubleClickZoom.isEnabled()) map.doubleClickZoom.disable();
         }
-      } catch (_) {}
+      } catch (_) { }
     }
 
     const onPointerCheck = (e) => {
@@ -687,7 +711,7 @@ window.addEventListener('touchend', () => {
 // Modal State Bridge: Freezes map controls while modal dialogs are open
 // ---------------------------------------------------------------------------
 window.flutterModalOpen = false;
-window.setModalOpenWeb = function(isOpen) {
+window.setModalOpenWeb = function (isOpen) {
   window.flutterModalOpen = !!isOpen;
   Object.values(window.mapboxGlobeInstances || {}).forEach(map => {
     if (map) {
@@ -704,7 +728,7 @@ window.setModalOpenWeb = function(isOpen) {
           if (map.dragRotate && !map.dragRotate.isEnabled()) map.dragRotate.enable();
           if (map.touchZoomRotate && !map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
         }
-      } catch (_) {}
+      } catch (_) { }
     }
   });
 };
@@ -712,7 +736,7 @@ window.setModalOpenWeb = function(isOpen) {
 // ---------------------------------------------------------------------------
 // flyTo
 // ---------------------------------------------------------------------------
-window.mapboxGlobeFlyToWeb = function(viewId, lng, lat, zoom) {
+window.mapboxGlobeFlyToWeb = function (viewId, lng, lat, zoom) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
   try {
@@ -723,7 +747,7 @@ window.mapboxGlobeFlyToWeb = function(viewId, lng, lat, zoom) {
 // ---------------------------------------------------------------------------
 // setStyle — strips mapbox:// sources that need a token
 // ---------------------------------------------------------------------------
-window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
+window.mapboxGlobeSetStyleJSONWeb = function (viewId, styleJsonStr) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
   try {
@@ -735,24 +759,24 @@ window.mapboxGlobeSetStyleJSONWeb = function(viewId, styleJsonStr) {
       try {
         map.setProjection({ type: 'globe' });
         disableGlobeReadbackErrorMeasurement(map);
-      } catch (_) {}
+      } catch (_) { }
       disableGlobeReadbackErrorMeasurement(map);
       if (map.setTerrain) {
-        try { map.setTerrain(null); } catch (_) {}
+        try { map.setTerrain(null); } catch (_) { }
       }
       map.resize();
     });
   } catch (e) {
     console.warn('[Globe] setStyle error:', e);
-    try { map.setStyle(ESRI_SATELLITE_GLOBE_STYLE, { diff: false }); } catch (_) {}
+    try { map.setStyle(ESRI_SATELLITE_GLOBE_STYLE, { diff: false }); } catch (_) { }
   }
 };
 
 // ---------------------------------------------------------------------------
 // Clear markers
 // ---------------------------------------------------------------------------
-window.mapboxGlobeClearMarkersWeb = function(viewId) {
-  (window.mapboxGlobeMarkers[viewId] || []).forEach(m => { try { m.remove(); } catch (_) {} });
+window.mapboxGlobeClearMarkersWeb = function (viewId) {
+  (window.mapboxGlobeMarkers[viewId] || []).forEach(m => { try { m.remove(); } catch (_) { } });
   window.mapboxGlobeMarkers[viewId] = [];
   // Also clear any pending queue
   delete window.mapboxGlobePendingCbs[viewId];
@@ -761,7 +785,7 @@ window.mapboxGlobeClearMarkersWeb = function(viewId) {
 // ---------------------------------------------------------------------------
 // Add marker — immediate if map exists, otherwise queues call
 // ---------------------------------------------------------------------------
-window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, callbackName) {
+window.mapboxGlobeAddMarkerWeb = function (viewId, lng, lat, iconUrl, markerId, callbackName) {
   const map = window.mapboxGlobeInstances[viewId];
   if (map) {
     _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName);
@@ -778,7 +802,7 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
 // ---------------------------------------------------------------------------
 // Set markers in batch (clears existing markers and adds new markers)
 // ---------------------------------------------------------------------------
-window.mapboxGlobeSetMarkersBatchWeb = function(viewId, markersJsonStr, callbackName) {
+window.mapboxGlobeSetMarkersBatchWeb = function (viewId, markersJsonStr, callbackName) {
   window.mapboxGlobeClearMarkersWeb(viewId);
   if (!markersJsonStr) return;
 
@@ -792,7 +816,7 @@ window.mapboxGlobeSetMarkersBatchWeb = function(viewId, markersJsonStr, callback
     }
     if (!Array.isArray(items) || items.length === 0) return;
 
-    items.forEach(function(item) {
+    items.forEach(function (item) {
       _doAddMarker(map, viewId, item.lng, item.lat, item.iconUrl, item.id, callbackName);
     });
   }
@@ -811,7 +835,7 @@ window.mapboxGlobeSetMarkersBatchWeb = function(viewId, markersJsonStr, callback
 // ---------------------------------------------------------------------------
 // Batch Valley line layers loader
 // ---------------------------------------------------------------------------
-window.mapboxGlobeLoadAllValleysWeb = function(viewId, valleysJsonStr, selectedValleyKey) {
+window.mapboxGlobeLoadAllValleysWeb = function (viewId, valleysJsonStr, selectedValleyKey) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
 
@@ -825,7 +849,7 @@ window.mapboxGlobeLoadAllValleysWeb = function(viewId, valleysJsonStr, selectedV
     }
     if (!Array.isArray(valleys)) return;
 
-    valleys.forEach(function(v) {
+    valleys.forEach(function (v) {
       try {
         const layerId = v.key;
         const sourceId = 'source-' + v.key;
@@ -847,16 +871,16 @@ window.mapboxGlobeLoadAllValleysWeb = function(viewId, valleysJsonStr, selectedV
           }
         });
 
-        map.on('click', layerId, function(e) {
+        map.on('click', layerId, function (e) {
           if (window.flutterModalOpen) return;
           if (typeof window.onValleyLineClicked === 'function') {
             window.onValleyLineClicked(layerId);
           }
         });
-        map.on('mouseenter', layerId, function() {
+        map.on('mouseenter', layerId, function () {
           if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
         });
-        map.on('mouseleave', layerId, function() {
+        map.on('mouseleave', layerId, function () {
           map.getCanvas().style.cursor = '';
         });
       } catch (err) {
@@ -875,7 +899,7 @@ window.mapboxGlobeLoadAllValleysWeb = function(viewId, valleysJsonStr, selectedV
 // ---------------------------------------------------------------------------
 // Add GeoJSON line layer (for single valley line)
 // ---------------------------------------------------------------------------
-window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJsonString, colorHex, lineWidth) {
+window.mapboxGlobeAddGeoJsonLineLayer = function (viewId, sourceId, layerId, geoJsonString, colorHex, lineWidth) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
 
@@ -885,7 +909,7 @@ window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJ
       if (map.getSource(sourceId)) map.removeSource(sourceId);
 
       let geoJson;
-      try { geoJson = JSON.parse(geoJsonString); } catch(e) { console.error('GeoJSON parse error:', e); return; }
+      try { geoJson = JSON.parse(geoJsonString); } catch (e) { console.error('GeoJSON parse error:', e); return; }
 
       map.addSource(sourceId, { type: 'geojson', data: geoJson });
       map.addLayer({
@@ -899,19 +923,19 @@ window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJ
         }
       });
 
-      map.on('click', layerId, function(e) {
+      map.on('click', layerId, function (e) {
         if (window.flutterModalOpen) return;
         if (typeof window.onValleyLineClicked === 'function') {
           window.onValleyLineClicked(layerId);
         }
       });
-      map.on('mouseenter', layerId, function() {
+      map.on('mouseenter', layerId, function () {
         if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
       });
-      map.on('mouseleave', layerId, function() {
+      map.on('mouseleave', layerId, function () {
         map.getCanvas().style.cursor = '';
       });
-    } catch(e) {
+    } catch (e) {
       console.error('addGeoJsonLineLayer error:', e);
     }
   }
@@ -926,7 +950,7 @@ window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJ
 // ---------------------------------------------------------------------------
 // Update Valley line colors: selected valley is RED (#FF0000), others are BLUE (#0000FF)
 // ---------------------------------------------------------------------------
-window.mapboxGlobeUpdateValleyColors = function(viewId, selectedValleyKey) {
+window.mapboxGlobeUpdateValleyColors = function (viewId, selectedValleyKey) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map || !map.isStyleLoaded()) return;
 
@@ -946,26 +970,26 @@ window.mapboxGlobeUpdateValleyColors = function(viewId, selectedValleyKey) {
     "Wadi_Tarj", "Wadi_Tathlith", "Wadi_Turubah", "Wadi_Yabah"
   ];
 
-  valleyNames.forEach(function(vName) {
+  valleyNames.forEach(function (vName) {
     try {
       if (map.getLayer(vName)) {
         const isSelected = (vName === selectedValleyKey);
         map.setPaintProperty(vName, 'line-color', isSelected ? '#FF0000' : '#0000FF');
         map.setPaintProperty(vName, 'line-width', isSelected ? 4.5 : 3.0);
       }
-    } catch (_) {}
+    } catch (_) { }
   });
 };
 
 // ---------------------------------------------------------------------------
 // Update Dam marker icons: selected dam is RED (red_droplet), others are BLUE (droplet)
 // ---------------------------------------------------------------------------
-window.mapboxGlobeUpdateDamMarkers = function(viewId, selectedDamName) {
+window.mapboxGlobeUpdateDamMarkers = function (viewId, selectedDamName) {
   const redIconUrl = resolveAssetUrl('assets/images/red_droplet.png');
   const blueIconUrl = resolveAssetUrl('assets/images/droplet.png');
 
   const markers = window.mapboxGlobeMarkers[viewId] || [];
-  markers.forEach(function(m) {
+  markers.forEach(function (m) {
     try {
       const el = m.getElement();
       if (!el) return;
@@ -980,18 +1004,18 @@ window.mapboxGlobeUpdateDamMarkers = function(viewId, selectedDamName) {
           img.style.filter = 'none';
         }
       }
-    } catch (_) {}
+    } catch (_) { }
   });
 };
 
 // ---------------------------------------------------------------------------
 // Clear GeoJSON line layers (e.g. when switching away from Valleys)
 // ---------------------------------------------------------------------------
-window.mapboxGlobeClearGeoJsonLineLayers = function(viewId, layerIdsStr, sourceIdsStr) {
+window.mapboxGlobeClearGeoJsonLineLayers = function (viewId, layerIdsStr, sourceIdsStr) {
   const map = window.mapboxGlobeInstances[viewId];
   if (!map || !map.isStyleLoaded()) return;
   const layerIds = layerIdsStr ? layerIdsStr.split(',') : [];
   const sourceIds = sourceIdsStr ? sourceIdsStr.split(',') : [];
-  layerIds.forEach(id => { try { if (id && map.getLayer(id)) map.removeLayer(id); } catch(_) {} });
-  sourceIds.forEach(id => { try { if (id && map.getSource(id)) map.removeSource(id); } catch(_) {} });
+  layerIds.forEach(id => { try { if (id && map.getLayer(id)) map.removeLayer(id); } catch (_) { } });
+  sourceIds.forEach(id => { try { if (id && map.getSource(id)) map.removeSource(id); } catch (_) { } });
 };

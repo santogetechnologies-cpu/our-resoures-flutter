@@ -32,7 +32,8 @@ class MapShellController {
       } else if (mapboxMap != null) {
         await mapboxMap!.style.setStyleJSON(styleJson);
         try {
-          await mapboxMap!.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
+          await mapboxMap!.style
+              .setProjection(StyleProjection(name: StyleProjectionName.globe));
         } catch (_) {}
       }
     } catch (e) {
@@ -72,13 +73,11 @@ class MapShellController {
     if (kIsWeb && webDomId != null) {
       // Flutter Web serves bundled assets under 'assets/<asset-path>'
       // e.g. 'assets/images/oil_marker.png' → 'assets/assets/images/oil_marker.png'
-      final webUrl = iconAsset.startsWith('assets/')
-          ? 'assets/$iconAsset'
-          : iconAsset;
+      final webUrl =
+          iconAsset.startsWith('assets/') ? 'assets/$iconAsset' : iconAsset;
       addMarkerWeb(webDomId!, longitude, latitude, webUrl, id, onTap);
     }
   }
-
 
   void clearWebMarkers() {
     if (kIsWeb && webDomId != null) {
@@ -86,7 +85,8 @@ class MapShellController {
     }
   }
 
-  void setWebMarkersBatch(String markersJsonStr, void Function(String markerId) onTap) {
+  void setWebMarkersBatch(
+      String markersJsonStr, void Function(String markerId) onTap) {
     if (kIsWeb && webDomId != null) {
       setMarkersBatchWeb(webDomId!, markersJsonStr, onTap);
     }
@@ -110,13 +110,18 @@ class MapShellController {
     double lineWidth = 3.0,
   }) async {
     if (kIsWeb && webDomId != null) {
-      addGeoJsonLineLayerWeb(webDomId!, sourceId, layerId, geoJsonString, colorHex, lineWidth);
+      addGeoJsonLineLayerWeb(
+          webDomId!, sourceId, layerId, geoJsonString, colorHex, lineWidth);
     } else if (mapboxMap != null) {
       try {
         final style = mapboxMap!.style;
         // Remove existing layer/source if present
-        try { await style.removeStyleLayer(layerId); } catch (_) {}
-        try { await style.removeStyleSource(sourceId); } catch (_) {}
+        try {
+          await style.removeStyleLayer(layerId);
+        } catch (_) {}
+        try {
+          await style.removeStyleSource(sourceId);
+        } catch (_) {}
         await style.addSource(GeoJsonSource(id: sourceId, data: geoJsonString));
         final hexClean = colorHex.replaceFirst('#', '');
         final int colorInt = int.parse('FF$hexClean', radix: 16);
@@ -135,7 +140,8 @@ class MapShellController {
   }
 
   /// Updates valley lines colors: selected is red (#FF0000), others are blue (#0000FF).
-  Future<void> updateValleyColors(List<String> valleyKeys, String selectedValleyKey) async {
+  Future<void> updateValleyColors(
+      List<String> valleyKeys, String selectedValleyKey) async {
     if (kIsWeb && webDomId != null) {
       updateValleyColorsWeb(webDomId!, selectedValleyKey);
     } else if (mapboxMap != null) {
@@ -165,15 +171,20 @@ class MapShellController {
   }
 
   /// Removes all GeoJSON line layers/sources by their IDs.
-  Future<void> clearGeoJsonLineLayers(List<String> layerIds, List<String> sourceIds) async {
+  Future<void> clearGeoJsonLineLayers(
+      List<String> layerIds, List<String> sourceIds) async {
     if (kIsWeb && webDomId != null) {
       clearGeoJsonLineLayersWeb(webDomId!, layerIds, sourceIds);
     } else if (mapboxMap != null) {
       for (final id in layerIds) {
-        try { await mapboxMap!.style.removeStyleLayer(id); } catch (_) {}
+        try {
+          await mapboxMap!.style.removeStyleLayer(id);
+        } catch (_) {}
       }
       for (final id in sourceIds) {
-        try { await mapboxMap!.style.removeStyleSource(id); } catch (_) {}
+        try {
+          await mapboxMap!.style.removeStyleSource(id);
+        } catch (_) {}
       }
     }
   }
@@ -260,7 +271,8 @@ class _MapShellState extends State<MapShell> {
         body: LayoutBuilder(
           builder: (context, constraints) {
             final effectiveSidebarWidth = constraints.maxWidth < 600
-                ? (constraints.maxWidth * 0.52).clamp(240.0, widget.sidebarWidth)
+                ? (constraints.maxWidth * 0.52)
+                    .clamp(240.0, widget.sidebarWidth)
                 : widget.sidebarWidth;
 
             return Stack(
@@ -314,7 +326,8 @@ class _MapShellState extends State<MapShell> {
                           width: 28,
                           height: 28,
                           color: Colors.white,
-                          errorBuilder: (c, e, s) => const Icon(Icons.home, color: Colors.white),
+                          errorBuilder: (c, e, s) =>
+                              const Icon(Icons.home, color: Colors.white),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -328,7 +341,9 @@ class _MapShellState extends State<MapShell> {
                           width: 26,
                           height: 26,
                           color: Colors.white,
-                          errorBuilder: (c, e, s) => const Icon(Icons.zoom_out_map, color: Colors.white),
+                          errorBuilder: (c, e, s) => const Icon(
+                              Icons.zoom_out_map,
+                              color: Colors.white),
                         ),
                       ),
                     ],
@@ -391,20 +406,27 @@ class _MapShellState extends State<MapShell> {
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 padding: const EdgeInsets.only(bottom: 60),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     if (widget.onBriefPressed != null) ...[
                                       Container(
                                         width: double.infinity,
                                         height: 70,
-                                        margin: const EdgeInsets.only(left: 21, right: 21, bottom: 16),
+                                        margin: const EdgeInsets.only(
+                                            left: 21, right: 21, bottom: 16),
                                         decoration: BoxDecoration(
                                           color: AppColors.mainMenuBtnBg,
-                                          borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                                          border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+                                          borderRadius: BorderRadius.circular(
+                                              AppColors.borderRadius),
+                                          border: Border.all(
+                                              color:
+                                                  Colors.white.withOpacity(0.8),
+                                              width: 1.5),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.12),
+                                              color: Colors.black
+                                                  .withOpacity(0.12),
                                               blurRadius: 6,
                                               offset: const Offset(0, 3),
                                             ),
@@ -413,7 +435,8 @@ class _MapShellState extends State<MapShell> {
                                         child: Material(
                                           color: Colors.transparent,
                                           child: InkWell(
-                                            borderRadius: BorderRadius.circular(AppColors.borderRadius),
+                                            borderRadius: BorderRadius.circular(
+                                                AppColors.borderRadius),
                                             onTap: widget.onBriefPressed,
                                             child: Center(
                                               child: FittedBox(

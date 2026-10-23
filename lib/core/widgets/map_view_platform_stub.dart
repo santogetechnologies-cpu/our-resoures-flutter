@@ -53,9 +53,10 @@ Widget buildPlatformMapWidget({
       final controller = MapShellController();
       controller.mapboxMap = mapboxMap;
 
-      if (initialStyleAsset != null && initialStyleAsset.isNotEmpty) {
-        await controller.setStyleFromAsset(initialStyleAsset);
-      }
+      final styleAsset = (initialStyleAsset != null && initialStyleAsset.isNotEmpty)
+          ? initialStyleAsset
+          : 'assets/maps/saudi_geo/sahel.json';
+      await controller.setStyleFromAsset(styleAsset);
 
       try {
         await mapboxMap.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
