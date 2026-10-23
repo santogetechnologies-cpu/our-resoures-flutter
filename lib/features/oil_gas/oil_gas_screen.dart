@@ -14,7 +14,6 @@ class FieldLocation {
   final String title;
   final String description;
   final bool isGas;
-  final bool isRenewable;
 
   const FieldLocation({
     required this.latitude,
@@ -22,7 +21,6 @@ class FieldLocation {
     required this.title,
     required this.description,
     this.isGas = false,
-    this.isRenewable = false,
   });
 }
 
@@ -37,53 +35,7 @@ class _OilGasScreenState extends State<OilGasScreen> {
   MapShellController? _mapController;
   bool _oilExpanded = true;
   bool _gasExpanded = false;
-  bool _renewableExpanded = false;
   final Map<String, FieldLocation> _annotationFieldMap = {};
-
-  final List<FieldLocation> _renewableProjects = const [
-    FieldLocation(
-      latitude: 29.9697,
-      longitude: 40.2064,
-      title: 'محطة سكاكا للطاقة الشمسية',
-      isRenewable: true,
-      description: 'أول مشروع ضمن البرنامج الوطني للطاقة المتجددة في المملكة العربية السعودية تحت مظلة رؤية 2030. تبلغ طاقتها الإنتاجية 300 ميجاواط وتغطي مساحة 6 كيلومترات مربعة بمنطقة الجوف، وتكفي لتزويد أكثر من 45 ألف وحدة سكنية بالطاقة النظيفة وتخفيض 500 ألف طن من الانبعاثات الكربونية سنوياً.',
-    ),
-    FieldLocation(
-      latitude: 29.8167,
-      longitude: 39.8667,
-      title: 'محطة دومة الجندل لطاقة الرياح',
-      isRenewable: true,
-      description: 'أكبر محطة لتوليد الكهرباء من طاقة الرياح في الشرق الأوسط والأولى من نوعها في المملكة العربية السعودية. تبلغ طاقتها الإنتاجية 400 ميجاواط وتضم 99 توربيناً عملاقاً للرياح بمنطقة الجوف، وتغذي 70 ألف منزل بالطاقة الكهربائية النظيفة وتسهم في خفض انبعاثات الكربون بنحو مليون طن سنوياً.',
-    ),
-    FieldLocation(
-      latitude: 25.5833,
-      longitude: 45.6167,
-      title: 'محطة سدير للطاقة الشمسية',
-      isRenewable: true,
-      description: 'واحدة من أكبر محطات الطاقة الشمسية في العالم بتكلفة استثمارية ضخمة وقدرة إنتاجية تصل إلى 1,500 ميجاواط في منطقة الرياض، وتعتمد على أحدث تقنيات الألواح الكهروضوئية ثنائية الوجه وأنظمة التتبع الشمسي لتزويد نحو 185 ألف منزل بالكهرباء النظيفة.',
-    ),
-    FieldLocation(
-      latitude: 28.0000,
-      longitude: 35.3000,
-      title: 'مشروع نيوم للهيدروجين الأخضر',
-      isRenewable: true,
-      description: 'أكبر منشأة لإنتاج الهيدروجين الأخضر الخالي من الكربون في العالم بالشراكة بين نيوم وأكوا باور وإير برودكتس. تعتمد كلياً على طاقتي الشمس والرياح لإنتاج 600 طن متري يومياً من الهيدروجين النظيف وتصديره عالمياً على شكل أمونيا خضراء لدعم تحول الطاقة النظيفة.',
-    ),
-    FieldLocation(
-      latitude: 20.6750,
-      longitude: 39.5200,
-      title: 'محطة الشعيبة للطاقة الشمسية',
-      isRenewable: true,
-      description: 'مشروع عملاق للطاقة الشمسية الكهروضوئية في منطقة مكة المكرمة بقدرة إجمالية تتجاوز 2,060 ميجاواط، يسهم في تعزيز مزيج الطاقة الأمثل وتوليد الكهرباء المستدامة وتغذية مدن ومشاريع الساحل الغربي.',
-    ),
-    FieldLocation(
-      latitude: 24.4686,
-      longitude: 39.6142,
-      title: 'الطاقة الحرارية الأرضية (الحرات البركانية)',
-      isRenewable: true,
-      description: 'استكشاف واستغلال الطاقة الحرارية الأرضية (Geothermal Energy) الكامنة في أعماق الحرات البركانية (مثل حرة رهط وخيبر) بالمنطقة الغربية كمصدر واعد ونظيف ومستدام لتوليد الحمل الأساسي للكهرباء وتحلية المياه الحرارية.',
-    ),
-  ];
 
   final List<FieldLocation> _oilFields = const [
     FieldLocation(
@@ -276,7 +228,6 @@ class _OilGasScreenState extends State<OilGasScreen> {
 
   Future<void> _loadMarkers(MapShellController controller) async {
     final List<FieldLocation> allFields = [
-      ..._renewableProjects,
       ..._oilFields,
       ..._gasFields,
     ];
@@ -285,9 +236,7 @@ class _OilGasScreenState extends State<OilGasScreen> {
       controller.clearWebMarkers();
       for (final field in allFields) {
         if (field.latitude > 0 && field.longitude > 0) {
-          final icon = field.isRenewable
-              ? AppAssets.markerIcon
-              : (field.isGas ? AppAssets.gasMarker : AppAssets.oilMarker);
+          final icon = field.isGas ? AppAssets.gasMarker : AppAssets.oilMarker;
           controller.addWebMarker(
             latitude: field.latitude,
             longitude: field.longitude,
@@ -312,16 +261,11 @@ class _OilGasScreenState extends State<OilGasScreen> {
       final ByteData gasByteData = await rootBundle.load(AppAssets.gasMarker);
       final Uint8List gasBytes = gasByteData.buffer.asUint8List();
 
-      final ByteData renewableByteData = await rootBundle.load(AppAssets.markerIcon);
-      final Uint8List renewableBytes = renewableByteData.buffer.asUint8List();
-
       final List<PointAnnotationOptions> optionsList = [];
 
       for (final field in allFields) {
         if (field.latitude > 0 && field.longitude > 0) {
-          final imageBytes = field.isRenewable
-              ? renewableBytes
-              : (field.isGas ? gasBytes : oilBytes);
+          final imageBytes = field.isGas ? gasBytes : oilBytes;
           optionsList.add(
             PointAnnotationOptions(
               geometry: Point(coordinates: Position(field.longitude, field.latitude)),
@@ -441,26 +385,6 @@ class _OilGasScreenState extends State<OilGasScreen> {
               ),
             ),
 
-          // Button 3: مشاريع الطاقة المتجددة
-          CustomButton(
-            text: 'مشاريع الطاقة المتجددة',
-            styleType: ButtonStyleType.mainMenu,
-            onPressed: () {
-              setState(() {
-                _renewableExpanded = !_renewableExpanded;
-              });
-            },
-          ),
-
-          // Renewable Projects List
-          if (_renewableExpanded)
-            ..._renewableProjects.map(
-              (f) => CustomButton(
-                text: f.title,
-                styleType: ButtonStyleType.subMenu,
-                onPressed: () => _selectField(f),
-              ),
-            ),
         ],
       ),
     );
