@@ -246,6 +246,7 @@ class _BooksScreenState extends State<BooksScreen> {
   Widget build(BuildContext context) {
     return MapShell(
       title: 'الموسوعات والكتب',
+      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       sidebarContent: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
