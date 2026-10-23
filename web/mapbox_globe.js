@@ -139,6 +139,13 @@ function transformMapboxStyle(styleInput) {
 
   // Clean layers and sanitize Mapbox v3 unsupported expressions (e.g. pitch culling)
   if (Array.isArray(style.layers)) {
+    // Strip out baked-in vector symbols for Materials so Gold, Nickel, Zinc, etc. are never displayed by default
+    style.layers = style.layers.filter(layer => {
+      if (layer.id === 'symbols') return false;
+      if (layer['source-layer'] === 'Materials') return false;
+      return true;
+    });
+
     style.layers.forEach((layer, idx) => {
       delete layer.slot;
       if (layer.filter) {
