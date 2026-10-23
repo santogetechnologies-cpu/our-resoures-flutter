@@ -553,7 +553,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
       title: 'الصخور والمعادن الإقتصادية',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
-      initialStyleAsset: 'assets/maps/materials/allMaterials.json',
+      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       isLoading: _isLoading,
       onMapCreated: (controller) => _mapController = controller,
       sidebarContent: Column(
