@@ -355,18 +355,19 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
     await Future.delayed(const Duration(milliseconds: 200));
 
     if (kIsWeb && _mapController != null) {
-      _mapController!.clearWebMarkers();
-      for (final dam in _dams) {
-        if (dam.latitude > 0.0 && dam.longitude > 0.0) {
-          _mapController!.addWebMarker(
-            latitude: dam.latitude,
-            longitude: dam.longitude,
-            iconAsset: AppAssets.droplet,
-            id: dam.name,
-            onTap: () => _showDamPopup(dam),
-          );
-        }
-      }
+      final validDams = _dams.where((d) => d.latitude > 0.0 && d.longitude > 0.0).toList();
+      final webUrl = 'assets/${AppAssets.droplet}';
+      final batchList = validDams.map((dam) => {
+        'id': dam.name,
+        'lat': dam.latitude,
+        'lng': dam.longitude,
+        'iconUrl': webUrl,
+      }).toList();
+      final damMap = {for (final d in validDams) d.name: d};
+      _mapController!.setWebMarkersBatch(jsonEncode(batchList), (damName) {
+        final d = damMap[damName];
+        if (d != null) _showDamPopup(d);
+      });
       _mapController?.flyTo(latitude: 20.275332, longitude: 41.438495, zoom: 6.3);
       return;
     }
@@ -474,23 +475,37 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
 
       await Future.delayed(const Duration(milliseconds: 300));
 
-      for (final entry in _valleys.entries) {
-        final key = entry.key;
-        final valley = entry.value;
-        try {
-          final geoJsonStr = await rootBundle.loadString(valley.path);
-          final sourceId = 'source-$key';
-          final layerId = key;
+      if (kIsWeb && _mapController != null) {
+        final List<Map<String, dynamic>> valleyBatch = [];
+        for (final entry in _valleys.entries) {
+          try {
+            final geoJsonStr = await rootBundle.loadString(entry.value.path);
+            valleyBatch.add({
+              'key': entry.key,
+              'geoJson': geoJsonStr,
+            });
+          } catch (_) {}
+        }
+        _mapController?.loadAllValleys(jsonEncode(valleyBatch), null);
+      } else {
+        for (final entry in _valleys.entries) {
+          final key = entry.key;
+          final valley = entry.value;
+          try {
+            final geoJsonStr = await rootBundle.loadString(valley.path);
+            final sourceId = 'source-$key';
+            final layerId = key;
 
-          await _mapController?.addGeoJsonLineLayer(
-            sourceId: sourceId,
-            layerId: layerId,
-            geoJsonString: geoJsonStr,
-            colorHex: '#0000FF',
-            lineWidth: 3.0,
-          );
-        } catch (e) {
-          debugPrint('Valley layer $key error: $e');
+            await _mapController?.addGeoJsonLineLayer(
+              sourceId: sourceId,
+              layerId: layerId,
+              geoJsonString: geoJsonStr,
+              colorHex: '#0000FF',
+              lineWidth: 3.0,
+            );
+          } catch (e) {
+            debugPrint('Valley layer $key error: $e');
+          }
         }
       }
     } catch (e) {

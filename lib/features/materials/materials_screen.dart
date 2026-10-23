@@ -354,39 +354,39 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     'Granite': 'الجرانيت',
     'Gypsum': 'الجبس',
     'Iron': 'الحديد',
-    'Kyanite': 'الكايانيت',
+    'Kyanite': 'الكيانايت',
     'Limestone': 'الحجر الجيري',
-    'Magnesite': 'المغنسيت',
+    'Magnesite': 'المغنيزايت',
     'Marble': 'الرخام',
     'Nickel': 'النيكل',
     'Phosphate': 'الفوسفات',
     'Sandstone': 'الحجر الرملي',
-    'Bauxite': 'البوكسايت',
+    'Bauxite': 'البوكسيت',
     'Chromium': 'الكروم',
     'SilicaSand': 'رمل السيليكا',
     'Silver': 'الفضة',
     'Zinc': 'الزنك',
-    'NephelineSyenite': 'النيفلين سينيت',
-    'Diatomite': 'الدياتومايت',
+    'NephelineSyenite': 'النيفلين سيانايت',
+    'Diatomite': 'الدياتوميت',
     'Perlite': 'البيرلايت',
-    'Bentonite': 'البنتونايت',
+    'Bentonite': 'البنتونيت',
     'Barite': 'البارايت',
     'Quartzite': 'الكوارتزايت',
-    'Clay': 'الطين والصلصال',
+    'Clay': 'الطين',
     'Pozzolan': 'البوزولان',
     'Salt': 'الملح الصخري',
     'Kaolin': 'الكاولين',
-    'AggregateMaterials': 'مواد الركام والركام الطبيعي',
+    'AggregateMaterials': 'مواد البحص',
     'Talc': 'التلك',
     'Uranium': 'اليورانيوم',
-    'Aluminium': 'الألمنيوم',
+    'Aluminium': 'الألومنيوم',
     'Lead': 'الرصاص',
     'Asbestos': 'الأسبستوس',
-    'Ilmenite': 'الإلمينايت',
-    'Olivine': 'الزبرجد الزيتوني (الأوليفين)',
-    'Garnet': 'العقيق (الجارنت)',
+    'Ilmenite': 'الإلمنايت',
+    'Olivine': 'الأوليفين',
+    'Garnet': 'الجارنت',
     'Zeolite': 'الزيولايت',
-    'Graphite': 'الجرافيت',
+    'Graphite': 'الجرافايت',
     'Dolomite': 'الدلومايت',
     'Basalt': 'البازلت',
   };
@@ -428,6 +428,10 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
   }
 
   Future<void> _onMetalSelected(String metalEn) async {
+    if (_allLocations.isEmpty) {
+      await _loadExcelData();
+    }
+
     final info = _mineralsData[metalEn];
 
     // Filter locations for this metal
@@ -436,26 +440,33 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     ).toList();
 
     if (kIsWeb && _mapController != null) {
-      _mapController!.clearWebMarkers();
       final iconPath = info?.iconAsset ?? AppAssets.mineralIcon(metalEn);
-      for (final loc in filtered) {
-        _mapController!.addWebMarker(
-          latitude: loc.latitude,
-          longitude: loc.longitude,
-          iconAsset: iconPath,
-          id: '${loc.latitude}_${loc.longitude}',
-          onTap: () {
-            AppPopupDialog.show(
-              context,
-              title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
-              description: 'الموقع الجغرافي: ${loc.locationName}\n'
-                  'المنطقة الإدارية: ${loc.region}\n'
-                  'خط الطول شرقاً: ${loc.longitude}\n'
-                  'خط العرض شمالاً: ${loc.latitude}',
-            );
-          },
-        );
-      }
+      final webUrl = iconPath.startsWith('assets/') ? 'assets/$iconPath' : iconPath;
+
+      final batchList = filtered.map((loc) => {
+        'id': '${loc.latitude}_${loc.longitude}',
+        'lat': loc.latitude,
+        'lng': loc.longitude,
+        'iconUrl': webUrl,
+      }).toList();
+
+      final locMap = {
+        for (final loc in filtered) '${loc.latitude}_${loc.longitude}': loc
+      };
+
+      _mapController!.setWebMarkersBatch(jsonEncode(batchList), (markerId) {
+        final loc = locMap[markerId];
+        if (loc != null) {
+          AppPopupDialog.show(
+            context,
+            title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
+            description: 'الموقع: ${loc.locationName}\n'
+                'المنطقة الإدارية: ${loc.region}\n'
+                'خط الطول شرقاً: ${loc.longitude}\n'
+                'خط العرض شمالاً: ${loc.latitude}',
+          );
+        }
+      });
     } else if (_mapController?.pointAnnotationManager != null) {
       final manager = _mapController!.pointAnnotationManager!;
       await manager.deleteAll();
@@ -494,7 +505,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
               AppPopupDialog.show(
                 context,
                 title: loc.nameAr.isNotEmpty ? loc.nameAr : (info?.nameAr ?? metalEn),
-                description: 'الموقع الجغرافي: ${loc.locationName}\n'
+                description: 'الموقع: ${loc.locationName}\n'
                     'المنطقة الإدارية: ${loc.region}\n'
                     'خط الطول شرقاً: ${loc.longitude}\n'
                     'خط العرض شمالاً: ${loc.latitude}',

@@ -9,6 +9,8 @@ void flyToWeb(String domId, double lng, double lat, double zoom) {}
 void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String markerId, VoidCallback onTap) {}
 
 void clearMarkersWeb(String domId) {}
+void setMarkersBatchWeb(String domId, String markersJsonStr, void Function(String markerId) onTap) {}
+void loadAllValleysWeb(String domId, String valleysJsonStr, String? selectedValleyKey) {}
 
 void addGeoJsonLineLayerWeb(String domId, String sourceId, String layerId,
     String geoJsonString, String colorHex, double lineWidth) {}

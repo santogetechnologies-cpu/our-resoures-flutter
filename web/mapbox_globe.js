@@ -761,24 +761,14 @@ window.mapboxGlobeClearMarkersWeb = function(viewId) {
 };
 
 // ---------------------------------------------------------------------------
-// Add marker — queues call if the map isn't ready yet
+// Add marker — immediate if map exists, otherwise queues call
 // ---------------------------------------------------------------------------
 window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, callbackName) {
   const map = window.mapboxGlobeInstances[viewId];
-
-  // Map is ready → add immediately
-  if (map && map.loaded && map.loaded()) {
+  if (map) {
     _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName);
     return;
   }
-
-  // Map exists but style not loaded yet → wait for style.load event
-  if (map) {
-    map.once('style.load', () => _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName));
-    return;
-  }
-
-  // Map not initialised yet → queue and execute when initMapboxGlobeWeb fires
   if (!window.mapboxGlobePendingCbs[viewId]) {
     window.mapboxGlobePendingCbs[viewId] = [];
   }
@@ -788,7 +778,104 @@ window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, c
 };
 
 // ---------------------------------------------------------------------------
-// Add GeoJSON line layer (for valley lines)
+// Set markers in batch (clears existing markers and adds new markers)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeSetMarkersBatchWeb = function(viewId, markersJsonStr, callbackName) {
+  window.mapboxGlobeClearMarkersWeb(viewId);
+  if (!markersJsonStr) return;
+
+  function _applyBatch(map) {
+    let items;
+    try {
+      items = (typeof markersJsonStr === 'string') ? JSON.parse(markersJsonStr) : markersJsonStr;
+    } catch (e) {
+      console.error('[Globe] setMarkersBatch JSON parse error:', e);
+      return;
+    }
+    if (!Array.isArray(items) || items.length === 0) return;
+
+    items.forEach(function(item) {
+      _doAddMarker(map, viewId, item.lng, item.lat, item.iconUrl, item.id, callbackName);
+    });
+  }
+
+  const map = window.mapboxGlobeInstances[viewId];
+  if (map) {
+    _applyBatch(map);
+  } else {
+    if (!window.mapboxGlobePendingCbs[viewId]) {
+      window.mapboxGlobePendingCbs[viewId] = [];
+    }
+    window.mapboxGlobePendingCbs[viewId].push(_applyBatch);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Batch Valley line layers loader
+// ---------------------------------------------------------------------------
+window.mapboxGlobeLoadAllValleysWeb = function(viewId, valleysJsonStr, selectedValleyKey) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map) return;
+
+  function _loadValleys() {
+    let valleys;
+    try {
+      valleys = (typeof valleysJsonStr === 'string') ? JSON.parse(valleysJsonStr) : valleysJsonStr;
+    } catch (e) {
+      console.error('[Globe] loadAllValleys JSON parse error:', e);
+      return;
+    }
+    if (!Array.isArray(valleys)) return;
+
+    valleys.forEach(function(v) {
+      try {
+        const layerId = v.key;
+        const sourceId = 'source-' + v.key;
+        if (map.getLayer(layerId)) map.removeLayer(layerId);
+        if (map.getSource(sourceId)) map.removeSource(sourceId);
+
+        const geoJson = (typeof v.geoJson === 'string') ? JSON.parse(v.geoJson) : v.geoJson;
+        map.addSource(sourceId, { type: 'geojson', data: geoJson });
+
+        const isSelected = (v.key === selectedValleyKey);
+        map.addLayer({
+          id: layerId,
+          type: 'line',
+          source: sourceId,
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: {
+            'line-color': isSelected ? '#FF0000' : '#0000FF',
+            'line-width': isSelected ? 4.5 : 3.0
+          }
+        });
+
+        map.on('click', layerId, function(e) {
+          if (window.flutterModalOpen) return;
+          if (typeof window.onValleyLineClicked === 'function') {
+            window.onValleyLineClicked(layerId);
+          }
+        });
+        map.on('mouseenter', layerId, function() {
+          if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', layerId, function() {
+          map.getCanvas().style.cursor = '';
+        });
+      } catch (err) {
+        console.error('Error adding valley ' + v.key, err);
+      }
+    });
+  }
+
+  if (map.isStyleLoaded()) {
+    _loadValleys();
+  } else {
+    map.once('style.load', _loadValleys);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Add GeoJSON line layer (for single valley line)
 // ---------------------------------------------------------------------------
 window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJsonString, colorHex, lineWidth) {
   const map = window.mapboxGlobeInstances[viewId];
@@ -796,7 +883,6 @@ window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJ
 
   function _doAdd() {
     try {
-      // Remove existing layer/source if present
       if (map.getLayer(layerId)) map.removeLayer(layerId);
       if (map.getSource(sourceId)) map.removeSource(sourceId);
 
@@ -815,7 +901,6 @@ window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJ
         }
       });
 
-      // Valley line click & cursor interactions
       map.on('click', layerId, function(e) {
         if (window.flutterModalOpen) return;
         if (typeof window.onValleyLineClicked === 'function') {

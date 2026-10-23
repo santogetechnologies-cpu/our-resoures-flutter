@@ -86,6 +86,18 @@ class MapShellController {
     }
   }
 
+  void setWebMarkersBatch(String markersJsonStr, void Function(String markerId) onTap) {
+    if (kIsWeb && webDomId != null) {
+      setMarkersBatchWeb(webDomId!, markersJsonStr, onTap);
+    }
+  }
+
+  void loadAllValleys(String valleysJsonStr, String? selectedValleyKey) {
+    if (kIsWeb && webDomId != null) {
+      loadAllValleysWeb(webDomId!, valleysJsonStr, selectedValleyKey);
+    }
+  }
+
   /// Adds a GeoJSON line layer to the map (for valley lines).
   /// [sourceId] & [layerId] must be unique per valley.
   /// [geoJsonString] is the raw GeoJSON content.

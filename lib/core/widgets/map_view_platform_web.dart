@@ -47,6 +47,22 @@ void clearMarkersWeb(String domId) {
   }
 }
 
+void setMarkersBatchWeb(String domId, String markersJsonStr, void Function(String markerId) onTap) {
+  final callbackName = 'mapbox_batch_marker_cb_$domId';
+  js.context[callbackName] = (String id) {
+    onTap(id);
+  };
+  if (js.context.hasProperty('mapboxGlobeSetMarkersBatchWeb')) {
+    js.context.callMethod('mapboxGlobeSetMarkersBatchWeb', [domId, markersJsonStr, callbackName]);
+  }
+}
+
+void loadAllValleysWeb(String domId, String valleysJsonStr, String? selectedValleyKey) {
+  if (js.context.hasProperty('mapboxGlobeLoadAllValleysWeb')) {
+    js.context.callMethod('mapboxGlobeLoadAllValleysWeb', [domId, valleysJsonStr, selectedValleyKey]);
+  }
+}
+
 void addGeoJsonLineLayerWeb(String domId, String sourceId, String layerId,
     String geoJsonString, String colorHex, double lineWidth) {
   if (js.context.hasProperty('mapboxGlobeAddGeoJsonLineLayer')) {
