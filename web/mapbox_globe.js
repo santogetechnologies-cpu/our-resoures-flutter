@@ -448,22 +448,25 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
       console.warn('[Globe] Giving up on container', viewId);
       return;
     }
+    if (targetContainer && !targetContainer.isConnected) {
+      targetContainer = null;
+    }
     if (!targetContainer) {
       targetContainer = document.getElementById(viewId);
     }
     // Deep shadow-DOM search as last resort
-    if (!targetContainer) {
+    if (!targetContainer || !targetContainer.isConnected) {
       const all = document.querySelectorAll('*');
       for (let i = 0; i < all.length; i++) {
-        if (all[i].id === viewId) { targetContainer = all[i]; break; }
+        if (all[i].id === viewId && all[i].isConnected) { targetContainer = all[i]; break; }
         if (all[i].shadowRoot) {
           const hit = all[i].shadowRoot.querySelector('[id="' + viewId + '"]');
-          if (hit) { targetContainer = hit; break; }
+          if (hit && hit.isConnected) { targetContainer = hit; break; }
         }
       }
     }
 
-    if (!targetContainer || typeof maplibregl === 'undefined') {
+    if (!targetContainer || !targetContainer.isConnected || typeof maplibregl === 'undefined') {
       return setTimeout(tryInit, 80);
     }
 
@@ -493,6 +496,8 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
       attributionControl: false,
       doubleClickZoom: false
     });
+    map._styleIsLoading = true;
+    window.mapboxGlobeInstances[viewId] = map;
 
     try { map.doubleClickZoom.disable(); } catch (_) { }
     try { map.keyboard.disable(); } catch (_) { }
@@ -530,6 +535,7 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
     });
 
     map.on('style.load', () => {
+      map._styleIsLoading = false;
       registerDefaultMarkerImages(map);
       setupCanvasA11y(map, targetContainer);
       // Globe projection (MapLibre v5 API)
@@ -552,6 +558,7 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
       pending.forEach(fn => fn(map));
       delete window.mapboxGlobePendingCbs[viewId];
     });
+    setTimeout(() => { if (map) map._styleIsLoading = false; }, 800);
 
     map.once('render', () => {
       disableGlobeReadbackErrorMeasurement(map);
@@ -748,8 +755,13 @@ window.mapboxGlobeSetStyleJSONWeb = function (viewId, styleJsonStr) {
   if (!map) return;
   try {
     const transformed = transformMapboxStyle(styleJsonStr);
+    map._styleIsLoading = true;
     map.setStyle(transformed, { diff: false });
-    map.once('style.load', () => {
+    let styleHandled = false;
+    const onStyleDone = () => {
+      if (styleHandled) return;
+      styleHandled = true;
+      map._styleIsLoading = false;
       registerDefaultMarkerImages(map);
       setupCanvasA11y(map);
       try {
@@ -761,8 +773,11 @@ window.mapboxGlobeSetStyleJSONWeb = function (viewId, styleJsonStr) {
         try { map.setTerrain(null); } catch (_) { }
       }
       map.resize();
-    });
+    };
+    map.once('style.load', onStyleDone);
+    setTimeout(onStyleDone, 500);
   } catch (e) {
+    map._styleIsLoading = false;
     console.warn('[Globe] setStyle error:', e);
     try { map.setStyle(ESRI_SATELLITE_GLOBE_STYLE, { diff: false }); } catch (_) { }
   }
@@ -833,7 +848,15 @@ window.mapboxGlobeSetMarkersBatchWeb = function (viewId, markersJsonStr, callbac
 // ---------------------------------------------------------------------------
 window.mapboxGlobeLoadAllValleysWeb = function (viewId, valleysJsonStr, selectedValleyKey) {
   const map = window.mapboxGlobeInstances[viewId];
-  if (!map) return;
+  if (!map) {
+    if (!window.mapboxGlobePendingCbs[viewId]) {
+      window.mapboxGlobePendingCbs[viewId] = [];
+    }
+    window.mapboxGlobePendingCbs[viewId].push(function () {
+      window.mapboxGlobeLoadAllValleysWeb(viewId, valleysJsonStr, selectedValleyKey);
+    });
+    return;
+  }
 
   function _loadValleys() {
     let valleys;
@@ -844,6 +867,8 @@ window.mapboxGlobeLoadAllValleysWeb = function (viewId, valleysJsonStr, selected
       return;
     }
     if (!Array.isArray(valleys)) return;
+
+    map._loadedValleyKeys = valleys.map(function (v) { return v.key; });
 
     valleys.forEach(function (v) {
       try {
@@ -885,10 +910,28 @@ window.mapboxGlobeLoadAllValleysWeb = function (viewId, valleysJsonStr, selected
     });
   }
 
-  if (map.isStyleLoaded()) {
-    _loadValleys();
+  function _safeLoad() {
+    try {
+      _loadValleys();
+    } catch (e) {
+      console.warn('[Globe] _loadValleys error, retrying in 150ms:', e);
+      setTimeout(function () {
+        try { _loadValleys(); } catch (err) { console.error('[Globe] _loadValleys retry failed:', err); }
+      }, 150);
+    }
+  }
+
+  if (map._styleIsLoading) {
+    let done = false;
+    const onReady = function () {
+      if (done) return;
+      done = true;
+      _safeLoad();
+    };
+    map.once('style.load', onReady);
+    setTimeout(onReady, 400);
   } else {
-    map.once('style.load', _loadValleys);
+    _safeLoad();
   }
 };
 
@@ -897,7 +940,15 @@ window.mapboxGlobeLoadAllValleysWeb = function (viewId, valleysJsonStr, selected
 // ---------------------------------------------------------------------------
 window.mapboxGlobeAddGeoJsonLineLayer = function (viewId, sourceId, layerId, geoJsonString, colorHex, lineWidth) {
   const map = window.mapboxGlobeInstances[viewId];
-  if (!map) return;
+  if (!map) {
+    if (!window.mapboxGlobePendingCbs[viewId]) {
+      window.mapboxGlobePendingCbs[viewId] = [];
+    }
+    window.mapboxGlobePendingCbs[viewId].push(function () {
+      window.mapboxGlobeAddGeoJsonLineLayer(viewId, sourceId, layerId, geoJsonString, colorHex, lineWidth);
+    });
+    return;
+  }
 
   function _doAdd() {
     try {
@@ -936,10 +987,28 @@ window.mapboxGlobeAddGeoJsonLineLayer = function (viewId, sourceId, layerId, geo
     }
   }
 
-  if (map.isStyleLoaded()) {
-    _doAdd();
+  function _safeAdd() {
+    try {
+      _doAdd();
+    } catch (e) {
+      console.warn('[Globe] _doAdd error, retrying in 150ms:', e);
+      setTimeout(function () {
+        try { _doAdd(); } catch (err) { console.error('[Globe] _doAdd retry failed:', err); }
+      }, 150);
+    }
+  }
+
+  if (map._styleIsLoading) {
+    let done = false;
+    const onReady = function () {
+      if (done) return;
+      done = true;
+      _safeAdd();
+    };
+    map.once('style.load', onReady);
+    setTimeout(onReady, 400);
   } else {
-    map.once('style.load', _doAdd);
+    _safeAdd();
   }
 };
 
@@ -948,7 +1017,7 @@ window.mapboxGlobeAddGeoJsonLineLayer = function (viewId, sourceId, layerId, geo
 // ---------------------------------------------------------------------------
 window.mapboxGlobeUpdateValleyColors = function (viewId, selectedValleyKey) {
   const map = window.mapboxGlobeInstances[viewId];
-  if (!map || !map.isStyleLoaded()) return;
+  if (!map) return;
 
   const valleyNames = [
     "Wadi_Aba_Al_Qu", "Wadi_Aba_Ar_Ruwath", "Wadi_Al_Ahsabah", "Wadi_Al_Akhda",
@@ -965,8 +1034,9 @@ window.mapboxGlobeUpdateValleyColors = function (viewId, selectedValleyKey) {
     "Wadi_Rash", "Wadi_Shuwayhat", "Wadi_Tabalah", "Wadi_Tarif",
     "Wadi_Tarj", "Wadi_Tathlith", "Wadi_Turubah", "Wadi_Yabah"
   ];
+  const keys = map._loadedValleyKeys || valleyNames;
 
-  valleyNames.forEach(function (vName) {
+  keys.forEach(function (vName) {
     try {
       if (map.getLayer(vName)) {
         const isSelected = (vName === selectedValleyKey);
@@ -1009,7 +1079,7 @@ window.mapboxGlobeUpdateDamMarkers = function (viewId, selectedDamName) {
 // ---------------------------------------------------------------------------
 window.mapboxGlobeClearGeoJsonLineLayers = function (viewId, layerIdsStr, sourceIdsStr) {
   const map = window.mapboxGlobeInstances[viewId];
-  if (!map || !map.isStyleLoaded()) return;
+  if (!map) return;
   const layerIds = layerIdsStr ? layerIdsStr.split(',') : [];
   const sourceIds = sourceIdsStr ? sourceIdsStr.split(',') : [];
   layerIds.forEach(id => { try { if (id && map.getLayer(id)) map.removeLayer(id); } catch (_) { } });
