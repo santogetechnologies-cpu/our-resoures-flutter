@@ -41,19 +41,10 @@ const ESRI_SATELLITE_GLOBE_STYLE = {
       ],
       tileSize: 256,
       attribution: '© Esri, Maxar, Earthstar Geographics'
-    },
-    'esri-labels': {
-      type: 'raster',
-      tiles: [
-        'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
-      ],
-      tileSize: 256
     }
   },
   layers: [
-    { id: 'imagery', type: 'raster', source: 'esri-world-imagery', minzoom: 0, maxzoom: 19 },
-    { id: 'labels',  type: 'raster', source: 'esri-labels',
-      minzoom: 0, maxzoom: 19, paint: { 'raster-opacity': 0.85 } }
+    { id: 'imagery', type: 'raster', source: 'esri-world-imagery', minzoom: 0, maxzoom: 19 }
   ]
 };
 

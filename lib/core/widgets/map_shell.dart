@@ -198,7 +198,7 @@ class MapShell extends StatefulWidget {
     this.onBriefPressed,
     this.briefButtonText = 'مقدمة',
     required this.sidebarContent,
-    this.initialStyleAsset,
+    this.initialStyleAsset = 'assets/maps/saudi_geo/sahel.json',
     this.isLoading = false,
     this.onMapCreated,
     this.initialLatitude = 24.694291,
