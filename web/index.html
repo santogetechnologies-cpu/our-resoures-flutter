@@ -20,6 +20,15 @@
   <title>ثرواتنا من أرضنا</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- Ensure ServiceWorker and stale cache are cleared for latest Arabic maps -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        for (let r of regs) { r.unregister(); }
+      });
+    }
+  </script>
+
   <!-- MapLibre GL JS v5 with 3D Globe Projection (Token-free, 100% stable) -->
   <link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
