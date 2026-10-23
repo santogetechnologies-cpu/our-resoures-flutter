@@ -41,6 +41,9 @@ class AppAssets {
   static const String earth = '$basePath/earth.jpg';
   static const String geologicMapArabianPeninsula =
       '$basePath/geologic_map_arabian_peninsula.jpg';
+  static const String formationBrief = '$basePath/formation_brief.png';
+  static const String formation2 = '$basePath/formation2.jpg';
+  static const String waterInfoback = '$basePath/infoback.png';
 
   // Datasets
   static const String materialsXlsx = 'assets/data/materials.xlsx';

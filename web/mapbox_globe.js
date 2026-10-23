@@ -203,6 +203,7 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   // MapLibre's Marker attaches translate(X, Y) to `el`. We must NEVER modify `el.style.transform`.
   const el = document.createElement('div');
   el.className = 'mapbox-custom-marker';
+  el.setAttribute('data-marker-id', markerId);
   el.style.cssText = 'pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-select:none;';
 
   // Inner container for styling, shadow, and scale animations
@@ -543,6 +544,38 @@ window.initMapboxGlobeWeb = function(viewId, containerEl, initialLng, initialLat
       if (s && s !== 401 && s !== 404) console.warn('[Globe] error:', e);
     });
 
+    // ── Setup click listener for formation polygons & valleys on map ───────────────
+    map.on('click', e => {
+      if (window.flutterModalOpen) return;
+      try {
+        const formationLayers = [
+          "Saq_Formation-657oal",
+          "Tabuk_Formation-767mbq",
+          "Wajid_Formation-0m41k3",
+          "Minjur_Formation-cp2j29",
+          "Biyadh_Formation-ciunt8",
+          "Wasia_Formation-8gn6np",
+          "Umm_er_radhuma_Formation-31a0hp",
+          "Dammam_Formation-8o2pjs",
+          "Neogene_Formation-98k03q",
+          "Aruma_Formation-4kp806",
+          "Jauf_Formation-3102c9"
+        ];
+        const activeLayers = formationLayers.filter(l => map.getLayer(l));
+        if (activeLayers.length > 0) {
+          const features = map.queryRenderedFeatures(e.point, { layers: activeLayers });
+          if (features && features.length > 0) {
+            const f = features[0];
+            const layerKey = f.sourceLayer || (f.layer && f.layer.id);
+            if (layerKey && typeof window.onFormationPolygonClicked === 'function') {
+              window.onFormationPolygonClicked(layerKey);
+              return;
+            }
+          }
+        }
+      } catch (_) {}
+    });
+
     window.mapboxGlobeInstances[viewId] = map;   // also set immediately for resize calls
     window.mapboxGlobeMarkers[viewId]   = [];
 
@@ -728,28 +761,239 @@ window.mapboxGlobeClearMarkersWeb = function(viewId) {
 };
 
 // ---------------------------------------------------------------------------
-// Add marker — queues call if the map isn't ready yet
+// Add marker — immediate if map exists, otherwise queues call
 // ---------------------------------------------------------------------------
 window.mapboxGlobeAddMarkerWeb = function(viewId, lng, lat, iconUrl, markerId, callbackName) {
   const map = window.mapboxGlobeInstances[viewId];
-
-  // Map is ready → add immediately
-  if (map && map.loaded && map.loaded()) {
+  if (map) {
     _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName);
     return;
   }
-
-  // Map exists but style not loaded yet → wait for style.load event
-  if (map) {
-    map.once('style.load', () => _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName));
-    return;
-  }
-
-  // Map not initialised yet → queue and execute when initMapboxGlobeWeb fires
   if (!window.mapboxGlobePendingCbs[viewId]) {
     window.mapboxGlobePendingCbs[viewId] = [];
   }
   window.mapboxGlobePendingCbs[viewId].push(
     readyMap => _doAddMarker(readyMap, viewId, lng, lat, iconUrl, markerId, callbackName)
   );
+};
+
+// ---------------------------------------------------------------------------
+// Set markers in batch (clears existing markers and adds new markers)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeSetMarkersBatchWeb = function(viewId, markersJsonStr, callbackName) {
+  window.mapboxGlobeClearMarkersWeb(viewId);
+  if (!markersJsonStr) return;
+
+  function _applyBatch(map) {
+    let items;
+    try {
+      items = (typeof markersJsonStr === 'string') ? JSON.parse(markersJsonStr) : markersJsonStr;
+    } catch (e) {
+      console.error('[Globe] setMarkersBatch JSON parse error:', e);
+      return;
+    }
+    if (!Array.isArray(items) || items.length === 0) return;
+
+    items.forEach(function(item) {
+      _doAddMarker(map, viewId, item.lng, item.lat, item.iconUrl, item.id, callbackName);
+    });
+  }
+
+  const map = window.mapboxGlobeInstances[viewId];
+  if (map) {
+    _applyBatch(map);
+  } else {
+    if (!window.mapboxGlobePendingCbs[viewId]) {
+      window.mapboxGlobePendingCbs[viewId] = [];
+    }
+    window.mapboxGlobePendingCbs[viewId].push(_applyBatch);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Batch Valley line layers loader
+// ---------------------------------------------------------------------------
+window.mapboxGlobeLoadAllValleysWeb = function(viewId, valleysJsonStr, selectedValleyKey) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map) return;
+
+  function _loadValleys() {
+    let valleys;
+    try {
+      valleys = (typeof valleysJsonStr === 'string') ? JSON.parse(valleysJsonStr) : valleysJsonStr;
+    } catch (e) {
+      console.error('[Globe] loadAllValleys JSON parse error:', e);
+      return;
+    }
+    if (!Array.isArray(valleys)) return;
+
+    valleys.forEach(function(v) {
+      try {
+        const layerId = v.key;
+        const sourceId = 'source-' + v.key;
+        if (map.getLayer(layerId)) map.removeLayer(layerId);
+        if (map.getSource(sourceId)) map.removeSource(sourceId);
+
+        const geoJson = (typeof v.geoJson === 'string') ? JSON.parse(v.geoJson) : v.geoJson;
+        map.addSource(sourceId, { type: 'geojson', data: geoJson });
+
+        const isSelected = (v.key === selectedValleyKey);
+        map.addLayer({
+          id: layerId,
+          type: 'line',
+          source: sourceId,
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: {
+            'line-color': isSelected ? '#FF0000' : '#0000FF',
+            'line-width': isSelected ? 4.5 : 3.0
+          }
+        });
+
+        map.on('click', layerId, function(e) {
+          if (window.flutterModalOpen) return;
+          if (typeof window.onValleyLineClicked === 'function') {
+            window.onValleyLineClicked(layerId);
+          }
+        });
+        map.on('mouseenter', layerId, function() {
+          if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', layerId, function() {
+          map.getCanvas().style.cursor = '';
+        });
+      } catch (err) {
+        console.error('Error adding valley ' + v.key, err);
+      }
+    });
+  }
+
+  if (map.isStyleLoaded()) {
+    _loadValleys();
+  } else {
+    map.once('style.load', _loadValleys);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Add GeoJSON line layer (for single valley line)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeAddGeoJsonLineLayer = function(viewId, sourceId, layerId, geoJsonString, colorHex, lineWidth) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map) return;
+
+  function _doAdd() {
+    try {
+      if (map.getLayer(layerId)) map.removeLayer(layerId);
+      if (map.getSource(sourceId)) map.removeSource(sourceId);
+
+      let geoJson;
+      try { geoJson = JSON.parse(geoJsonString); } catch(e) { console.error('GeoJSON parse error:', e); return; }
+
+      map.addSource(sourceId, { type: 'geojson', data: geoJson });
+      map.addLayer({
+        id: layerId,
+        type: 'line',
+        source: sourceId,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': colorHex,
+          'line-width': lineWidth
+        }
+      });
+
+      map.on('click', layerId, function(e) {
+        if (window.flutterModalOpen) return;
+        if (typeof window.onValleyLineClicked === 'function') {
+          window.onValleyLineClicked(layerId);
+        }
+      });
+      map.on('mouseenter', layerId, function() {
+        if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', layerId, function() {
+        map.getCanvas().style.cursor = '';
+      });
+    } catch(e) {
+      console.error('addGeoJsonLineLayer error:', e);
+    }
+  }
+
+  if (map.isStyleLoaded()) {
+    _doAdd();
+  } else {
+    map.once('style.load', _doAdd);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Update Valley line colors: selected valley is RED (#FF0000), others are BLUE (#0000FF)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeUpdateValleyColors = function(viewId, selectedValleyKey) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map || !map.isStyleLoaded()) return;
+
+  const valleyNames = [
+    "Wadi_Aba_Al_Qu", "Wadi_Aba_Ar_Ruwath", "Wadi_Al_Ahsabah", "Wadi_Al_Akhda",
+    "Wadi_Al_Amq", "Wadi_Al_Batin", "Wadi_Al_Farshah", "Wadi_Al_Gharr",
+    "Wadi_al_Ghinah", "Wadi_Al_Hamal", "Wadi_Al_Hamd", "Wadi_Al_Hinu",
+    "Wadi_Al_Jarir", "Wadi_Al_Jizil", "Wadi_al_Judwal", "Wadi_Al_Khurmah",
+    "Wadi_Al_Lith", "Wadi_Al_Makhit", "Wadi_Al_Maqran", "Wadi_Al_Mira",
+    "Wadi_al_Qimra", "Wadi_Ar_Raka", "Wadi_Ar_Risha", "Wadi_Ar_Rumah",
+    "Wadi_Arar", "Wadi_As_Sahba", "Wadi_As_surrah", "Wadi_Ash_Shu-bah",
+    "Wadi_Baysh", "Wadi_Bishah", "Wadi_Bitat", "Wadi_Damad",
+    "Wadi_Dawqah", "Wadi_Fajr", "Wadi_Hali", "Wadi_Hamir",
+    "Wadi_Hanifah", "Wadi_Hirjab", "Wadi_Hubuna", "Wadi_Itwad",
+    "Wadi_Najran", "Wadi_Nayyal", "Wadi_Qatan", "Wadi_Ranyah",
+    "Wadi_Rash", "Wadi_Shuwayhat", "Wadi_Tabalah", "Wadi_Tarif",
+    "Wadi_Tarj", "Wadi_Tathlith", "Wadi_Turubah", "Wadi_Yabah"
+  ];
+
+  valleyNames.forEach(function(vName) {
+    try {
+      if (map.getLayer(vName)) {
+        const isSelected = (vName === selectedValleyKey);
+        map.setPaintProperty(vName, 'line-color', isSelected ? '#FF0000' : '#0000FF');
+        map.setPaintProperty(vName, 'line-width', isSelected ? 4.5 : 3.0);
+      }
+    } catch (_) {}
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Update Dam marker icons: selected dam is RED (red_droplet), others are BLUE (droplet)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeUpdateDamMarkers = function(viewId, selectedDamName) {
+  const redIconUrl = resolveAssetUrl('assets/images/red_droplet.png');
+  const blueIconUrl = resolveAssetUrl('assets/images/droplet.png');
+
+  const markers = window.mapboxGlobeMarkers[viewId] || [];
+  markers.forEach(function(m) {
+    try {
+      const el = m.getElement();
+      if (!el) return;
+      const markerId = el.getAttribute('data-marker-id');
+      const img = el.querySelector('img');
+      if (img && markerId) {
+        if (markerId === selectedDamName) {
+          img.src = redIconUrl;
+          img.style.filter = 'drop-shadow(0 0 8px rgba(255,0,0,0.8))';
+        } else {
+          img.src = blueIconUrl;
+          img.style.filter = 'none';
+        }
+      }
+    } catch (_) {}
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Clear GeoJSON line layers (e.g. when switching away from Valleys)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeClearGeoJsonLineLayers = function(viewId, layerIdsStr, sourceIdsStr) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map || !map.isStyleLoaded()) return;
+  const layerIds = layerIdsStr ? layerIdsStr.split(',') : [];
+  const sourceIds = sourceIdsStr ? sourceIdsStr.split(',') : [];
+  layerIds.forEach(id => { try { if (id && map.getLayer(id)) map.removeLayer(id); } catch(_) {} });
+  sourceIds.forEach(id => { try { if (id && map.getSource(id)) map.removeSource(id); } catch(_) {} });
 };

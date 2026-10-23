@@ -27,14 +27,14 @@ void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String m
   final callbackKey = 'mapbox_marker_cb_${markerId}_$domId';
   _webMarkerCallbacks[callbackKey] = onTap; // ← keyed by full callbackKey
 
-  js.context[callbackKey] = js.allowInterop((String id) {
+  js.context[callbackKey] = (String id) {
     // JS passes markerId; reconstruct the full key to look up the callback.
     final key = 'mapbox_marker_cb_${id}_$domId';
     final cb = _webMarkerCallbacks[key];
     if (cb != null) {
       cb();
     }
-  });
+  };
 
   if (js.context.hasProperty('mapboxGlobeAddMarkerWeb')) {
     js.context.callMethod('mapboxGlobeAddMarkerWeb', [domId, lng, lat, iconUrl, markerId, callbackKey]);
@@ -44,6 +44,74 @@ void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String m
 void clearMarkersWeb(String domId) {
   if (js.context.hasProperty('mapboxGlobeClearMarkersWeb')) {
     js.context.callMethod('mapboxGlobeClearMarkersWeb', [domId]);
+  }
+}
+
+void setMarkersBatchWeb(String domId, String markersJsonStr, void Function(String markerId) onTap) {
+  final callbackName = 'mapbox_batch_marker_cb_$domId';
+  js.context[callbackName] = (String id) {
+    onTap(id);
+  };
+  if (js.context.hasProperty('mapboxGlobeSetMarkersBatchWeb')) {
+    js.context.callMethod('mapboxGlobeSetMarkersBatchWeb', [domId, markersJsonStr, callbackName]);
+  }
+}
+
+void loadAllValleysWeb(String domId, String valleysJsonStr, String? selectedValleyKey) {
+  if (js.context.hasProperty('mapboxGlobeLoadAllValleysWeb')) {
+    js.context.callMethod('mapboxGlobeLoadAllValleysWeb', [domId, valleysJsonStr, selectedValleyKey]);
+  }
+}
+
+void addGeoJsonLineLayerWeb(String domId, String sourceId, String layerId,
+    String geoJsonString, String colorHex, double lineWidth) {
+  if (js.context.hasProperty('mapboxGlobeAddGeoJsonLineLayer')) {
+    js.context.callMethod('mapboxGlobeAddGeoJsonLineLayer',
+        [domId, sourceId, layerId, geoJsonString, colorHex, lineWidth]);
+  }
+}
+
+void clearGeoJsonLineLayersWeb(
+    String domId, List<String> layerIds, List<String> sourceIds) {
+  if (js.context.hasProperty('mapboxGlobeClearGeoJsonLineLayers')) {
+    js.context.callMethod('mapboxGlobeClearGeoJsonLineLayers',
+        [domId, layerIds.join(','), sourceIds.join(',')]);
+  }
+}
+
+void updateValleyColorsWeb(String domId, String selectedValleyKey) {
+  if (js.context.hasProperty('mapboxGlobeUpdateValleyColors')) {
+    js.context.callMethod('mapboxGlobeUpdateValleyColors', [domId, selectedValleyKey]);
+  }
+}
+
+void updateDamMarkersWeb(String domId, String selectedDamName) {
+  if (js.context.hasProperty('mapboxGlobeUpdateDamMarkers')) {
+    js.context.callMethod('mapboxGlobeUpdateDamMarkers', [domId, selectedDamName]);
+  }
+}
+
+void registerFormationPolygonCallback(void Function(String layerKey)? callback) {
+  if (callback == null) {
+    js.context['onFormationPolygonClicked'] = null;
+  } else {
+    js.context['onFormationPolygonClicked'] = (dynamic key) {
+      if (key is String) {
+        callback(key);
+      }
+    };
+  }
+}
+
+void registerValleyLineCallback(void Function(String layerKey)? callback) {
+  if (callback == null) {
+    js.context['onValleyLineClicked'] = null;
+  } else {
+    js.context['onValleyLineClicked'] = (dynamic key) {
+      if (key is String) {
+        callback(key);
+      }
+    };
   }
 }
 
@@ -57,11 +125,11 @@ void registerSidebarScrollCallback(void Function(double deltaY)? callback) {
   if (callback == null) {
     js.context['flutterSidebarScroll'] = null;
   } else {
-    js.context['flutterSidebarScroll'] = js.allowInterop((dynamic deltaY) {
+    js.context['flutterSidebarScroll'] = (dynamic deltaY) {
       if (deltaY is num) {
         callback(deltaY.toDouble());
       }
-    });
+    };
   }
 }
 

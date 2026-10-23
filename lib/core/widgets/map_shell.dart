@@ -85,6 +85,98 @@ class MapShellController {
       clearMarkersWeb(webDomId!);
     }
   }
+
+  void setWebMarkersBatch(String markersJsonStr, void Function(String markerId) onTap) {
+    if (kIsWeb && webDomId != null) {
+      setMarkersBatchWeb(webDomId!, markersJsonStr, onTap);
+    }
+  }
+
+  void loadAllValleys(String valleysJsonStr, String? selectedValleyKey) {
+    if (kIsWeb && webDomId != null) {
+      loadAllValleysWeb(webDomId!, valleysJsonStr, selectedValleyKey);
+    }
+  }
+
+  /// Adds a GeoJSON line layer to the map (for valley lines).
+  /// [sourceId] & [layerId] must be unique per valley.
+  /// [geoJsonString] is the raw GeoJSON content.
+  /// [colorHex] e.g. '#1aa33f'.
+  Future<void> addGeoJsonLineLayer({
+    required String sourceId,
+    required String layerId,
+    required String geoJsonString,
+    required String colorHex,
+    double lineWidth = 3.0,
+  }) async {
+    if (kIsWeb && webDomId != null) {
+      addGeoJsonLineLayerWeb(webDomId!, sourceId, layerId, geoJsonString, colorHex, lineWidth);
+    } else if (mapboxMap != null) {
+      try {
+        final style = mapboxMap!.style;
+        // Remove existing layer/source if present
+        try { await style.removeStyleLayer(layerId); } catch (_) {}
+        try { await style.removeStyleSource(sourceId); } catch (_) {}
+        await style.addSource(GeoJsonSource(id: sourceId, data: geoJsonString));
+        final hexClean = colorHex.replaceFirst('#', '');
+        final int colorInt = int.parse('FF$hexClean', radix: 16);
+        await style.addLayer(LineLayer(
+          id: layerId,
+          sourceId: sourceId,
+          lineColor: colorInt,
+          lineWidth: lineWidth,
+          lineCap: LineCap.ROUND,
+          lineJoin: LineJoin.ROUND,
+        ));
+      } catch (e) {
+        debugPrint('addGeoJsonLineLayer error: $e');
+      }
+    }
+  }
+
+  /// Updates valley lines colors: selected is red (#FF0000), others are blue (#0000FF).
+  Future<void> updateValleyColors(List<String> valleyKeys, String selectedValleyKey) async {
+    if (kIsWeb && webDomId != null) {
+      updateValleyColorsWeb(webDomId!, selectedValleyKey);
+    } else if (mapboxMap != null) {
+      final style = mapboxMap!.style;
+      for (final key in valleyKeys) {
+        try {
+          final isSelected = (key == selectedValleyKey);
+          final colorInt = isSelected ? 0xFFFF0000 : 0xFF0000FF;
+          await style.updateLayer(LineLayer(
+            id: key,
+            sourceId: 'source-$key',
+            lineColor: colorInt,
+            lineWidth: isSelected ? 4.5 : 3.0,
+            lineCap: LineCap.ROUND,
+            lineJoin: LineJoin.ROUND,
+          ));
+        } catch (_) {}
+      }
+    }
+  }
+
+  /// Updates dam marker icons on web (red for selected, blue for others).
+  void updateDamMarkersWebOnly(String selectedDamName) {
+    if (kIsWeb && webDomId != null) {
+      updateDamMarkersWeb(webDomId!, selectedDamName);
+    }
+  }
+
+  /// Removes all GeoJSON line layers/sources by their IDs.
+  Future<void> clearGeoJsonLineLayers(List<String> layerIds, List<String> sourceIds) async {
+    if (kIsWeb && webDomId != null) {
+      clearGeoJsonLineLayersWeb(webDomId!, layerIds, sourceIds);
+    } else if (mapboxMap != null) {
+      for (final id in layerIds) {
+        try { await mapboxMap!.style.removeStyleLayer(id); } catch (_) {}
+      }
+      for (final id in sourceIds) {
+        try { await mapboxMap!.style.removeStyleSource(id); } catch (_) {}
+      }
+    }
+  }
 }
 
 class MapShell extends StatefulWidget {

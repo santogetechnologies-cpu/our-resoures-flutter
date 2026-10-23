@@ -9,10 +9,27 @@ void flyToWeb(String domId, double lng, double lat, double zoom) {}
 void addMarkerWeb(String domId, double lng, double lat, String iconUrl, String markerId, VoidCallback onTap) {}
 
 void clearMarkersWeb(String domId) {}
+void setMarkersBatchWeb(String domId, String markersJsonStr, void Function(String markerId) onTap) {}
+void loadAllValleysWeb(String domId, String valleysJsonStr, String? selectedValleyKey) {}
+
+void addGeoJsonLineLayerWeb(String domId, String sourceId, String layerId,
+    String geoJsonString, String colorHex, double lineWidth) {}
+
+void clearGeoJsonLineLayersWeb(
+    String domId, List<String> layerIds, List<String> sourceIds) {}
+
+void updateValleyColorsWeb(String domId, String selectedValleyKey) {}
+
+void updateDamMarkersWeb(String domId, String selectedDamName) {}
+
+void registerFormationPolygonCallback(void Function(String layerKey)? callback) {}
+
+void registerValleyLineCallback(void Function(String layerKey)? callback) {}
 
 void setModalOpenWeb(bool isOpen) {}
 
 void registerSidebarScrollCallback(void Function(double deltaY)? callback) {}
+
 
 Widget buildPlatformMapWidget({
   required String viewId,

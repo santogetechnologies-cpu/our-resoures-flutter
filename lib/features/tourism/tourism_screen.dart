@@ -503,6 +503,7 @@ final List<TourismLandmark> _landmarks = const [
       title: 'السياحة والآثار',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
+      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       onMapCreated: (c) {
         _mapController = c;
         _loadMarkers(c);

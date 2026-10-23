@@ -72,7 +72,7 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
             onTap: () {
               AppPopupDialog.show(
                 context,
-                title: 'زلزال مسجل',
+                title: '',
                 description: 'قدر الزلزال (Magnitude) : ${p.magnitude}\nالتاريخ: ${p.date}\nالوقت: ${p.time} (GMT)',
               );
             },
@@ -155,7 +155,7 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
       title: 'قاعدة البيانات الزلزالية',
       onBriefPressed: _showIntroBrief,
       briefButtonText: 'مقدمة',
-      initialStyleAsset: 'assets/maps/earthquake/allearth.json',
+      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       isLoading: _isLoading,
       onMapCreated: (c) => _mapController = c,
       sidebarContent: Column(
