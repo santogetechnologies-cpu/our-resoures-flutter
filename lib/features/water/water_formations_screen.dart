@@ -58,6 +58,7 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
   final Map<DamLocation, PointAnnotation> _damAnnotationMap = {};
   Uint8List? _dropletBytes;
   Uint8List? _redDropletBytes;
+  static String? _cachedValleyBatchJson;
 
   static final Map<String, ({String path, Color color, String nameAr, double length})> _valleys = {
     'Wadi_Aba_Al_Qu': (path: 'assets/maps/valleys/Wadi_Aba_Al_Qu.geojson', color: const Color(0xFF1AA33F), nameAr: 'وادي أبا القور', length: 203.1),
@@ -476,17 +477,20 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
       await Future.delayed(const Duration(milliseconds: 300));
 
       if (kIsWeb && _mapController != null) {
-        final List<Map<String, dynamic>> valleyBatch = [];
-        for (final entry in _valleys.entries) {
-          try {
-            final geoJsonStr = await rootBundle.loadString(entry.value.path);
-            valleyBatch.add({
-              'key': entry.key,
-              'geoJson': geoJsonStr,
-            });
-          } catch (_) {}
+        if (_cachedValleyBatchJson == null) {
+          final List<Map<String, dynamic>> valleyBatch = [];
+          for (final entry in _valleys.entries) {
+            try {
+              final geoJsonStr = await rootBundle.loadString(entry.value.path);
+              valleyBatch.add({
+                'key': entry.key,
+                'geoJson': geoJsonStr,
+              });
+            } catch (_) {}
+          }
+          _cachedValleyBatchJson = jsonEncode(valleyBatch);
         }
-        _mapController?.loadAllValleys(jsonEncode(valleyBatch), null);
+        _mapController?.loadAllValleys(_cachedValleyBatchJson!, null);
       } else {
         for (final entry in _valleys.entries) {
           final key = entry.key;

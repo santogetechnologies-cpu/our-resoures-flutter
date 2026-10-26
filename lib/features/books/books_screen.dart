@@ -73,9 +73,11 @@ class _BooksScreenState extends State<BooksScreen> {
     'جيولوجية القمر': 'assets/books/educational/edu_book_12.pdf',
     'الأغلفة المحيطة بالأرض': 'assets/books/educational/edu_book_13.pdf',
     'المشاكل البيئية وحلولها': 'assets/books/educational/edu_book_14.pdf',
-    'التغيرات المناخية والإحتباس الحراري': 'assets/books/educational/edu_book_15.pdf',
+    'التغيرات المناخية والإحتباس الحراري':
+        'assets/books/educational/edu_book_15.pdf',
     'التشجير التحديات والحلول': 'assets/books/educational/edu_book_16.pdf',
-    'الإنزلاقات والإنهيارات والفيضانات': 'assets/books/educational/edu_book_17.pdf',
+    'الإنزلاقات والإنهيارات والفيضانات':
+        'assets/books/educational/edu_book_17.pdf',
     'الامطار والسيول والسدود': 'assets/books/educational/edu_book_18.pdf',
     'التصحر والجفاف': 'assets/books/educational/edu_book_19.pdf',
     'مستقبل الطاقة في عالمنا': 'assets/books/educational/edu_book_20.pdf',
@@ -84,15 +86,24 @@ class _BooksScreenState extends State<BooksScreen> {
     'الجيوفيزياء النووية': 'assets/books/educational/edu_book_23.pdf',
     'الجيولوجيا الطبية': 'assets/books/educational/edu_book_24.pdf',
     'أنظمة الإنذار المبكر': 'assets/books/educational/edu_book_25.pdf',
-    'الدليل الى كتابة الرسائل الجامعية والنشر العلمي عربي': 'assets/books/educational/edu_book_26.pdf',
-    'الدليل الى كتابة الرسائل الجامعية والنشر العلمي إنجليزي': 'assets/books/educational/edu_book_27.pdf',
-    '321 سؤال وجواب في أصل وتطور الأرض': 'assets/books/educational/edu_book_28.pdf',
-    '358 سؤال وجواب في علم الصخور والجيوكيمياء والاستشعار عن بعد': 'assets/books/educational/edu_book_29.pdf',
-    '358 سؤال وجواب في الثروات الطبيعية': 'assets/books/educational/edu_book_30.pdf',
-    '380 سؤال وجواب في المخاطر الجيولوجية': 'assets/books/educational/edu_book_31.pdf',
-    '303 سؤال وجواب في علم الزلازل والزلزالية الهندسية': 'assets/books/educational/edu_book_32.pdf',
-    '300 سؤال وجواب في الجيوفيزياء التطبيقية': 'assets/books/educational/edu_book_33.pdf',
-    'تطبيقات الذكاء الاصطناعي في علوم الأرض': 'assets/books/educational/edu_book_34.pdf',
+    'الدليل الى كتابة الرسائل الجامعية والنشر العلمي عربي':
+        'assets/books/educational/edu_book_26.pdf',
+    'الدليل الى كتابة الرسائل الجامعية والنشر العلمي إنجليزي':
+        'assets/books/educational/edu_book_27.pdf',
+    '321 سؤال وجواب في أصل وتطور الأرض':
+        'assets/books/educational/edu_book_28.pdf',
+    '358 سؤال وجواب في علم الصخور والجيوكيمياء والاستشعار عن بعد':
+        'assets/books/educational/edu_book_29.pdf',
+    '358 سؤال وجواب في الثروات الطبيعية':
+        'assets/books/educational/edu_book_30.pdf',
+    '380 سؤال وجواب في المخاطر الجيولوجية':
+        'assets/books/educational/edu_book_31.pdf',
+    '303 سؤال وجواب في علم الزلازل والزلزالية الهندسية':
+        'assets/books/educational/edu_book_32.pdf',
+    '300 سؤال وجواب في الجيوفيزياء التطبيقية':
+        'assets/books/educational/edu_book_33.pdf',
+    'تطبيقات الذكاء الاصطناعي في علوم الأرض':
+        'assets/books/educational/edu_book_34.pdf',
   };
 
   // 2. الموسوعة التخصصية (6 items)
@@ -235,6 +246,7 @@ class _BooksScreenState extends State<BooksScreen> {
   Widget build(BuildContext context) {
     return MapShell(
       title: 'الموسوعات والكتب',
+      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       sidebarContent: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -286,7 +298,8 @@ class _BooksScreenState extends State<BooksScreen> {
             ..._zamzamEncyclopediaItems.map(
               (text) => _buildSubItem(
                 text,
-                () => _openPdfBook('موسوعة زمزم - $text', _zamzamBooksAssets[text]),
+                () => _openPdfBook(
+                    'موسوعة زمزم - $text', _zamzamBooksAssets[text]),
               ),
             ),
 

@@ -62,9 +62,9 @@ class MapScaleBar extends StatelessWidget {
     String formatUnit(double distMeters) {
       if (distMeters >= 1000) {
         final km = distMeters / 1000;
-        return km % 1 == 0 ? '${km.toInt()} km' : '${km.toStringAsFixed(1)} km';
+        return km % 1 == 0 ? '${km.toInt()} كم' : '${km.toStringAsFixed(1)} كم';
       } else {
-        return '${distMeters.toInt()} m';
+        return '${distMeters.toInt()} م';
       }
     }
 
