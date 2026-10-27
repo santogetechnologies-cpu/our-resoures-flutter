@@ -223,6 +223,11 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   el.className = 'mapbox-custom-marker';
   el.setAttribute('data-marker-id', markerId);
   el.style.cssText = 'pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-select:none;';
+  if (window.flutterModalOpen) {
+    el.style.setProperty('visibility', 'hidden', 'important');
+    el.style.setProperty('opacity', '0', 'important');
+    el.style.setProperty('pointer-events', 'none', 'important');
+  }
 
   // Inner container for styling, shadow, and scale animations
   const inner = document.createElement('div');
@@ -239,15 +244,24 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;';
   img.src = resolvedUrl;
 
-  // Resilient fallback chain: resolved → raw → assets/raw → dot
-  const fallbacks = [iconUrl, 'assets/' + iconUrl, 'assets/assets/' + iconUrl];
+  // Resilient fallback chain: resolved → raw → assets/raw → root variants → dot
+  const cleanIcon = (iconUrl || '').replace(/^\/+/, '');
+  const fallbacks = [
+    resolvedUrl,
+    cleanIcon,
+    'assets/' + cleanIcon,
+    'assets/assets/' + cleanIcon.replace(/^assets\//, ''),
+    'assets/images/' + cleanIcon.split('/').pop(),
+    'assets/assets/images/' + cleanIcon.split('/').pop()
+  ];
   let fbIdx = 0;
   img.onerror = function () {
-    if (fbIdx < fallbacks.length) {
+    while (fbIdx < fallbacks.length) {
       const next = fallbacks[fbIdx++];
-      if (next !== this.src) { this.src = next; return; }
-      fbIdx++;
-      if (fbIdx <= fallbacks.length) { this.src = fallbacks[fbIdx - 1]; return; }
+      if (next && next !== this.src) {
+        this.src = next;
+        return;
+      }
     }
     // Gold dot fallback
     inner.innerHTML =
@@ -557,8 +571,33 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
       const pending = window.mapboxGlobePendingCbs[viewId] || [];
       pending.forEach(fn => fn(map));
       delete window.mapboxGlobePendingCbs[viewId];
+
+      if (window.mapboxGlobeLastBatch && window.mapboxGlobeLastBatch[viewId]) {
+        const curMarkers = window.mapboxGlobeMarkers[viewId] || [];
+        if (curMarkers.length === 0) {
+          const lb = window.mapboxGlobeLastBatch[viewId];
+          window.mapboxGlobeSetMarkersBatchWeb(viewId, lb.markersJsonStr, lb.callbackName);
+        }
+      }
     });
-    setTimeout(() => { if (map) map._styleIsLoading = false; }, 800);
+
+    setTimeout(() => {
+      if (map) {
+        map._styleIsLoading = false;
+        const pending = window.mapboxGlobePendingCbs[viewId] || [];
+        if (pending.length > 0) {
+          pending.forEach(fn => fn(map));
+          delete window.mapboxGlobePendingCbs[viewId];
+        }
+        if (window.mapboxGlobeLastBatch && window.mapboxGlobeLastBatch[viewId]) {
+          const curMarkers = window.mapboxGlobeMarkers[viewId] || [];
+          if (curMarkers.length === 0) {
+            const lb = window.mapboxGlobeLastBatch[viewId];
+            window.mapboxGlobeSetMarkersBatchWeb(viewId, lb.markersJsonStr, lb.callbackName);
+          }
+        }
+      }
+    }, 800);
 
     map.once('render', () => {
       disableGlobeReadbackErrorMeasurement(map);
@@ -716,6 +755,56 @@ window.addEventListener('touchend', () => {
 window.flutterModalOpen = false;
 window.setModalOpenWeb = function (isOpen) {
   window.flutterModalOpen = !!isOpen;
+  if (document.body) {
+    document.body.classList.toggle('flutter-modal-open', window.flutterModalOpen);
+  }
+  if (document.documentElement) {
+    document.documentElement.classList.toggle('flutter-modal-open', window.flutterModalOpen);
+  }
+
+  // Hide or show all marker elements in DOM
+  const markers = document.querySelectorAll('.mapbox-custom-marker, .maplibregl-marker, .mapboxgl-marker');
+  markers.forEach(el => {
+    if (window.flutterModalOpen) {
+      el.style.setProperty('visibility', 'hidden', 'important');
+      el.style.setProperty('opacity', '0', 'important');
+      el.style.setProperty('pointer-events', 'none', 'important');
+    } else {
+      el.style.removeProperty('visibility');
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('pointer-events');
+      el.style.visibility = 'visible';
+      el.style.opacity = '1';
+      el.style.pointerEvents = 'auto';
+    }
+  });
+
+  // Also iterate through stored marker instances
+  Object.values(window.mapboxGlobeMarkers || {}).forEach(markerList => {
+    if (Array.isArray(markerList)) {
+      markerList.forEach(m => {
+        try {
+          const mel = m && m.getElement && m.getElement();
+          if (mel) {
+            if (window.flutterModalOpen) {
+              mel.style.setProperty('visibility', 'hidden', 'important');
+              mel.style.setProperty('opacity', '0', 'important');
+              mel.style.setProperty('pointer-events', 'none', 'important');
+            } else {
+              mel.style.removeProperty('visibility');
+              mel.style.removeProperty('opacity');
+              mel.style.removeProperty('pointer-events');
+              mel.style.visibility = 'visible';
+              mel.style.opacity = '1';
+              mel.style.pointerEvents = 'auto';
+            }
+          }
+        } catch (_) {}
+      });
+    }
+  });
+
+  // Freeze / unfreeze map interactions
   Object.values(window.mapboxGlobeInstances || {}).forEach(map => {
     if (map) {
       try {
@@ -786,6 +875,8 @@ window.mapboxGlobeSetStyleJSONWeb = function (viewId, styleJsonStr) {
 // ---------------------------------------------------------------------------
 // Clear markers
 // ---------------------------------------------------------------------------
+window.mapboxGlobeLastBatch = window.mapboxGlobeLastBatch || {};
+
 window.mapboxGlobeClearMarkersWeb = function (viewId) {
   (window.mapboxGlobeMarkers[viewId] || []).forEach(m => { try { m.remove(); } catch (_) { } });
   window.mapboxGlobeMarkers[viewId] = [];
@@ -794,11 +885,11 @@ window.mapboxGlobeClearMarkersWeb = function (viewId) {
 };
 
 // ---------------------------------------------------------------------------
-// Add marker — immediate if map exists, otherwise queues call
+// Add marker — immediate if map exists & style loaded, otherwise queues call
 // ---------------------------------------------------------------------------
 window.mapboxGlobeAddMarkerWeb = function (viewId, lng, lat, iconUrl, markerId, callbackName) {
   const map = window.mapboxGlobeInstances[viewId];
-  if (map) {
+  if (map && !map._styleIsLoading) {
     _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName);
     return;
   }
@@ -814,6 +905,9 @@ window.mapboxGlobeAddMarkerWeb = function (viewId, lng, lat, iconUrl, markerId, 
 // Set markers in batch (clears existing markers and adds new markers)
 // ---------------------------------------------------------------------------
 window.mapboxGlobeSetMarkersBatchWeb = function (viewId, markersJsonStr, callbackName) {
+  if (markersJsonStr) {
+    window.mapboxGlobeLastBatch[viewId] = { markersJsonStr, callbackName };
+  }
   window.mapboxGlobeClearMarkersWeb(viewId);
   if (!markersJsonStr) return;
 
@@ -833,7 +927,7 @@ window.mapboxGlobeSetMarkersBatchWeb = function (viewId, markersJsonStr, callbac
   }
 
   const map = window.mapboxGlobeInstances[viewId];
-  if (map) {
+  if (map && !map._styleIsLoading) {
     _applyBatch(map);
   } else {
     if (!window.mapboxGlobePendingCbs[viewId]) {

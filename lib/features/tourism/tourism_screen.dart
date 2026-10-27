@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -461,21 +462,32 @@ class _TourismScreenState extends State<TourismScreen> {
   final Map<String, TourismLandmark> _annotationLandmarkMap = {};
 
   Future<void> _loadMarkers(MapShellController controller) async {
+    final validLandmarks = _landmarks
+        .where((l) => l.latitude > 0.0 && l.longitude > 0.0)
+        .toList();
+
     if (kIsWeb) {
-      controller.clearWebMarkers();
-      for (final landmark in _landmarks) {
-        if (landmark.latitude > 0.0 && landmark.longitude > 0.0) {
-          controller.addWebMarker(
-            latitude: landmark.latitude,
-            longitude: landmark.longitude,
-            iconAsset: AppAssets.markerIcon,
-            id: '${landmark.latitude}_${landmark.longitude}',
-            onTap: () {
-              _showLandmark(landmark);
-            },
-          );
+      final webUrl = 'assets/${AppAssets.markerIcon}';
+      final batchList = validLandmarks
+          .map((landmark) => {
+                'id': '${landmark.latitude}_${landmark.longitude}',
+                'lat': landmark.latitude,
+                'lng': landmark.longitude,
+                'iconUrl': webUrl,
+              })
+          .toList();
+
+      final landmarkMap = {
+        for (final landmark in validLandmarks)
+          '${landmark.latitude}_${landmark.longitude}': landmark
+      };
+
+      controller.setWebMarkersBatch(jsonEncode(batchList), (markerId) {
+        final landmark = landmarkMap[markerId];
+        if (landmark != null) {
+          _showLandmark(landmark);
         }
-      }
+      });
       return;
     }
 
@@ -486,9 +498,7 @@ class _TourismScreenState extends State<TourismScreen> {
       final ByteData byteData = await rootBundle.load(AppAssets.markerIcon);
       final Uint8List imageBytes = byteData.buffer.asUint8List();
 
-      final optionsList = _landmarks
-          .where((l) => l.latitude > 0.0 && l.longitude > 0.0)
-          .map((landmark) {
+      final optionsList = validLandmarks.map((landmark) {
         return PointAnnotationOptions(
           geometry: Point(
               coordinates: Position(landmark.longitude, landmark.latitude)),
@@ -498,9 +508,6 @@ class _TourismScreenState extends State<TourismScreen> {
       }).toList();
 
       final annotations = await manager.createMulti(optionsList);
-      final validLandmarks = _landmarks
-          .where((l) => l.latitude > 0.0 && l.longitude > 0.0)
-          .toList();
       for (int i = 0;
           i < annotations.length && i < validLandmarks.length;
           i++) {
@@ -530,7 +537,7 @@ class _TourismScreenState extends State<TourismScreen> {
       _mapController!.flyTo(
         latitude: landmark.latitude,
         longitude: landmark.longitude,
-        zoom: 9.5,
+        zoom: 10.0,
       );
     }
     AppPopupDialog.show(
@@ -595,6 +602,9 @@ class _TourismScreenState extends State<TourismScreen> {
                       }
                     }
                   });
+                  if (_mapController != null) {
+                    _loadMarkers(_mapController!);
+                  }
                 },
               ),
               if (isExpanded)
