@@ -4174,6 +4174,70 @@
                     0
                 ]
             }
+        },
+        {
+            "id": "symbols",
+            "type": "symbol",
+            "metadata": {
+                "mapbox:featureComponent": "data-viz/symbols",
+                "mapbox:group": "Symbols, symbols"
+            },
+            "source": "composite",
+            "source-layer": "Materials",
+            "minzoom": 1,
+            "filter": ["has", "Name"],
+            "layout": {
+                "text-size": 12,
+                "text-radial-offset": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    1,
+                    0.05,
+                    5,
+                    0.0625,
+                    10,
+                    0.088,
+                    22,
+                    0.1
+                ],
+                "text-variable-anchor": [
+                    "top-right",
+                    "bottom-right",
+                    "right",
+                    "top-left",
+                    "bottom-left"
+                ],
+                "icon-image": [
+                    "match",
+                    ["get", "Name"],
+                    "Gold",
+                    "in-national-3",
+                    "Sandstone",
+                    "au-tourist-2",
+                    "Granite",
+                    "diamond",
+                    "Zinc",
+                    "nz-state-2",
+                    "Diatomite",
+                    "hu-main-2",
+                    "Feldspar",
+                    "border-dot-13",
+                    "Iron",
+                    "us-interstate-2",
+                    ""
+                ],
+                "text-font": ["DIN Pro Medium", "Arial Unicode MS Regular"],
+                "icon-allow-overlap": true,
+                "text-justify": "auto",
+                "text-padding": 10,
+                "text-field": ["get", "Name"]
+            },
+            "paint": {
+                "text-halo-color": "hsl(0, 0%, 100%)",
+                "text-halo-width": 1.25,
+                "text-halo-blur": 0.5
+            }
         }
     ],
     "created": "2023-11-27T04:25:00.882Z",
