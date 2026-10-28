@@ -295,18 +295,22 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
 
   Future<void> _showInitialDams() async {
     if (kIsWeb && _mapController != null) {
-      _mapController!.clearWebMarkers();
-      for (final dam in _dams) {
-        if (dam.latitude > 0.0 && dam.longitude > 0.0) {
-          _mapController!.addWebMarker(
-            latitude: dam.latitude,
-            longitude: dam.longitude,
-            iconAsset: AppAssets.droplet,
-            id: dam.name,
-            onTap: () => _showDamPopup(dam),
-          );
-        }
-      }
+      final validDams =
+          _dams.where((d) => d.latitude > 0.0 && d.longitude > 0.0).toList();
+      final webUrl = 'assets/${AppAssets.droplet}';
+      final batchList = validDams
+          .map((dam) => {
+                'id': dam.name,
+                'lat': dam.latitude,
+                'lng': dam.longitude,
+                'iconUrl': webUrl,
+              })
+          .toList();
+      final damMap = {for (final d in validDams) d.name: d};
+      _mapController!.setWebMarkersBatch(jsonEncode(batchList), (damName) {
+        final d = damMap[damName];
+        if (d != null) _showDamPopup(d);
+      });
       return;
     }
 

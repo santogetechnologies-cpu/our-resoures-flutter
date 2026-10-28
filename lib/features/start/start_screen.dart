@@ -75,9 +75,9 @@ class _StartScreenState extends State<StartScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Vision 2030 logo on Left
+                        // Alamry logo on Left
                         Image.asset(
-                          AppAssets.saudiVision,
+                          AppAssets.alamryLogo,
                           width: 140,
                           height: 95,
                           fit: BoxFit.contain,

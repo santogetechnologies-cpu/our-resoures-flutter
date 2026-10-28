@@ -181,9 +181,9 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 ),
                                 child: Row(
                                   children: [
-                                    // Saudi Vision 2030 logo
+                                    // Alamry platform logo
                                     Image.asset(
-                                      AppAssets.saudiVision,
+                                      AppAssets.alamryLogo,
                                       width: 110,
                                       height: 66,
                                       fit: BoxFit.contain,

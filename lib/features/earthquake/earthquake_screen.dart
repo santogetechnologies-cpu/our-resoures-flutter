@@ -63,23 +63,32 @@ class _EarthquakeScreenState extends State<EarthquakeScreen> {
       }).toList();
 
       if (kIsWeb && _mapController != null) {
-        _mapController!.clearWebMarkers();
-        for (final p in points) {
-          _mapController!.addWebMarker(
-            latitude: p.latitude,
-            longitude: p.longitude,
-            iconAsset: iconAsset,
-            id: '${p.latitude}_${p.longitude}_${p.date}',
-            onTap: () {
-              AppPopupDialog.show(
-                context,
-                title: '',
-                description:
-                    'قدر الزلزال (Magnitude) : ${p.magnitude}\nالتاريخ: ${p.date}\nالوقت: ${p.time} (GMT)',
-              );
-            },
-          );
-        }
+        final webUrl = 'assets/$iconAsset';
+        final batchList = points
+            .map((p) => {
+                  'id': '${p.latitude}_${p.longitude}_${p.date}',
+                  'lat': p.latitude,
+                  'lng': p.longitude,
+                  'iconUrl': webUrl,
+                })
+            .toList();
+
+        final pointMap = {
+          for (final p in points)
+            '${p.latitude}_${p.longitude}_${p.date}': p
+        };
+
+        _mapController!.setWebMarkersBatch(jsonEncode(batchList), (markerId) {
+          final p = pointMap[markerId];
+          if (p != null) {
+            AppPopupDialog.show(
+              context,
+              title: '',
+              description:
+                  'قدر الزلزال (Magnitude) : ${p.magnitude}\nالتاريخ: ${p.date}\nالوقت: ${p.time} (GMT)',
+            );
+          }
+        });
       } else if (_mapController?.pointAnnotationManager != null) {
         final manager = _mapController!.pointAnnotationManager!;
         await manager.deleteAll();

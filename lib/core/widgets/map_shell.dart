@@ -320,7 +320,7 @@ class _MapShellState extends State<MapShell> {
                         heroTag: 'fab_home_${widget.title}',
                         onPressed: () => Navigator.of(context).pop(),
                         backgroundColor: AppColors.primaryBrown,
-                        elevation: 6,
+                        elevation: 2,
                         child: Image.asset(
                           AppAssets.home,
                           width: 28,
@@ -335,7 +335,7 @@ class _MapShellState extends State<MapShell> {
                         heroTag: 'fab_zoom_${widget.title}',
                         onPressed: _resetZoom,
                         backgroundColor: AppColors.primaryBrown,
-                        elevation: 6,
+                        elevation: 2,
                         child: Image.asset(
                           AppAssets.zoom,
                           width: 26,

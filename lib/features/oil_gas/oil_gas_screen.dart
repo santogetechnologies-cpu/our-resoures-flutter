@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -258,22 +259,32 @@ class _OilGasScreenState extends State<OilGasScreen> {
       ..._gasFields,
     ];
 
+    final validFields = allFields
+        .where((f) => f.latitude > 0.0 && f.longitude > 0.0)
+        .toList();
+
     if (kIsWeb) {
-      controller.clearWebMarkers();
-      for (final field in allFields) {
-        if (field.latitude > 0 && field.longitude > 0) {
-          final icon = field.isGas ? AppAssets.gasMarker : AppAssets.oilMarker;
-          controller.addWebMarker(
-            latitude: field.latitude,
-            longitude: field.longitude,
-            iconAsset: icon,
-            id: '${field.latitude}_${field.longitude}',
-            onTap: () {
-              _selectField(field);
-            },
-          );
+      final batchList = validFields
+          .map((field) => {
+                'id': '${field.latitude}_${field.longitude}',
+                'lat': field.latitude,
+                'lng': field.longitude,
+                'iconUrl':
+                    'assets/${field.isGas ? AppAssets.gasMarker : AppAssets.oilMarker}',
+              })
+          .toList();
+
+      final fieldMap = {
+        for (final field in validFields)
+          '${field.latitude}_${field.longitude}': field
+      };
+
+      controller.setWebMarkersBatch(jsonEncode(batchList), (markerId) {
+        final field = fieldMap[markerId];
+        if (field != null) {
+          _selectField(field);
         }
-      }
+      });
       return;
     }
 
@@ -304,8 +315,6 @@ class _OilGasScreenState extends State<OilGasScreen> {
       }
 
       final annotations = await manager.createMulti(optionsList);
-      final validFields =
-          allFields.where((f) => f.latitude > 0 && f.longitude > 0).toList();
       for (int i = 0; i < annotations.length && i < validFields.length; i++) {
         final ann = annotations[i];
         if (ann != null) {
@@ -333,7 +342,7 @@ class _OilGasScreenState extends State<OilGasScreen> {
       _mapController!.flyTo(
         latitude: field.latitude,
         longitude: field.longitude,
-        zoom: 9.0,
+        zoom: 10.0,
       );
     }
 
@@ -382,6 +391,9 @@ class _OilGasScreenState extends State<OilGasScreen> {
               setState(() {
                 _oilExpanded = !_oilExpanded;
               });
+              if (_mapController != null) {
+                _loadMarkers(_mapController!);
+              }
             },
           ),
 
@@ -403,6 +415,9 @@ class _OilGasScreenState extends State<OilGasScreen> {
               setState(() {
                 _gasExpanded = !_gasExpanded;
               });
+              if (_mapController != null) {
+                _loadMarkers(_mapController!);
+              }
             },
           ),
 

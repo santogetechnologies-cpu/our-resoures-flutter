@@ -1,5 +1,33 @@
 // 3D Globe Web Bridge for Flutter Web (MapLibre GL JS v5 — Token-Free)
 
+// ---------------------------------------------------------------------------
+// Global A11y Guard: Prevent Chrome warning:
+// "Blocked aria-hidden on an element because its descendant retained focus."
+// When Flutter sets aria-hidden="true" on an ancestor (<flt-platform-view>),
+// blur any focused descendant first so Chrome allows aria-hidden cleanly.
+// ---------------------------------------------------------------------------
+(function () {
+  if (typeof Element !== 'undefined' && Element.prototype && !window.__a11yAriaHiddenPatched) {
+    window.__a11yAriaHiddenPatched = true;
+    const origSetAttribute = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (name, value) {
+      if (name === 'aria-hidden' && (value === 'true' || value === true)) {
+        try {
+          if (this.contains && document.activeElement && this.contains(document.activeElement)) {
+            if (typeof document.activeElement.blur === 'function') {
+              document.activeElement.blur();
+            }
+            if (document.body && typeof document.body.focus === 'function') {
+              try { document.body.focus(); } catch (_) { }
+            }
+          }
+        } catch (_) { }
+      }
+      return origSetAttribute.apply(this, arguments);
+    };
+  }
+})();
+
 window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
 window.mapboxGlobeMarkers = window.mapboxGlobeMarkers || {};
 window.mapboxGlobePendingCbs = window.mapboxGlobePendingCbs || {};   // queued marker calls
@@ -234,11 +262,17 @@ function _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName) {
   inner.style.cssText =
     `width:${SIZE}px;height:${SIZE}px;` +
     'display:flex;align-items:center;justify-content:center;' +
-    'filter:drop-shadow(0 3px 8px rgba(0,0,0,.65));' +
-    'transition:transform .15s ease;pointer-events:auto;';
+    'filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));' +
+    'transition:transform .15s ease, filter .15s ease;pointer-events:auto;';
 
-  inner.onmouseenter = () => { inner.style.transform = 'scale(1.25)'; };
-  inner.onmouseleave = () => { inner.style.transform = 'scale(1.0)'; };
+  inner.onmouseenter = () => {
+    inner.style.transform = 'scale(1.25)';
+    inner.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,.35))';
+  };
+  inner.onmouseleave = () => {
+    inner.style.transform = 'scale(1.0)';
+    inner.style.filter = 'drop-shadow(0 1px 2px rgba(0,0,0,.25))';
+  };
 
   const img = document.createElement('img');
   img.style.cssText = 'width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;';
@@ -351,36 +385,101 @@ function disableGlobeReadbackErrorMeasurement(map) {
 }
 
 // ---------------------------------------------------------------------------
-// Accessibility: prevent canvas from retaining focus inside Flutter platform views
+// Accessibility: prevent canvas & container from retaining focus inside Flutter platform views
 // ---------------------------------------------------------------------------
 function setupCanvasA11y(map, targetContainer) {
+  const container = targetContainer || (map && map.getContainer && map.getContainer());
   const canvas = map && map.getCanvas && map.getCanvas();
-  if (canvas) {
-    canvas.removeAttribute('tabindex');
+
+  function blockTabIndex(el) {
+    if (!el) return;
+    el.removeAttribute('tabindex');
     try {
-      Object.defineProperty(canvas, 'tabIndex', {
+      Object.defineProperty(el, 'tabIndex', {
         get: () => -1,
         set: () => { },
         configurable: true
       });
-    } catch (_) {
-      canvas.tabIndex = -1;
+    } catch (_) { }
+
+    if (!el._origSetAttr) {
+      el._origSetAttr = el.setAttribute.bind(el);
+      el.setAttribute = function (name, value) {
+        if (name && name.toLowerCase() === 'tabindex') {
+          return;
+        }
+        return el._origSetAttr(name, value);
+      };
     }
-    canvas.addEventListener('focus', () => {
-      try { canvas.blur(); } catch (_) { }
-      if (document.activeElement === canvas && document.body) {
-        document.body.focus();
-      }
-    }, true);
-    canvas.addEventListener('pointerdown', () => {
-      if (document.activeElement === canvas) {
-        try { canvas.blur(); } catch (_) { }
-      }
-    }, true);
+
+    if (!el._tabIndexObserver && window.MutationObserver) {
+      el._tabIndexObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.type === 'attributes' && m.attributeName === 'tabindex') {
+            if (el.hasAttribute('tabindex')) {
+              el.removeAttribute('tabindex');
+            }
+          }
+        }
+      });
+      el._tabIndexObserver.observe(el, { attributes: true, attributeFilter: ['tabindex'] });
+    }
   }
-  if (targetContainer) {
-    targetContainer.removeAttribute('tabindex');
-    targetContainer.tabIndex = -1;
+
+  if (canvas) {
+    blockTabIndex(canvas);
+
+    if (!canvas._a11yAttached) {
+      canvas._a11yAttached = true;
+      canvas.addEventListener('focus', () => {
+        try { canvas.blur(); } catch (_) { }
+        if (document.activeElement && (document.activeElement === canvas || (container && container.contains(document.activeElement)))) {
+          if (document.body && typeof document.body.focus === 'function') {
+            try { document.body.focus(); } catch (_) { }
+          }
+        }
+      }, true);
+
+      canvas.addEventListener('pointerdown', () => {
+        if (document.activeElement && (document.activeElement === canvas || (container && container.contains(document.activeElement)))) {
+          try { document.activeElement.blur(); } catch (_) { }
+        }
+      }, true);
+    }
+  }
+
+  if (container) {
+    blockTabIndex(container);
+
+    if (!container._a11yAttached) {
+      container._a11yAttached = true;
+      container.addEventListener('focus', (e) => {
+        try {
+          if (e.target && typeof e.target.blur === 'function') {
+            e.target.blur();
+          }
+        } catch (_) { }
+        try { container.blur(); } catch (_) { }
+        if (document.activeElement && (document.activeElement === container || container.contains(document.activeElement))) {
+          if (document.body && typeof document.body.focus === 'function') {
+            try { document.body.focus(); } catch (_) { }
+          }
+        }
+      }, true);
+
+      container.addEventListener('pointerdown', () => {
+        if (document.activeElement && (document.activeElement === container || container.contains(document.activeElement))) {
+          try { document.activeElement.blur(); } catch (_) { }
+        }
+      }, true);
+    }
+
+    if (document.activeElement && (document.activeElement === container || container.contains(document.activeElement))) {
+      try { document.activeElement.blur(); } catch (_) { }
+      if (document.body && typeof document.body.focus === 'function') {
+        try { document.body.focus(); } catch (_) { }
+      }
+    }
   }
 }
 
@@ -521,11 +620,10 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
     map.on('render', () => setupCanvasA11y(map, targetContainer));
 
     targetContainer.addEventListener('pointerdown', () => {
-      const canvas = map.getCanvas && map.getCanvas();
-      if (canvas && document.activeElement === canvas) {
-        try { canvas.blur(); } catch (_) { }
+      if (document.activeElement && (document.activeElement === targetContainer || targetContainer.contains(document.activeElement))) {
+        try { document.activeElement.blur(); } catch (_) { }
       }
-    });
+    }, true);
 
     map.on('styleimagemissing', (e) => {
       const id = e.id;
@@ -755,6 +853,17 @@ window.addEventListener('touchend', () => {
 window.flutterModalOpen = false;
 window.setModalOpenWeb = function (isOpen) {
   window.flutterModalOpen = !!isOpen;
+  if (isOpen) {
+    if (document.activeElement && document.activeElement.closest &&
+        document.activeElement.closest('.maplibregl-map, flt-platform-view')) {
+      try {
+        document.activeElement.blur();
+      } catch (_) { }
+      if (document.body && typeof document.body.focus === 'function') {
+        try { document.body.focus(); } catch (_) { }
+      }
+    }
+  }
   if (document.body) {
     document.body.classList.toggle('flutter-modal-open', window.flutterModalOpen);
   }
@@ -888,6 +997,18 @@ window.mapboxGlobeClearMarkersWeb = function (viewId) {
 // Add marker — immediate if map exists & style loaded, otherwise queues call
 // ---------------------------------------------------------------------------
 window.mapboxGlobeAddMarkerWeb = function (viewId, lng, lat, iconUrl, markerId, callbackName) {
+  window.mapboxGlobeLastBatch = window.mapboxGlobeLastBatch || {};
+  if (!window.mapboxGlobeLastBatch[viewId]) {
+    window.mapboxGlobeLastBatch[viewId] = { markersJsonStr: '[]', callbackName };
+  }
+  try {
+    let list = JSON.parse(window.mapboxGlobeLastBatch[viewId].markersJsonStr || '[]');
+    list = list.filter(item => item.id !== markerId);
+    list.push({ id: markerId, lat: lat, lng: lng, iconUrl: iconUrl });
+    window.mapboxGlobeLastBatch[viewId].markersJsonStr = JSON.stringify(list);
+    window.mapboxGlobeLastBatch[viewId].callbackName = callbackName || window.mapboxGlobeLastBatch[viewId].callbackName;
+  } catch (_) { }
+
   const map = window.mapboxGlobeInstances[viewId];
   if (map && !map._styleIsLoading) {
     _doAddMarker(map, viewId, lng, lat, iconUrl, markerId, callbackName);
@@ -1179,3 +1300,43 @@ window.mapboxGlobeClearGeoJsonLineLayers = function (viewId, layerIdsStr, source
   layerIds.forEach(id => { try { if (id && map.getLayer(id)) map.removeLayer(id); } catch (_) { } });
   sourceIds.forEach(id => { try { if (id && map.getSource(id)) map.removeSource(id); } catch (_) { } });
 };
+
+// ---------------------------------------------------------------------------
+// Global Accessibility Safeguards: Prevent map & platform view descendants from
+// retaining focus when parent platform view has aria-hidden="true"
+// ---------------------------------------------------------------------------
+window.addEventListener('focusin', (e) => {
+  const el = e.target;
+  if (el && (el.closest && (el.closest('flt-platform-view') || el.closest('.maplibregl-map') || el.classList?.contains('maplibregl-map')))) {
+    try {
+      el.blur();
+      if (document.body && (document.activeElement === el || el.closest('flt-platform-view')?.contains(document.activeElement))) {
+        document.body.focus();
+      }
+    } catch (_) { }
+  }
+}, true);
+
+if (typeof window !== 'undefined' && window.MutationObserver) {
+  const a11yObserver = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.type === 'attributes' && m.attributeName === 'aria-hidden') {
+        const target = m.target;
+        if (target && target.getAttribute('aria-hidden') === 'true') {
+          if (document.activeElement && (target.contains(document.activeElement) || target === document.activeElement)) {
+            try { document.activeElement.blur(); } catch (_) { }
+            if (document.body) { try { document.body.focus(); } catch (_) { } }
+          }
+        }
+      }
+    }
+  });
+  if (document.documentElement) {
+    a11yObserver.observe(document.documentElement, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['aria-hidden']
+    });
+  }
+}
+

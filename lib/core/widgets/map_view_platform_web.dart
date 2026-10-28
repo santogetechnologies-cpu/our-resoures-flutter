@@ -157,6 +157,11 @@ Widget buildPlatformMapWidget({
       ..style.bottom = '0'
       ..style.overflow = 'hidden'
       ..style.backgroundColor = '#0b0b19';
+    div.onFocus.listen((_) {
+      try {
+        div.blur();
+      } catch (_) {}
+    });
     _registeredWebDivs[domId] = div;
     return div;
   });
