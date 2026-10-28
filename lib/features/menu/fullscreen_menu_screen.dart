@@ -129,15 +129,19 @@ class FullscreenMenuScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
+        backgroundColor: const Color(0xFFF7F4EF),
         body: Stack(
           fit: StackFit.expand,
           children: [
-            // Background wallpaper
-            Image.asset(
-              AppAssets.wallpaper5,
-              fit: BoxFit.cover,
-              errorBuilder: (c, e, s) =>
-                  Container(color: const Color(0xFFF7F4EF)),
+            // Background wallpaper with reduced opacity
+            Opacity(
+              opacity: 0.5,
+              child: Image.asset(
+                AppAssets.wallpaper5,
+                fit: BoxFit.cover,
+                errorBuilder: (c, e, s) =>
+                    Container(color: const Color(0xFFF7F4EF)),
+              ),
             ),
 
             SafeArea(
