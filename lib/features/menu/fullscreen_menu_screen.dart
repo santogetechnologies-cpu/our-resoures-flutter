@@ -307,19 +307,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     // Row 1 (1 & 2)
                                     Row(
                                       children: [
-                                        // Right (1): الاستشعار عن بعد وال GIS
-                                        Expanded(
-                                          child: _buildCategoryButton(
-                                            context: context,
-                                            title: 'الاستشعار عن بعد وال GIS',
-                                            height: 64,
-                                            onTap: () =>
-                                                AboutDialogs.showRemoteSensing(
-                                                    context),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 24),
-                                        // Left (2): جيولوجية و جيومورفولوجية المملكة
+                                        // Right (1): جيولوجية و جيومورفولوجية المملكة
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -330,14 +318,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                 context, const GeologyScreen()),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-
-                                    // Row 2 (3 & 4)
-                                    Row(
-                                      children: [
-                                        // Right (3): الصخور والمعادن الإقتصادية
+                                        const SizedBox(width: 24),
+                                        // Left (2): الصخور والمعادن الإقتصادية
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -348,8 +330,14 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                 const MaterialsScreen()),
                                           ),
                                         ),
-                                        const SizedBox(width: 24),
-                                        // Left (4): البترول والغاز
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    // Row 2 (3 & 4)
+                                    Row(
+                                      children: [
+                                        // Right (3): البترول والغاز
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -359,14 +347,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                 context, const OilGasScreen()),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-
-                                    // Row 3 (5 & 6)
-                                    Row(
-                                      children: [
-                                        // Right (5): مصادر المياه
+                                        const SizedBox(width: 24),
+                                        // Left (4): مصادر المياه
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -376,8 +358,14 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                 const WaterFormationsScreen()),
                                           ),
                                         ),
-                                        const SizedBox(width: 24),
-                                        // Left (6): السياحة والآثار
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    // Row 3 (5 & 6)
+                                    Row(
+                                      children: [
+                                        // Right (5): السياحة والآثار
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -387,14 +375,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                 context, const TourismScreen()),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-
-                                    // Row 4 (7 & 8)
-                                    Row(
-                                      children: [
-                                        // Right (7): المحميات الطبيعية
+                                        const SizedBox(width: 24),
+                                        // Left (6): المحميات الطبيعية
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -404,8 +386,14 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                 .showNaturalReserves(context),
                                           ),
                                         ),
-                                        const SizedBox(width: 24),
-                                        // Left (8): استراتيجية المخاطر الطبيعية
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    // Row 4 (7 & 8)
+                                    Row(
+                                      children: [
+                                        // Right (7): استراتيجية المخاطر الطبيعية
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -417,14 +405,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                     context),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-
-                                    // Row 5 (9 & 10)
-                                    Row(
-                                      children: [
-                                        // Right (9): الموسوعات والكتب
+                                        const SizedBox(width: 24),
+                                        // Left (8): الموسوعات والكتب
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -434,8 +416,14 @@ class FullscreenMenuScreen extends StatelessWidget {
                                                 context, const BooksScreen()),
                                           ),
                                         ),
-                                        const SizedBox(width: 24),
-                                        // Left (10): قاعدة البيانات الزلزالية
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    // Row 5 (9 & 10)
+                                    Row(
+                                      children: [
+                                        // Right (9): قاعدة البيانات الزلزالية
                                         Expanded(
                                           child: _buildCategoryButton(
                                             context: context,
@@ -443,6 +431,18 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             height: 64,
                                             onTap: () => _navigate(context,
                                                 const EarthquakeScreen()),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 24),
+                                        // Left (10): الاستشعار عن بعد وال GIS
+                                        Expanded(
+                                          child: _buildCategoryButton(
+                                            context: context,
+                                            title: 'الاستشعار عن بعد وال GIS',
+                                            height: 64,
+                                            onTap: () =>
+                                                AboutDialogs.showRemoteSensing(
+                                                    context),
                                           ),
                                         ),
                                       ],
