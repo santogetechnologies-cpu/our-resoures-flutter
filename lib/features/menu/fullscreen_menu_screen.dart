@@ -169,7 +169,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 24, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: AppColors.categoryBtnBg,
+                                  color: const Color(0xFF723A2E),
                                   borderRadius: BorderRadius.circular(
                                       AppColors.borderRadius),
                                   border: Border.all(
@@ -177,7 +177,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       width: 1.5),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.14),
+                                      color: Colors.black.withOpacity(0.18),
                                       blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
@@ -206,7 +206,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             fontFamily: 'NotoKufi',
                                             fontSize: 52,
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.textBlack,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
@@ -218,6 +218,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       width: 110,
                                       height: 66,
                                       fit: BoxFit.contain,
+                                      color: Colors.white,
                                       errorBuilder: (c, e, s) =>
                                           const SizedBox(width: 110),
                                     ),
