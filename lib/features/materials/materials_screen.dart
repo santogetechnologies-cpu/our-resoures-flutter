@@ -6,8 +6,8 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
-import '../../core/dialogs/app_brief_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
+import '../../core/dialogs/pdf_viewer_dialog.dart';
 
 class MaterialLocation {
   final double latitude;
@@ -347,6 +347,52 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
   };
 
   // Button labels matching exact Arabic strings in activity_materials.xml
+  // ----------------------------------------------------
+  // Mining Summary PDF Sections (From تلخيص التعدين نهائي.pdf)
+  // ----------------------------------------------------
+  final List<Map<String, String>> _miningPdfSections = const [
+    {
+      'title': 'مقدمة',
+      'asset': 'assets/books/geology/mining/01_intro.pdf',
+    },
+    {
+      'title': 'أهداف الإستكشاف التعديني',
+      'asset': 'assets/books/geology/mining/02_goals.pdf',
+    },
+    {
+      'title': 'أهمية الإستثمار في قطاع التعدين',
+      'asset': 'assets/books/geology/mining/03_importance.pdf',
+    },
+    {
+      'title': 'آلية الإستثمار في قطاع التعدين',
+      'asset': 'assets/books/geology/mining/04_mechanism.pdf',
+    },
+    {
+      'title': 'التعدين في المملكة',
+      'asset': 'assets/books/geology/mining/05_mining_ksa.pdf',
+    },
+    {
+      'title': 'المعادن والصخور الإقتصادية',
+      'asset': 'assets/books/geology/mining/06_minerals_rocks.pdf',
+    },
+    {
+      'title': 'الأحجار الكريمة في المملكة',
+      'asset': 'assets/books/geology/mining/07_gemstones.pdf',
+    },
+    {
+      'title': 'اللائحة المنظمة لتراخيص التعدين',
+      'asset': 'assets/books/geology/mining/08_regulations.pdf',
+    },
+    {
+      'title': 'قطاع التعدين: التحديات والحلول',
+      'asset': 'assets/books/geology/mining/09_challenges_solutions.pdf',
+    },
+    {
+      'title': 'خارطة الطريق',
+      'asset': 'assets/books/geology/mining/10_roadmap.pdf',
+    },
+  ];
+
   final Map<String, String> _metalButtonLabels = const {
     'Copper': 'النحاس',
     'Feldspar': 'الفلدسبار',
@@ -538,83 +584,156 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     }
   }
 
-  void _showIntroBrief() {
-    AppBriefDialog.show(
-      context,
-      title: 'المعادن الإقتصادية',
-      description: ' المعدن Mineral مادة صلبة متجانسة وغير عضوية تكونت بفعل عوامل طبيعية لها تركيب كيميائي محدد ( وغير ثابت ) وترتيب ذري داخلي محدد .تعتبر الذرة هي أصغر جزء من المادة وتحتفظ بخواصها الطبيعية ، تتجمع الذرات مع بعضها لتكون العنصر وتتجمع العناصر مع بعضها لتكون المعادن وتتجمع المعادن مع بعضها لتكون الصخر ، فإذا احتوى المعدن على عناصر ذات قيمة اقتصادية فيسمى معدن خام أو معدن اقتصادي ...\n'
-          'وإذا احتوى الصخر على معدن خام يسمى راسب معدني.\n'
-          ' المعدن الخام Ore Mineral هو المعدن الذي يمكن استخلاص فلز أو أكثر منه بصورة اقتصادية . إما أن يكون على هيئة فلز حر مثل الذهب والبلاتين أو على هيئة الفلز متحد مع عنصر أو عناصر أخرى مكوناً مركبات كيميائية متعددة ( أكاسيد ، كبريتيدات ). \n'
-          'المعادن تنقسم إلى معادن فلزية و معادن لافلزية أو مواد أرضية مثل الفحم, والصلصال, والبترول.\n'
-          'المعادن الفلزية\n'
-          'مثل الذهب والنحاس والحديد والنيكل فهي ذات ألوان طبيعية ثابتة, كما أن لها بريقاً معدنياً, ولها شكل خاص , فهي إما كلوية الشكل مثل بعض معادن الحديد, أو شجرية مثل معادن المنجنيز. وتتميز المعادن الفلزية أيضاً بأنها ذات صفات خاصة من حيث الصلادة, فالمعدن الصلد يمكن أن يخدش ما هو أقل منه صلادة.\n'
-          '•\tالمعادن الفلزية النقية : - الذهب . - الفضة .  النحاس . - القصدير- خام التن . \n'
-          '•\tمعادن فلزية غير نقية : - الألمنيوم-البوكسايت - الأنتيمون -الإستبنايت - الكروم-الكرومايت - الكوبالت - النيوبيوم-كولومبايت - التنتالوم-تنتالايت - معادن خامات الحديد - الرصاص-الجالينا - الليثيوم-مركبات الليثيوم - المنجنيز-البيرولوزايت - الموليبدنيوم– الموليبدنايت - النيكل- النيكولايت - معادن مجموعة البلاتيِن - العناصر الأرضية النادرة - التيتانيوم-الإلمينايت - التنجستن-الولفرامايت - الفاناديوم-الفانادينايت - الزنك-السفاليرايت . \n'
-          '\n\n'
-          'المعادن اللافلزية\n'
-          'فتختلف عن الفلزات في أنها تستخدم وهي على صورتها التي تستخرج بها من الطبيعة, فالصلصال مثلا يستخدمه الإنسان لخواصه الطبيعية وليس لاحتوائه على الألومنيوم, كما أن الأسبستوس ) الصخر الحريري ( يستخدمه الإنسان لبريقه الحريري ,و لشكله الليفي, ولا للحصول على الماغنسيوم الداخل في تكوينه.  فالمعادن اللافلزية تستخدم في الحقيقة لما لها من خصائص ومميزات طبيعية وليس لخصائصها الكيمائية.\n'
-          '•\tالمعادن غير الفلزية : السيليكا-الكوارتز - الفلسبار - الفلور-الفلورايت - الباريوم-البارايت - البيريليوم-البريل - الهالايت - الجبس - الكبريت - الكالسيوم -الحجر الجيري - الفوسفور-الفوسفات - الميكا (حجر البلق) - معادن الطين - الأسبستوس - الفحم - اليورانيوم\n'
-          '\n'
-          'تنتشر الثروات المعدنية في المملكة في أكثر من 5,300 موقع، وتقدر قيمتها بنحو خمسة تريليونات ريال، وثمة نحو 360 مجمعً تعديني تنتج العديد من المعادن والمنتجات المعدنية التي لها دور مهم في تطوير سلاسل القيمة للمعادن الفلزية واللافلزية؛ إذ يبلغ إنتاج المملكة من البوكسايت (الخام الطبيعي الذي يصنع منه معظم معدن الألومنيوم) حوالي 4.9 ملايين طن سنويًا، يتم معالجته لإنتاج حوالي مليون طن من الألمنيوم سنويًا، كما يتم إنتاج حوالي 409 آلاف أوقية من الذهب بمنطقة الدرع العربي الغنية بالمعادن النفيسة والمعادن الأساس، ونحو 68 ألف طن سنويًا من مركَّزات النحاس والزنك، و24.6 مليون طن من خام الفوسفات سنويًا، حيث تتم معالجته لإنتاج نحو 5.26 ملايين طن من الأسمدة الفوسفاتية.\n'
-          'تم اكتشاف العديد من المعادن في المملكة، تم تقسيمها إلى: معادن فلزية: كالذهب والنحاس والفضة والحديد والكروم والألومنيوم. معادن مشعة: اليورانيوم والثوريوم. معادن لا فلزية: كالفحم، الكبريت، الفوسفات. معادن صناعية: كالماغنسيوم والفلورايت والأسبستوس والمايكا. أحجار الزينة والبناء: كالجرانيت والرخام والطين الرمل الزجاجي.\n'
-          'تستهدف المملكة -ضمن رؤية 2030م- رفع الناتج المحلي من قطاع التعدين من 17 مليار دولار إلى 64 مليار دولار بحلول 2030م، ورفع نسبة مشاركة قطاع التعدين في الناتج المحلي الوطني لتتجاوز %5، بزيادة أعمال الكشف عن المعادن، وزيادة قيمة الاستثمارات التعدينية من نحو 3.9 مليار ريال خلال 2020م، إلى 115 مليار ريال في 2025م، بفتح المجال أمام المستثمرين المحليين والأجانب في مجال التنقيب عن المعادن.\n',
-    );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return MapShell(
-      title: 'المعادن الإقتصادية',
-      onBriefPressed: _showIntroBrief,
-      briefButtonText: 'مقدمة',
-      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
-      isLoading: _isLoading,
-      onMapCreated: (controller) => _mapController = controller,
-      sidebarContent: Column(
-        children: _metalButtonLabels.entries.map((entry) {
-          final key = entry.key;
-          final arabicLabel = entry.value;
 
-          return Container(
-            width: double.infinity,
-            height: 70,
-            margin: const EdgeInsets.only(left: 21, right: 21, top: 16),
-            decoration: BoxDecoration(
-              color: AppColors.mainMenuBtnBg,
-              borderRadius: BorderRadius.circular(AppColors.borderRadius),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.8),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(AppColors.borderRadius),
-                onTap: () => _onMetalSelected(key),
-                child: Center(
-                  child: Text(
-                    arabicLabel,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: 'NotoKufi',
-                      fontSize: 25,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textBlack,
-                    ),
+  Widget _buildMiningPdfButton(String title, String assetPath) {
+    return Container(
+      width: double.infinity,
+      height: 70,
+      margin: const EdgeInsets.only(left: 21, right: 21, top: 14),
+      decoration: BoxDecoration(
+        color: AppColors.mainMenuBtnBg,
+        borderRadius: BorderRadius.circular(AppColors.borderRadius),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.85),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          onTap: () {
+            PdfViewerDialog.show(
+              context,
+              title: title,
+              assetPath: assetPath,
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'NotoKufi',
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textBlack,
                   ),
                 ),
               ),
             ),
-          );
-        }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionDivider(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 21, right: 21, top: 24, bottom: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 1.5,
+              color: AppColors.solidBrown.withOpacity(0.35),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'NotoKufi',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.solidBrown,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              height: 1.5,
+              color: AppColors.solidBrown.withOpacity(0.35),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetalLayerButton(String key, String arabicLabel) {
+    return Container(
+      width: double.infinity,
+      height: 70,
+      margin: const EdgeInsets.only(left: 21, right: 21, top: 14),
+      decoration: BoxDecoration(
+        color: AppColors.mainMenuBtnBg,
+        borderRadius: BorderRadius.circular(AppColors.borderRadius),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.8),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppColors.borderRadius),
+          onTap: () => _onMetalSelected(key),
+          child: Center(
+            child: Text(
+              arabicLabel,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'NotoKufi',
+                fontSize: 25,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBlack,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    return MapShell(
+      title: 'المعادن والثروات التعدينية',
+      onBriefPressed: null,
+      initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
+      isLoading: _isLoading,
+      onMapCreated: (controller) => _mapController = controller,
+      sidebarContent: Column(
+        children: [
+          // 1. Top 10 Mining PDF Section Buttons
+          ..._miningPdfSections.map((sec) => _buildMiningPdfButton(sec['title']!, sec['asset']!)),
+
+          // 2. Visual Section Divider
+          _buildSectionDivider('المعادن والصخور في الخريطة'),
+
+          // 3. All Map Layer Buttons moved down below
+          ..._metalButtonLabels.entries.map((entry) => _buildMetalLayerButton(entry.key, entry.value)),
+        ],
       ),
     );
   }
