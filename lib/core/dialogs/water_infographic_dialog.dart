@@ -39,10 +39,6 @@ class WaterInfographicDialog extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFFAF6EE),
             borderRadius: BorderRadius.circular(AppColors.borderRadius),
-            image: const DecorationImage(
-              image: AssetImage(AppAssets.infoback),
-              fit: BoxFit.cover,
-            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.40),
@@ -265,67 +261,7 @@ class WaterInfographicDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         child: Image.asset(AppAssets.formation2, fit: BoxFit.contain),
                       ),
-                      const SizedBox(height: 24),
 
-                      const Center(
-                        child: Text(
-                          'مشاكل المياه',
-                          style: TextStyle(
-                            fontFamily: 'NotoKufi',
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.solidBrown,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'تتمثل مشاكل المياه في المملكة في الندرة النسبية والتلوث ونقل البطحاء والرمال من بطون الأودية، وحفر الآبار العشوائية، واستعمال أساليب الري غير المناسبة، إضافة إلى زيادة الطلب على المياه نتيجة التوسع في الاستخدام الزراعي والصناعي ، مما أدى إلى خلل واضح بين الطلب على المياه والكميات المتاحة من المياه السطحية والجوفية ومياه التحلية ومياه الصرف الصحي المعالجة، الأمر الذي أدى زيادة السحب من المخزون المائي الاستراتيجي، ويعزى السبب في ذلك إلى أن القطاع الزراعي هو أكبر القطاعات استهلاكاً للمياه الجوفية.',
-                        style: TextStyle(
-                          fontFamily: 'NotoKufi',
-                          fontSize: 17,
-                          height: 1.8,
-                          color: AppColors.textDark,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      const Center(
-                        child: Text(
-                          'لوحات ومخططات مشاكل المياه',
-                          style: TextStyle(
-                            fontFamily: 'NotoKufi',
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.solidBrown,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      for (int i = 1; i <= 10; i++) ...[
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.asset(
-                              AppAssets.waterProblem(i),
-                              fit: BoxFit.contain,
-                              errorBuilder: (ctx, err, stack) => const SizedBox.shrink(),
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),

@@ -9,6 +9,7 @@ import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/map_view_platform.dart';
 import '../../core/dialogs/water_infographic_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
+import '../../core/dialogs/pdf_viewer_dialog.dart';
 
 class DamLocation {
   final String name;
@@ -621,12 +622,39 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
     }
   }
 
+
+  // ----------------------------------------------------
+  // Water Summary PDF Sections (From -water-تلخيص المياه نهائي.pdf)
+  // ----------------------------------------------------
+  final List<Map<String, String>> _waterPdfSections = const [
+    {
+      'title': 'المياه السطحية',
+      'asset': 'assets/books/water/01_surface_water.pdf',
+    },
+    {
+      'title': 'المياه المجددة',
+      'asset': 'assets/books/water/02_recycled_water.pdf',
+    },
+    {
+      'title': 'مياه البحر المحلاة',
+      'asset': 'assets/books/water/03_desalinated_water.pdf',
+    },
+    {
+      'title': 'المياه الجوفية',
+      'asset': 'assets/books/water/04_ground_water.pdf',
+    },
+    {
+      'title': 'تحديات ومشاكل المياه في المملكة',
+      'asset': 'assets/books/water/05_water_challenges.pdf',
+    },
+  ];
+
+
   @override
   Widget build(BuildContext context) {
     return MapShell(
-      title: 'مصادر المياه',
-      onBriefPressed: _onBriefPressed,
-      briefButtonText: 'مقدمة ',
+      title: 'الموارد المائية والأودية والسدود',
+      onBriefPressed: null,
       initialStyleAsset: 'assets/maps/water_formation/allformations.json',
       isLoading: _isLoading,
       onMapCreated: (controller) {
@@ -637,6 +665,28 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
       },
       sidebarContent: Column(
         children: [
+          // 1. Top 5 Water PDF Section Buttons
+          ..._waterPdfSections.map((sec) => CustomButton(
+                text: sec['title']!,
+                styleType: ButtonStyleType.mainMenu,
+                onPressed: () {
+                  PdfViewerDialog.show(
+                    context,
+                    title: sec['title']!,
+                    assetPath: sec['asset']!,
+                  );
+                },
+              )),
+
+
+          // 3. Existing Buttons Moved Down
+          // زر مقدمة
+          CustomButton(
+            text: 'مقدمة',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: _onBriefPressed,
+          ),
+
           // Button 1: الأودية الرئيسية
           CustomButton(
             text: 'الأودية الرئيسية',
