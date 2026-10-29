@@ -7,9 +7,8 @@ import '../../core/constants/app_assets.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/map_view_platform.dart';
+import '../../core/dialogs/water_infographic_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
-import '../../core/dialogs/pdf_viewer_dialog.dart';
-import '../../core/theme/app_theme.dart';
 
 class DamLocation {
   final String name;
@@ -606,91 +605,28 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
     }
   }
 
-
-
-  // ----------------------------------------------------
-  // Water Summary PDF Sections (From -water-تلخيص المياه نهائي.pdf)
-  // ----------------------------------------------------
-  final List<Map<String, String>> _waterPdfSections = const [
-    {
-      'title': 'مقدمة',
-      'asset': 'assets/books/water/01_water_intro.pdf',
-    },
-    {
-      'title': 'المياه السطحية',
-      'asset': 'assets/books/water/02_surface_water.pdf',
-    },
-    {
-      'title': 'المياه المجددة',
-      'asset': 'assets/books/water/03_recycled_water.pdf',
-    },
-    {
-      'title': 'مياه البحر المحلاة',
-      'asset': 'assets/books/water/04_desalinated_water.pdf',
-    },
-    {
-      'title': 'المياه الجوفية',
-      'asset': 'assets/books/water/05_ground_water.pdf',
-    },
-    {
-      'title': 'تحديات ومشاكل المياه في المملكة',
-      'asset': 'assets/books/water/06_water_challenges.pdf',
-    },
-  ];
-
-  Widget _buildWaterPdfButton(String title, String assetPath) {
-    return CustomButton(
-      text: title,
-      styleType: ButtonStyleType.mainMenu,
-      onPressed: () {
-        PdfViewerDialog.show(
-          context,
-          title: title,
-          assetPath: assetPath,
-        );
-      },
-    );
-  }
-
-  Widget _buildSectionDivider(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 21, right: 21, top: 24, bottom: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 1.5,
-              color: AppColors.solidBrown.withOpacity(0.35),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontFamily: 'NotoKufi',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.solidBrown,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: 1.5,
-              color: AppColors.solidBrown.withOpacity(0.35),
-            ),
-          ),
-        ],
-      ),
-    );
+  Future<void> _onBriefPressed() async {
+    setState(() {
+      _valleysExpanded = false;
+      _damsExpanded = false;
+      _mainFormationsExpanded = false;
+      _subFormationsExpanded = false;
+    });
+    await _clearValleyLines();
+    await _mapController?.setStyleFromAsset('assets/maps/water_formation/allformations.json');
+    _mapController?.flyTo(latitude: 24.694291, longitude: 47.189224, zoom: 4.3);
+    await _showInitialDams();
+    if (mounted) {
+      WaterInfographicDialog.show(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MapShell(
-      title: 'الموارد المائية والأودية والسدود',
-      onBriefPressed: null,
+      title: 'مصادر المياه',
+      onBriefPressed: _onBriefPressed,
+      briefButtonText: 'مقدمة ',
       initialStyleAsset: 'assets/maps/water_formation/allformations.json',
       isLoading: _isLoading,
       onMapCreated: (controller) {
@@ -701,13 +637,6 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
       },
       sidebarContent: Column(
         children: [
-          // 1. Top 6 Water PDF Section Buttons
-          ..._waterPdfSections.map((sec) => _buildWaterPdfButton(sec['title']!, sec['asset']!)),
-
-          // 2. Visual Section Divider
-          _buildSectionDivider('الخرائط والطبقات المائية'),
-
-          // 3. Map Layer Buttons moved down below
           // Button 1: الأودية الرئيسية
           CustomButton(
             text: 'الأودية الرئيسية',
