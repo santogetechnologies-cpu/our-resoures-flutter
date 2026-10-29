@@ -709,9 +709,53 @@ class AboutDialogs {
     );
   }
 
-  static void showNaturalResources(BuildContext context) {
+  static void showNaturalResources(BuildContext context) => showMineralLocations(context);
+
+  static Widget _buildStatBadge(String number, String label, Color accentColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: accentColor.withOpacity(0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            number,
+            style: TextStyle(
+              fontFamily: 'NotoKufi',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: accentColor,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'NotoKufi',
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void showMineralLocations(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final dialogWidth = size.width * 0.75;
+    final dialogWidth = size.width > 900 ? 820.0 : size.width * 0.88;
 
     _showStyledDialog(
       context,
@@ -735,23 +779,43 @@ class AboutDialogs {
                   offset: const Offset(0, 6),
                 ),
               ],
-              border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+              border: Border.all(
+                color: AppColors.borderBrown.withOpacity(0.5),
+                width: 1,
+              ),
             ),
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
+                // Header with Title, Subtitle, and Close button
                 Row(
                   children: [
                     const Expanded(
-                      child: Text(
-                        'المصادر والثروات الطبيعية',
-                        style: TextStyle(
-                          fontFamily: 'NotoKufi',
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.solidBrown,
-                        ),
-                        textAlign: TextAlign.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'مواقع الصخور والمعادن الاقتصادية',
+                            style: TextStyle(
+                              fontFamily: 'NotoKufi',
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.solidBrown,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'ثرواتنا من أرضنا',
+                            style: TextStyle(
+                              fontFamily: 'NotoKufi',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF8B221E),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
@@ -761,7 +825,11 @@ class AboutDialogs {
                           color: Colors.grey.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.close, size: 22, color: AppColors.textDark),
+                        child: const Icon(
+                          Icons.close,
+                          size: 22,
+                          color: AppColors.textDark,
+                        ),
                       ),
                       onPressed: () => Navigator.of(ctx).pop(),
                     ),
@@ -769,32 +837,266 @@ class AboutDialogs {
                 ),
                 const Divider(color: AppColors.borderBrown, thickness: 1.5),
                 const SizedBox(height: 10),
-                const Expanded(
+
+                // Scrollable Body
+                Expanded(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          'تكامل الثروات والمصادر الطبيعية في المملكة:\n\n'
-                          '• الطاقة المتجددة (الطاقة الشمسية وطاقة الرياح والطاقة الحرارية الأرضية).\n'
-                          '• الموارد التعدينية والفلزية والصناعية الواعدة في الدرع العربي والغطاء الرسوبي.\n'
-                          '• الثروات المائية والأحواض الجوفية الاستراتيجية.\n'
-                          '• الموارد النفطية والغاز الطبيعي التقليدي وغير التقليدي.\n'
-                          '• المعالم السياحية والبيئية والمحميات الطبيعية المستدامة.',
-                          textAlign: TextAlign.right,
+                        // Quick Metric Badges
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 10,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            _buildStatBadge('+5,300', 'موقع ومكمن ومؤشر معدني', const Color(0xFF8B221E)),
+                            _buildStatBadge('42', 'معدنًا وصخرًا اقتصاديًا', const Color(0xFF7F4D2C)),
+                            _buildStatBadge('800', 'موقع للنحاس', const Color(0xFFB87333)),
+                            _buildStatBadge('700', 'موقع للذهب', const Color(0xFFD4AF37)),
+                            _buildStatBadge('400', 'موقع للزنك', const Color(0xFF5A7282)),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Introduction Paragraphs
+                        const Text(
+                          'تتميز المملكة بتنوع جيولوجي ومعدني كبير، وتنتشر مواقع ومكامن ومؤشرات الثروات المعدنية في مناطق واسعة من المملكة. وقد جرى في المنصة التفاعلية لعلوم الأرض والطبيعة تجميع وتصنيف وتمثيل أكثر من 5,300 موقع للثروات المعدنية والصخور الاقتصادية، وربطها بقاعدة بيانات مكانية وعرضها على الخرائط التفاعلية للمنصة.',
+                          textAlign: TextAlign.justify,
                           style: TextStyle(
                             fontFamily: 'NotoKufi',
-                            fontSize: 18,
-                            height: 1.9,
+                            fontSize: 16,
+                            height: 1.85,
                             color: AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        const Text(
+                          'وتضم قاعدة البيانات 42 معدنًا وصخرًا اقتصاديًا تم اختيارها وتصنيفها بعناية وفق أهميتها الجيولوجية والاقتصادية وتوافر المعلومات المكانية عنها. وتشمل المعادن الفلزية وغير الفلزية والصخور والخامات الصناعية ذات الأهمية الاقتصادية.',
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 16,
+                            height: 1.85,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        const Text(
+                          'وتوضح كثافة البيانات حجم التنوع المعدني في المملكة؛ فعلى سبيل المثال، تتضمن قاعدة البيانات نحو 800 موقع ومكمن ومؤشر للنحاس، ونحو 700 للذهب، ونحو 400 للزنك، إلى جانب آلاف المواقع المرتبطة بالمعادن والصخور الاقتصادية الأخرى.',
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 16,
+                            height: 1.85,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Feasibility Callout
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF8E7),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFECC880)),
+                          ),
+                          child: const Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.info_outline_rounded,
+                                color: Color(0xFF8B221E),
+                                size: 22,
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'ولا تعني الإشارة إلى هذه المواقع بالضرورة أن جميعها احتياطيات معدنية مؤكدة أو مناجم قابلة للاستثمار اقتصاديًا؛ إذ تختلف المواقع في طبيعتها ودرجة دراستها بين مكامن وظهورات ومؤشرات معدنية ومواقع استكشافية ومناجم أو خامات موثقة. كما أن تحديد الجدوى الاقتصادية لأي موقع يتطلب دراسات جيولوجية واستكشافية وفنية واقتصادية مستقلة.',
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(
+                                    fontFamily: 'NotoKufi',
+                                    fontSize: 15,
+                                    height: 1.8,
+                                    color: AppColors.textDark,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+
+                        // Section 1: سياسة عرض الإحداثيات والبيانات المكانية
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.borderBrown.withOpacity(0.35),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.policy_outlined,
+                                    color: AppColors.solidBrown,
+                                    size: 24,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'سياسة عرض الإحداثيات والبيانات المكانية',
+                                    style: TextStyle(
+                                      fontFamily: 'NotoKufi',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.solidBrown,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'حرصًا على الاستخدام المسؤول للمعلومات الجيولوجية والمكانية، واحترام مصادر البيانات وحقوق الجهات والأطراف ذات العلاقة، وعدم استخدام المعلومات خارج سياقها العلمي أو الاستثماري الصحيح، تعرض المنصة التوزيع الجغرافي والمعلومات العامة للصخور والمعادن الاقتصادية، بينما لا تُتاح الإحداثيات التفصيلية لبعض المواقع المعدنية بصورة مباشرة ومفتوحة للجميع. ويرجع ذلك إلى أن قاعدة البيانات جُمعت وطُورت بالاستفادة من مصادر وبيانات متعددة، وبعض المعلومات المكانية قد تكون مرتبطة بجهات أخرى أو خاضعة لشروط استخدام أو مشاركة، كما أن بعض المواقع تحتاج إلى التحقق من دقتها وتصنيفها قبل استخدامها لأغراض بحثية أو استثمارية. ويهدف هذا الإجراء إلى تحقيق التوازن بين إتاحة المعرفة الجيولوجية للجمهور والباحثين والمستثمرين من جهة، والمحافظة على سلامة استخدام البيانات واحترام الحقوق والضوابط المرتبطة بمصادرها من جهة أخرى.',
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(
+                                  fontFamily: 'NotoKufi',
+                                  fontSize: 15,
+                                  height: 1.8,
+                                  color: AppColors.textDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Section 2: للباحثين والمستثمرين
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.borderBrown.withOpacity(0.35),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: const [
+                                  Icon(
+                                    Icons.business_center_outlined,
+                                    color: AppColors.solidBrown,
+                                    size: 24,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'للباحثين والمستثمرين',
+                                    style: TextStyle(
+                                      fontFamily: 'NotoKufi',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.solidBrown,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'ترحب المنصة التفاعلية للأرض والطبيعة بطلبات الباحثين والجهات العلمية والمستثمرين الراغبين في الحصول على معلومات أكثر تفصيلًا عن معدن أو صخر اقتصادي أو نطاق جغرافي محدد. وتتم دراسة الطلبات كلٌ بحسب غرضه ونطاقه وطبيعة البيانات المطلوبة ومصدرها ومدى إمكانية مشاركتها، ويمكن توفير المعلومات المتاحة والمسموح بمشاركتها بما يخدم البحث العلمي والاستكشاف والاستثمار، دون أن يشكل ذلك ضمانًا لوجود احتياطي اقتصادي أو توصية استثمارية أو بديلًا عن الدراسات الفنية والقانونية والاقتصادية اللازمة.',
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(
+                                  fontFamily: 'NotoKufi',
+                                  fontSize: 15,
+                                  height: 1.8,
+                                  color: AppColors.textDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+
+                        // Section 3: Contact Email Card
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryBrown.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.solidBrown.withOpacity(0.4),
+                            ),
+                          ),
+                          child: Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 12,
+                            runSpacing: 8,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(
+                                    Icons.mail_outline_rounded,
+                                    color: AppColors.solidBrown,
+                                    size: 22,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'للتواصل والاستفسارات المتعلقة بالبيانات المعدنية:',
+                                    style: TextStyle(
+                                      fontFamily: 'NotoKufi',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.solidBrown,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: AppColors.solidBrown.withOpacity(0.5),
+                                    ),
+                                  ),
+                                  child: const SelectableText(
+                                    'alamri.geo@gmail.com',
+                                    style: TextStyle(
+                                      fontFamily: 'NotoKufi',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF8B221E),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+
+                const SizedBox(height: 14),
                 ElevatedButton(
                   onPressed: () => Navigator.of(ctx).pop(),
                   style: ElevatedButton.styleFrom(
@@ -803,11 +1105,18 @@ class AboutDialogs {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 12,
+                    ),
                   ),
                   child: const Text(
                     'إغلاق',
-                    style: TextStyle(fontFamily: 'NotoKufi', fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontFamily: 'NotoKufi',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],

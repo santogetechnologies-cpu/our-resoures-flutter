@@ -242,27 +242,56 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 ),
                               ),
 
-                              // Non-clickable Subtitle: "ثرواتنا من أرضنا" (styled text below main header bar)
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 2),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    'ثرواتنا من أرضنا',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontFamily: 'NotoKufi',
-                                      fontSize: 34,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(
-                                          0xFF8B221E), // Rich red text matching screenshot
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.white,
-                                          offset: Offset(0, 1),
-                                          blurRadius: 4,
+                              // Clickable Button: "ثرواتنا من أرضنا" (opens مواقع المعادن dialog)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: Center(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.categoryBtnBg,
+                                      borderRadius:
+                                          BorderRadius.circular(AppColors.borderRadius),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.95),
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.12),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 3),
                                         ),
                                       ],
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius:
+                                            BorderRadius.circular(AppColors.borderRadius),
+                                        onTap: () =>
+                                            AboutDialogs.showMineralLocations(context),
+                                        child: const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 28, vertical: 6),
+                                          child: Text(
+                                            'ثرواتنا من أرضنا',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontFamily: 'NotoKufi',
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF8B221E),
+                                              shadows: [
+                                                Shadow(
+                                                  color: Colors.white,
+                                                  offset: Offset(0, 1),
+                                                  blurRadius: 4,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
