@@ -640,39 +640,6 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     );
   }
 
-  Widget _buildSectionDivider(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 21, right: 21, top: 24, bottom: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 1.5,
-              color: AppColors.solidBrown.withOpacity(0.35),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontFamily: 'NotoKufi',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.solidBrown,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: 1.5,
-              color: AppColors.solidBrown.withOpacity(0.35),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildMetalLayerButton(String key, String arabicLabel) {
     return Container(
@@ -728,8 +695,6 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
           // 1. Top 10 Mining PDF Section Buttons
           ..._miningPdfSections.map((sec) => _buildMiningPdfButton(sec['title']!, sec['asset']!)),
 
-          // 2. Visual Section Divider
-          _buildSectionDivider('المعادن والصخور في الخريطة'),
 
           // 3. All Map Layer Buttons moved down below
           ..._metalButtonLabels.entries.map((entry) => _buildMetalLayerButton(entry.key, entry.value)),

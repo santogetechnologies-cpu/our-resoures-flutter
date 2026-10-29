@@ -8,6 +8,7 @@ import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/dialogs/app_brief_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
+import '../../core/dialogs/pdf_viewer_dialog.dart';
 
 class FieldLocation {
   final double latitude;
@@ -370,12 +371,71 @@ class _OilGasScreenState extends State<OilGasScreen> {
     );
   }
 
+
+  // ----------------------------------------------------
+  // Energy Summary PDF Sections (From -oil-gas-تلخيص الطاقة ok.pdf)
+  // ----------------------------------------------------
+  final List<Map<String, String>> _energyPdfSections = const [
+    {
+      'title': 'مصادر الطاقة',
+      'asset': 'assets/books/energy/01_energy_sources.pdf',
+    },
+    {
+      'title': 'التحديات التي تواجه قطاع الطاقة',
+      'asset': 'assets/books/energy/02_energy_challenges.pdf',
+    },
+    {
+      'title': 'الطاقة الشمسية',
+      'asset': 'assets/books/energy/03_solar_energy.pdf',
+    },
+    {
+      'title': 'طاقة الرياح',
+      'asset': 'assets/books/energy/04_wind_energy.pdf',
+    },
+    {
+      'title': 'الطاقة الحرارية الأرضية',
+      'asset': 'assets/books/energy/05_geothermal_energy.pdf',
+    },
+    {
+      'title': 'طاقة الهيدروجين الأخضر',
+      'asset': 'assets/books/energy/06_green_hydrogen.pdf',
+    },
+    {
+      'title': 'الطاقة الحيوية',
+      'asset': 'assets/books/energy/07_bioenergy.pdf',
+    },
+    {
+      'title': 'طاقة البحار',
+      'asset': 'assets/books/energy/08_ocean_energy.pdf',
+    },
+    {
+      'title': 'الطاقة الغير متجددة (الأحفورية)',
+      'asset': 'assets/books/energy/09_nonrenewable_energy.pdf',
+    },
+    {
+      'title': 'موارد الطاقة الغير متجددة',
+      'asset': 'assets/books/energy/10_nonrenewable_resources.pdf',
+    },
+    {
+      'title': 'النظام النفطي',
+      'asset': 'assets/books/energy/11_petroleum_system.pdf',
+    },
+    {
+      'title': 'سلاسل القيم في صناعة النفط',
+      'asset': 'assets/books/energy/12_oil_value_chain.pdf',
+    },
+    {
+      'title': 'سلاسل التوريد في النفط والغاز',
+      'asset': 'assets/books/energy/13_oil_gas_supply_chain.pdf',
+    },
+  ];
+
+
   @override
   Widget build(BuildContext context) {
     return MapShell(
-      title: 'حقول البترول والغاز',
-      onBriefPressed: _showIntroBrief,
-      briefButtonText: 'مقدمة',
+      title: 'الطاقة المتجددة وتطبيقاتها',
+      onBriefPressed: null,
       initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       onMapCreated: (c) {
         _mapController = c;
@@ -383,6 +443,48 @@ class _OilGasScreenState extends State<OilGasScreen> {
       },
       sidebarContent: Column(
         children: [
+          // 1. Top 13 Energy PDF Section Buttons
+          ..._energyPdfSections.map((sec) => CustomButton(
+                text: sec['title']!,
+                styleType: ButtonStyleType.mainMenu,
+                onPressed: () {
+                  PdfViewerDialog.show(
+                    context,
+                    title: sec['title']!,
+                    assetPath: sec['asset']!,
+                  );
+                },
+              )),
+
+          // 2. زر مواقع حقول النفط والغاز
+          CustomButton(
+            text: 'مواقع حقول النفط والغاز',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: () {
+              setState(() {
+                _oilExpanded = true;
+                _gasExpanded = true;
+              });
+              _mapController?.flyTo(
+                latitude: 24.694291,
+                longitude: 47.189224,
+                zoom: 4.8,
+              );
+              if (_mapController != null) {
+                _loadMarkers(_mapController!);
+              }
+            },
+          ),
+
+
+          // 4. Existing Buttons Moved Down
+          // زر مقدمة
+          CustomButton(
+            text: 'مقدمة',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: _showIntroBrief,
+          ),
+
           // Button 1: حقول البترول
           CustomButton(
             text: 'حقول البترول',

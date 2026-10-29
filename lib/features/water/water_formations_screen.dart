@@ -10,7 +10,6 @@ import '../../core/widgets/map_view_platform.dart';
 import '../../core/dialogs/water_infographic_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
 import '../../core/dialogs/pdf_viewer_dialog.dart';
-import '../../core/theme/app_theme.dart';
 
 class DamLocation {
   final String name;
@@ -650,39 +649,6 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
     },
   ];
 
-  Widget _buildSectionDivider(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 21, right: 21, top: 24, bottom: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 1.5,
-              color: AppColors.solidBrown.withOpacity(0.35),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontFamily: 'NotoKufi',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.solidBrown,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: 1.5,
-              color: AppColors.solidBrown.withOpacity(0.35),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -712,8 +678,6 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
                 },
               )),
 
-          // 2. Visual Section Divider
-          _buildSectionDivider('الخرائط والطبقات المائية'),
 
           // 3. Existing Buttons Moved Down
           // زر مقدمة
