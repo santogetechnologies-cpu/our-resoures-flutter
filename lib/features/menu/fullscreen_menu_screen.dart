@@ -32,12 +32,14 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Top beveled brown header banner with gold border (Fit screen responsive)
+  // Top beveled brown header banner with gold border and d_logo on the left
   Widget _buildTopBanner({
     required String title,
     double height = 66,
     double fontSize = 38,
   }) {
+    final logoH = (height * 0.75).clamp(34.0, 54.0);
+
     return Container(
       width: double.infinity,
       height: height,
@@ -55,21 +57,49 @@ class FullscreenMenuScreen extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-      child: Center(
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'NotoKufi',
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+      child: Stack(
+        children: [
+          // Centered Title
+          Positioned.fill(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: logoH + 28,
+                vertical: 4,
+              ),
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'NotoKufi',
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
+
+          // d_logo on the physical Left side
+          Positioned(
+            left: 20,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Image.asset(
+                AppAssets.dLogo,
+                height: logoH,
+                fit: BoxFit.contain,
+                color: Colors.white,
+                errorBuilder: (c, e, s) => const SizedBox.shrink(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
