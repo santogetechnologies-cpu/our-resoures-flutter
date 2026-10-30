@@ -32,11 +32,15 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Top beveled brown header banner with gold border (Wide & prominent)
-  Widget _buildTopBanner({required String title}) {
+  // Top beveled brown header banner with gold border (Fit screen responsive)
+  Widget _buildTopBanner({
+    required String title,
+    double height = 66,
+    double fontSize = 38,
+  }) {
     return Container(
       width: double.infinity,
-      height: 78,
+      height: height,
       decoration: ShapeDecoration(
         color: _kBrownBg,
         shape: BeveledRectangleBorder(
@@ -51,16 +55,16 @@ class FullscreenMenuScreen extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Center(
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'NotoKufi',
-              fontSize: 44,
+              fontSize: fontSize,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -75,6 +79,8 @@ class FullscreenMenuScreen extends StatelessWidget {
     required BuildContext context,
     required String title,
     required VoidCallback onTap,
+    double verticalPadding = 6,
+    double fontSize = 24,
   }) {
     return Container(
       decoration: ShapeDecoration(
@@ -99,13 +105,16 @@ class FullscreenMenuScreen extends StatelessWidget {
           ),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: 36,
+              vertical: verticalPadding,
+            ),
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'NotoKufi',
-                fontSize: 26,
+                fontSize: fontSize,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -116,7 +125,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Row inside the 10-button table grid (Exact border design: open perimeter, 5px dividers, double central line)
+  // Row inside the 10-button table grid (Exact border design: open perimeter, double central line)
   Widget _buildGridRow({
     required BuildContext context,
     required String rightTitle,
@@ -124,7 +133,8 @@ class FullscreenMenuScreen extends StatelessWidget {
     required String leftTitle,
     required VoidCallback leftOnTap,
     required Color bgColor,
-    double height = 74,
+    double height = 58,
+    double fontSize = 21,
   }) {
     return Container(
       height: height,
@@ -139,16 +149,16 @@ class FullscreenMenuScreen extends StatelessWidget {
                 onTap: rightOnTap,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                   alignment: Alignment.center,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
                       rightTitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'NotoKufi',
-                        fontSize: 24,
+                        fontSize: fontSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -159,13 +169,13 @@ class FullscreenMenuScreen extends StatelessWidget {
             ),
           ),
 
-          // Central vertical double royal navy line (5px blue, 4px white gap, 5px blue)
+          // Central vertical double royal navy line (4.5px blue, 3.5px white gap, 4.5px blue)
           Container(
-            width: 14,
+            width: 12.5,
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border.symmetric(
-                vertical: BorderSide(color: _kNavyDivider, width: 5.0),
+                vertical: BorderSide(color: _kNavyDivider, width: 4.5),
               ),
             ),
           ),
@@ -178,16 +188,16 @@ class FullscreenMenuScreen extends StatelessWidget {
                 onTap: leftOnTap,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                   alignment: Alignment.center,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
                       leftTitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'NotoKufi',
-                        fontSize: 24,
+                        fontSize: fontSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -202,10 +212,10 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Horizontal royal navy divider between table rows (5px thick)
-  Widget _buildRowDivider() {
+  // Horizontal royal navy divider between table rows
+  Widget _buildRowDivider({double thickness = 4.0}) {
     return Container(
-      height: 5.0,
+      height: thickness,
       color: _kNavyDivider,
     );
   }
@@ -215,8 +225,9 @@ class FullscreenMenuScreen extends StatelessWidget {
     required BuildContext context,
     required String title,
     required VoidCallback onTap,
-    double width = 220,
-    double height = 50,
+    double width = 210,
+    double height = 44,
+    double fontSize = 18,
   }) {
     return Container(
       width: width,
@@ -244,15 +255,15 @@ class FullscreenMenuScreen extends StatelessWidget {
           onTap: onTap,
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'NotoKufi',
-                    fontSize: 20,
+                    fontSize: fontSize,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -287,9 +298,25 @@ class FullscreenMenuScreen extends StatelessWidget {
             SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // Responsive logo sizing
-                  final logoSize =
-                      (constraints.maxHeight * 0.17).clamp(90.0, 140.0);
+                  final H = constraints.maxHeight;
+
+                  // Dynamic responsive dimensions calculated to fit any screen height without scrolling:
+                  final headerH = (H * 0.10).clamp(50.0, 72.0);
+                  final headerFontSize = (headerH * 0.52).clamp(24.0, 40.0);
+                  final logoSize = (H * 0.115).clamp(52.0, 95.0);
+                  final badgeVerticalPadding = (H * 0.008).clamp(3.0, 7.0);
+                  final badgeFontSize = (H * 0.035).clamp(18.0, 24.0);
+                  final rowH = (H * 0.082).clamp(42.0, 62.0);
+                  final rowFontSize = (rowH * 0.38).clamp(16.0, 22.0);
+                  final dividerThick = (rowH * 0.07).clamp(3.0, 4.5);
+                  final bottomBtnH = (H * 0.065).clamp(36.0, 46.0);
+                  final bottomBtnW =
+                      (constraints.maxWidth * 0.16).clamp(160.0, 210.0);
+                  final bottomBtnFontSize =
+                      (bottomBtnH * 0.42).clamp(15.0, 19.0);
+                  final vertPadding = (H * 0.012).clamp(6.0, 12.0);
+                  final gapSmall = (H * 0.009).clamp(3.0, 8.0);
+                  final gapMedium = (H * 0.013).clamp(5.0, 10.0);
 
                   return SingleChildScrollView(
                     physics: const BouncingScrollPhysics(
@@ -299,9 +326,9 @@ class FullscreenMenuScreen extends StatelessWidget {
                       constraints:
                           BoxConstraints(minHeight: constraints.maxHeight),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 24,
-                          vertical: 12,
+                          vertical: vertPadding,
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -315,13 +342,15 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 child: _buildTopBanner(
                                   title:
                                       'منصة العمري التفاعلية لعلوم الأرض والطبيعة',
+                                  height: headerH,
+                                  fontSize: headerFontSize,
                                 ),
                               ),
                             ),
 
-                            const SizedBox(height: 10),
+                            SizedBox(height: gapSmall),
 
-                            // 2. Central Section (Logo, Badge, and Table Grid: widened to maxWidth 1200px)
+                            // 2. Central Section (Logo, Badge, and Table Grid: maxWidth 1200px)
                             Center(
                               child: ConstrainedBox(
                                 constraints:
@@ -345,7 +374,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       ),
                                     ),
 
-                                    const SizedBox(height: 8),
+                                    SizedBox(height: gapSmall),
 
                                     // Beveled Badge: "ثرواتنا من أرضنا"
                                     _buildBadge(
@@ -353,11 +382,13 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       title: 'ثرواتنا من أرضنا',
                                       onTap: () => AboutDialogs
                                           .showMineralLocations(context),
+                                      verticalPadding: badgeVerticalPadding,
+                                      fontSize: badgeFontSize,
                                     ),
 
-                                    const SizedBox(height: 14),
+                                    SizedBox(height: gapMedium),
 
-                                    // 4. The 10 Buttons Unified Table / Grid (Exact design from mockup: open perimeter, 5px dividers, double central line)
+                                    // 4. The 10 Buttons Unified Table / Grid (Exact design from mockup: open perimeter, double central line)
                                     Container(
                                       color: Colors.transparent,
                                       child: Column(
@@ -379,8 +410,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                               const MaterialsScreen(),
                                             ),
                                             bgColor: _kRowGrey,
+                                            height: rowH,
+                                            fontSize: rowFontSize,
                                           ),
-                                          _buildRowDivider(),
+                                          _buildRowDivider(
+                                            thickness: dividerThick,
+                                          ),
 
                                           // Row 2 (Cream)
                                           _buildGridRow(
@@ -396,8 +431,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                               const WaterFormationsScreen(),
                                             ),
                                             bgColor: _kRowCream,
+                                            height: rowH,
+                                            fontSize: rowFontSize,
                                           ),
-                                          _buildRowDivider(),
+                                          _buildRowDivider(
+                                            thickness: dividerThick,
+                                          ),
 
                                           // Row 3 (Grey)
                                           _buildGridRow(
@@ -411,8 +450,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             leftOnTap: () => AboutDialogs
                                                 .showNaturalReserves(context),
                                             bgColor: _kRowGrey,
+                                            height: rowH,
+                                            fontSize: rowFontSize,
                                           ),
-                                          _buildRowDivider(),
+                                          _buildRowDivider(
+                                            thickness: dividerThick,
+                                          ),
 
                                           // Row 4 (Cream)
                                           _buildGridRow(
@@ -427,8 +470,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                               const BooksScreen(),
                                             ),
                                             bgColor: _kRowCream,
+                                            height: rowH,
+                                            fontSize: rowFontSize,
                                           ),
-                                          _buildRowDivider(),
+                                          _buildRowDivider(
+                                            thickness: dividerThick,
+                                          ),
 
                                           // Row 5 (Grey)
                                           _buildGridRow(
@@ -444,6 +491,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             leftOnTap: () => AboutDialogs
                                                 .showRemoteSensing(context),
                                             bgColor: _kRowGrey,
+                                            height: rowH,
+                                            fontSize: rowFontSize,
                                           ),
                                         ],
                                       ),
@@ -453,7 +502,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 16),
+                            SizedBox(height: gapMedium),
 
                             // 5. Bottom Navigation Row (2 Buttons)
                             Row(
@@ -464,6 +513,9 @@ class FullscreenMenuScreen extends StatelessWidget {
                                   title: 'نبذة تعريفية',
                                   onTap: () =>
                                       AboutDialogs.showIntroduction(context),
+                                  width: bottomBtnW,
+                                  height: bottomBtnH,
+                                  fontSize: bottomBtnFontSize,
                                 ),
                                 const SizedBox(width: 24),
                                 _buildBottomNavButton(
@@ -479,11 +531,14 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       );
                                     }
                                   },
+                                  width: bottomBtnW,
+                                  height: bottomBtnH,
+                                  fontSize: bottomBtnFontSize,
                                 ),
                               ],
                             ),
 
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 2),
                           ],
                         ),
                       ),
