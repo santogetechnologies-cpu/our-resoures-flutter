@@ -13,12 +13,12 @@ import '../books/books_screen.dart';
 class FullscreenMenuScreen extends StatelessWidget {
   const FullscreenMenuScreen({super.key});
 
-  // Palette extracted directly from the design mockup
+  // Palette extracted from the design mockup
   static const Color _kBrownBg = Color(0xFF70392F);
   static const Color _kGoldBorder = Color(0xFFC59965);
-  static const Color _kRowGrey = Color(0xFFCFD1D2);
-  static const Color _kRowCream = Color(0xFFFEFCE8);
-  static const Color _kNavyDivider = Color(0xFF253F8E);
+  static const Color _kRowGrey = Color(0xFFCCD0D5);
+  static const Color _kRowCream = Color(0xFFFDFBE6);
+  static const Color _kNavyDivider = Color(0xFF313D6C);
 
   void _navigate(BuildContext context, Widget screen) {
     Navigator.of(context).push(
@@ -115,7 +115,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Row inside the 10-button table grid (Matching exact mockup: open sides, thick dividers)
+  // Row inside the 10-button table grid
   Widget _buildGridRow({
     required BuildContext context,
     required String rightTitle,
@@ -123,7 +123,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     required String leftTitle,
     required VoidCallback leftOnTap,
     required Color bgColor,
-    double height = 74,
+    double height = 56,
   }) {
     return Container(
       height: height,
@@ -138,7 +138,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                 onTap: rightOnTap,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                   alignment: Alignment.center,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -147,7 +147,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'NotoKufi',
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -158,13 +158,13 @@ class FullscreenMenuScreen extends StatelessWidget {
             ),
           ),
 
-          // Central vertical double navy line (4.5px blue, 3px white gap, 4.5px blue)
+          // Central vertical double navy line
           Container(
-            width: 12,
+            width: 8,
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border.symmetric(
-                vertical: BorderSide(color: _kNavyDivider, width: 4.5),
+                vertical: BorderSide(color: _kNavyDivider, width: 2),
               ),
             ),
           ),
@@ -177,7 +177,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                 onTap: leftOnTap,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                   alignment: Alignment.center,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -186,7 +186,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'NotoKufi',
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -201,10 +201,10 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Horizontal navy divider between table rows (5px thick)
+  // Horizontal navy divider between table rows
   Widget _buildRowDivider() {
     return Container(
-      height: 5.0,
+      height: 2.5,
       color: _kNavyDivider,
     );
   }
@@ -275,7 +275,7 @@ class FullscreenMenuScreen extends StatelessWidget {
           children: [
             // Subtle wallpaper background with very low opacity
             Opacity(
-              opacity: 0.10,
+              opacity: 0.12,
               child: Image.asset(
                 AppAssets.wallpaper5,
                 fit: BoxFit.cover,
@@ -302,7 +302,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                           constraints: const BoxConstraints(maxWidth: 860),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
+                              horizontal: 20,
                               vertical: 12,
                             ),
                             child: Column(
@@ -343,9 +343,22 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                                 const SizedBox(height: 14),
 
-                                // 4. The 10 Buttons Unified Table / Grid (Exact design from mockup: open sides, thick dividers)
+                                // 4. The 10 Buttons Unified Table / Grid
                                 Container(
-                                  color: Colors.transparent,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      color: _kNavyDivider,
+                                      width: 2.0,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.10),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -358,7 +371,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                           context,
                                           const GeologyScreen(),
                                         ),
-                                        leftTitle: 'المعادن والثروات التعدينية',
+                                        leftTitle: 'الصخور والمعادن الإقتصادية',
                                         leftOnTap: () => _navigate(
                                           context,
                                           const MaterialsScreen(),
@@ -370,14 +383,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       // Row 2 (Cream)
                                       _buildGridRow(
                                         context: context,
-                                        rightTitle:
-                                            'البترول والغازوالطاقة المتجددة',
+                                        rightTitle: 'البترول والغاز',
                                         rightOnTap: () => _navigate(
                                           context,
                                           const OilGasScreen(),
                                         ),
-                                        leftTitle:
-                                            'الموارد المائية والأودية والسدود',
+                                        leftTitle: 'مصادر المياه',
                                         leftOnTap: () => _navigate(
                                           context,
                                           const WaterFormationsScreen(),
@@ -389,14 +400,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                       // Row 3 (Grey)
                                       _buildGridRow(
                                         context: context,
-                                        rightTitle:
-                                            'القرى التراثية والمواقع الاثرية',
+                                        rightTitle: 'السياحة والآثار',
                                         rightOnTap: () => _navigate(
                                           context,
                                           const TourismScreen(),
                                         ),
-                                        leftTitle:
-                                            'المحميات: حكاية الأرض ومخاطر الطبيعة',
+                                        leftTitle: 'المحميات الطبيعية',
                                         leftOnTap: () =>
                                             AboutDialogs.showNaturalReserves(
                                                 context),
@@ -428,7 +437,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                           context,
                                           const EarthquakeScreen(),
                                         ),
-                                        leftTitle: 'بوابة المصادر الجيومكانية',
+                                        leftTitle: 'الاستشعار عن بعد وال GIS',
                                         leftOnTap: () =>
                                             AboutDialogs.showRemoteSensing(
                                                 context),
