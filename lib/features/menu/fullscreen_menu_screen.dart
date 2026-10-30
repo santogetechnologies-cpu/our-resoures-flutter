@@ -123,7 +123,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     required String leftTitle,
     required VoidCallback leftOnTap,
     required Color bgColor,
-    double height = 74,
+    double height = 60,
   }) {
     return Container(
       height: height,
