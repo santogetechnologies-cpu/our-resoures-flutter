@@ -13,12 +13,12 @@ import '../books/books_screen.dart';
 class FullscreenMenuScreen extends StatelessWidget {
   const FullscreenMenuScreen({super.key});
 
-  // Palette extracted from the design mockup
+  // Palette extracted directly from the design mockup
   static const Color _kBrownBg = Color(0xFF70392F);
   static const Color _kGoldBorder = Color(0xFFC59965);
-  static const Color _kRowGrey = Color(0xFFCCD0D5);
-  static const Color _kRowCream = Color(0xFFFDFBE6);
-  static const Color _kNavyDivider = Color(0xFF313D6C);
+  static const Color _kRowGrey = Color(0xFFD1D2D4);
+  static const Color _kRowCream = Color(0xFFFEFCE8);
+  static const Color _kNavyDivider = Color(0xFF253F8E);
 
   void _navigate(BuildContext context, Widget screen) {
     Navigator.of(context).push(
@@ -115,7 +115,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Row inside the 10-button table grid
+  // Row inside the 10-button table grid (Exact border design: open perimeter, 5px dividers, double central line)
   Widget _buildGridRow({
     required BuildContext context,
     required String rightTitle,
@@ -123,7 +123,7 @@ class FullscreenMenuScreen extends StatelessWidget {
     required String leftTitle,
     required VoidCallback leftOnTap,
     required Color bgColor,
-    double height = 56,
+    double height = 74,
   }) {
     return Container(
       height: height,
@@ -138,7 +138,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                 onTap: rightOnTap,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   alignment: Alignment.center,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -147,7 +147,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'NotoKufi',
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -158,13 +158,13 @@ class FullscreenMenuScreen extends StatelessWidget {
             ),
           ),
 
-          // Central vertical double navy line
+          // Central vertical double royal navy line (5px blue, 4px white gap, 5px blue)
           Container(
-            width: 8,
+            width: 14,
             decoration: const BoxDecoration(
               color: Colors.white,
               border: Border.symmetric(
-                vertical: BorderSide(color: _kNavyDivider, width: 2),
+                vertical: BorderSide(color: _kNavyDivider, width: 5.0),
               ),
             ),
           ),
@@ -177,7 +177,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                 onTap: leftOnTap,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   alignment: Alignment.center,
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -186,7 +186,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'NotoKufi',
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -201,10 +201,10 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Horizontal navy divider between table rows
+  // Horizontal royal navy divider between table rows (5px thick)
   Widget _buildRowDivider() {
     return Container(
-      height: 2.5,
+      height: 5.0,
       color: _kNavyDivider,
     );
   }
@@ -275,7 +275,7 @@ class FullscreenMenuScreen extends StatelessWidget {
           children: [
             // Subtle wallpaper background with very low opacity
             Opacity(
-              opacity: 0.12,
+              opacity: 0.10,
               child: Image.asset(
                 AppAssets.wallpaper5,
                 fit: BoxFit.cover,
@@ -302,7 +302,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                           constraints: const BoxConstraints(maxWidth: 860),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
+                              horizontal: 16,
                               vertical: 12,
                             ),
                             child: Column(
@@ -343,22 +343,9 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                                 const SizedBox(height: 14),
 
-                                // 4. The 10 Buttons Unified Table / Grid
+                                // 4. The 10 Buttons Unified Table / Grid (Exact design from mockup: open perimeter, 5px dividers, double central line)
                                 Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: _kNavyDivider,
-                                      width: 2.0,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.10),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
+                                  color: Colors.transparent,
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
