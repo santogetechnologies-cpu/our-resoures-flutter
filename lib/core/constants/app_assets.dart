@@ -10,6 +10,8 @@ class AppAssets {
   // Logos
   static const String alamryLogo = '$basePath/alamry_logo.png';
   static const String saudiVision = '$basePath/saudi_vision.png';
+  static const String saudiVisionOriginal =
+      '$basePath/saudi_vision_original.png';
   static const String dLogo = '$basePath/d_logo.png';
   static const String click = '$basePath/click.png';
   static const String sign = '$basePath/sign.png';

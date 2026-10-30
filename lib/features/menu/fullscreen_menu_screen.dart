@@ -32,13 +32,15 @@ class FullscreenMenuScreen extends StatelessWidget {
     );
   }
 
-  // Top beveled brown header banner with gold border and d_logo on the left
+  // Top beveled brown header banner with gold border, d_logo on the left & Saudi Vision 2030 on the right
   Widget _buildTopBanner({
     required String title,
     double height = 66,
     double fontSize = 38,
   }) {
     final logoH = (height * 0.75).clamp(34.0, 54.0);
+    // Symmetric padding to ensure the title stays perfectly centered without overlapping either logo
+    final sidePadding = (logoH * 1.6) + 24;
 
     return Container(
       width: double.infinity,
@@ -63,7 +65,7 @@ class FullscreenMenuScreen extends StatelessWidget {
           Positioned.fill(
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: logoH + 28,
+                horizontal: sidePadding,
                 vertical: 4,
               ),
               child: Center(
@@ -95,6 +97,21 @@ class FullscreenMenuScreen extends StatelessWidget {
                 height: logoH,
                 fit: BoxFit.contain,
                 color: Colors.white,
+                errorBuilder: (c, e, s) => const SizedBox.shrink(),
+              ),
+            ),
+          ),
+
+          // Saudi Vision 2030 logo on the physical Right side
+          Positioned(
+            right: 20,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Image.asset(
+                AppAssets.saudiVisionOriginal,
+                height: logoH,
+                fit: BoxFit.contain,
                 errorBuilder: (c, e, s) => const SizedBox.shrink(),
               ),
             ),
