@@ -312,7 +312,7 @@ class AboutDialogs {
                   children: [
                     const Expanded(
                       child: Text(
-                        'الاستشعار عن بعد ونظم المعلومات الجغرافية (Remote Sensing & GIS)',
+                        'بوابة المصادر الجيومكانية',
                         style: TextStyle(
                           fontFamily: 'NotoKufi',
                           fontSize: 24,
@@ -419,7 +419,7 @@ class AboutDialogs {
                   children: [
                     const Expanded(
                       child: Text(
-                        'المحميات الطبيعية في المملكة العربية السعودية',
+                        'المحميات، حكاية الأرض ومخاطر الطبيعة',
                         style: TextStyle(
                           fontFamily: 'NotoKufi',
                           fontSize: 24,

@@ -434,7 +434,7 @@ class _OilGasScreenState extends State<OilGasScreen> {
   @override
   Widget build(BuildContext context) {
     return MapShell(
-      title: 'الطاقة المتجددة وتطبيقاتها',
+      title: 'البترول والغاز والطاقة المتجددة',
       onBriefPressed: null,
       initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       onMapCreated: (c) {

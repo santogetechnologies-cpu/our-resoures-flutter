@@ -56,7 +56,7 @@ class WaterInfographicDialog extends StatelessWidget {
                 children: [
                   const Expanded(
                     child: Text(
-                      'مصادر المياه في المملكة العربية السعودية',
+                      'الموارد المائية والأودية والسدود في المملكة العربية السعودية',
                       style: TextStyle(
                         fontFamily: 'NotoKufi',
                         fontSize: 26,

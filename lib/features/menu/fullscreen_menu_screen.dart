@@ -451,7 +451,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                               const GeologyScreen(),
                                             ),
                                             leftTitle:
-                                                'الصخور والمعادن الإقتصادية',
+                                                'المعادن والثروات التعدينية',
                                             leftOnTap: () => _navigate(
                                               context,
                                               const MaterialsScreen(),
@@ -467,12 +467,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                           // Row 2 (Cream)
                                           _buildGridRow(
                                             context: context,
-                                            rightTitle: 'البترول والغاز',
+                                            rightTitle: 'البترول والغاز والطاقة المتجددة',
                                             rightOnTap: () => _navigate(
                                               context,
                                               const OilGasScreen(),
                                             ),
-                                            leftTitle: 'مصادر المياه',
+                                            leftTitle: 'الموارد المائية والأودية والسدود',
                                             leftOnTap: () => _navigate(
                                               context,
                                               const WaterFormationsScreen(),
@@ -488,12 +488,12 @@ class FullscreenMenuScreen extends StatelessWidget {
                                           // Row 3 (Grey)
                                           _buildGridRow(
                                             context: context,
-                                            rightTitle: 'السياحة والآثار',
+                                            rightTitle: 'القرى التراثية والمواقع الاثرية',
                                             rightOnTap: () => _navigate(
                                               context,
                                               const TourismScreen(),
                                             ),
-                                            leftTitle: 'المحميات الطبيعية',
+                                            leftTitle: 'المحميات، حكاية الأرض ومخاطر الطبيعة',
                                             leftOnTap: () => AboutDialogs
                                                 .showNaturalReserves(context),
                                             bgColor: _kRowGrey,
@@ -534,7 +534,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                               const EarthquakeScreen(),
                                             ),
                                             leftTitle:
-                                                'الاستشعار عن بعد وال GIS',
+                                                'بوابة المصادر الجيومكانية',
                                             leftOnTap: () => AboutDialogs
                                                 .showRemoteSensing(context),
                                             bgColor: _kRowGrey,
