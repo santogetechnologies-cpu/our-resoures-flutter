@@ -391,6 +391,10 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
       'title': 'خارطة الطريق',
       'asset': 'assets/books/geology/mining/10_roadmap.pdf',
     },
+    {
+      'title': 'مواقع الصخور والمعادن الاقتصادية',
+      'asset': 'assets/books/geology/mining/11_mineral_locations.pdf',
+    },
   ];
 
   final Map<String, String> _metalButtonLabels = const {
