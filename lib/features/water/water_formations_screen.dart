@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../core/constants/app_assets.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/map_view_platform.dart';
@@ -628,6 +629,10 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
   // ----------------------------------------------------
   final List<Map<String, String>> _waterPdfSections = const [
     {
+      'title': 'مقدمة',
+      'asset': 'assets/books/water/00_water_intro.pdf',
+    },
+    {
       'title': 'المياه السطحية',
       'asset': 'assets/books/water/01_surface_water.pdf',
     },
@@ -665,7 +670,7 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
       },
       sidebarContent: Column(
         children: [
-          // 1. Top 5 Water PDF Section Buttons
+          // 1. Water PDF Section Buttons (Starts with مقدمة at the very top)
           ..._waterPdfSections.map((sec) => CustomButton(
                 text: sec['title']!,
                 styleType: ButtonStyleType.mainMenu,
@@ -674,19 +679,32 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
                     context,
                     title: sec['title']!,
                     assetPath: sec['asset']!,
+                    continuationWidget: sec['title'] == 'مقدمة'
+                        ? ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryBrown,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _onBriefPressed();
+                            },
+                            icon: const Icon(Icons.analytics_outlined, size: 20),
+                            label: const Text(
+                              'عرض إنفوجرافيك المياه',
+                              style: TextStyle(fontFamily: 'NotoKufi', fontSize: 14),
+                            ),
+                          )
+                        : null,
                   );
                 },
               )),
 
 
-          // 3. Existing Buttons Moved Down
-          // زر مقدمة
-          CustomButton(
-            text: 'مقدمة',
-            styleType: ButtonStyleType.mainMenu,
-            onPressed: _onBriefPressed,
-          ),
-
+          // 2. Existing Geological Buttons
           // Button 1: الأودية الرئيسية
           CustomButton(
             text: 'الأودية الرئيسية',
