@@ -350,7 +350,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                   // Dynamic responsive dimensions calculated to fit any screen height without scrolling:
                   final headerH = (H * 0.10).clamp(50.0, 72.0);
                   final headerFontSize = (headerH * 0.52).clamp(24.0, 40.0);
-                  final logoSize = (H * 0.115).clamp(52.0, 95.0);
+                  final logoSize = (H * 0.18).clamp(65.0, 150.0);
                   final badgeVerticalPadding = (H * 0.008).clamp(3.0, 7.0);
                   final badgeFontSize = (H * 0.035).clamp(18.0, 24.0);
                   final rowH = (H * 0.082).clamp(42.0, 62.0);
@@ -411,7 +411,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     Center(
                                       child: ClipOval(
                                         child: Image.asset(
-                                          'assets/images/alamry_logo.png',
+                                          AppAssets.alamryLogo,
                                           width: logoSize,
                                           height: logoSize,
                                           fit: BoxFit.contain,
