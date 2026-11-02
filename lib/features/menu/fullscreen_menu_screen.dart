@@ -423,10 +423,10 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                                     SizedBox(height: gapSmall),
 
-                                    // Beveled Badge: "ثرواتنا من أرضنا"
+                                    // Beveled Badge: "نبذة تعريفية"
                                     _buildBadge(
                                       context: context,
-                                      title: 'ثرواتنا من أرضنا',
+                                      title: 'نبذة تعريفية',
                                       onTap: () => AboutDialogs
                                           .showMineralLocations(context),
                                       verticalPadding: badgeVerticalPadding,
@@ -551,20 +551,10 @@ class FullscreenMenuScreen extends StatelessWidget {
 
                             SizedBox(height: gapMedium),
 
-                            // 5. Bottom Navigation Row (2 Buttons)
+                            // 5. Bottom Navigation Row (صفحة البداية)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _buildBottomNavButton(
-                                  context: context,
-                                  title: 'نبذة تعريفية',
-                                  onTap: () =>
-                                      AboutDialogs.showIntroduction(context),
-                                  width: bottomBtnW,
-                                  height: bottomBtnH,
-                                  fontSize: bottomBtnFontSize,
-                                ),
-                                const SizedBox(width: 24),
                                 _buildBottomNavButton(
                                   context: context,
                                   title: 'صفحة البداية',
