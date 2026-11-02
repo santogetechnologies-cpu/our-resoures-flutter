@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/dialogs/about_dialog.dart';
+import '../../core/dialogs/pdf_viewer_dialog.dart';
 import '../start/start_screen.dart';
 import '../geology/geology_screen.dart';
 import '../materials/materials_screen.dart';
@@ -394,7 +395,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                               ),
                             ),
 
-                            // 2. Circular Alamry Logo (Evenly aligned with equal top & bottom padding)
+                            // 2. Circular Alamry Logo (Centered with equal top & bottom padding)
                             Center(
                               child: ClipOval(
                                 child: Image.asset(
@@ -418,12 +419,15 @@ class FullscreenMenuScreen extends StatelessWidget {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.center,
                                   children: [
-                                    // Beveled Badge: "ثرواتنا من أرضنا"
+                                    // Beveled Badge: "نبذة تعريفية"
                                     _buildBadge(
                                       context: context,
-                                      title: 'ثرواتنا من أرضنا',
-                                      onTap: () => AboutDialogs
-                                          .showMineralLocations(context),
+                                      title: 'نبذة تعريفية',
+                                      onTap: () => PdfViewerDialog.show(
+                                        context,
+                                        title: 'نبذة تعريفية',
+                                        assetPath: 'assets/books/general_books/about_platform.pdf',
+                                      ),
                                       verticalPadding: badgeVerticalPadding,
                                       fontSize: badgeFontSize,
                                     ),
@@ -504,8 +508,11 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             context: context,
                                             rightTitle:
                                                 'استراتيجية المخاطر الطبيعية',
-                                            rightOnTap: () => AboutDialogs
-                                                .showHazards(context),
+                                            rightOnTap: () => PdfViewerDialog.show(
+                                              context,
+                                              title: 'استراتيجية المخاطر الطبيعية',
+                                              assetPath: 'assets/books/general_books/hazards_strategy.pdf',
+                                            ),
                                             leftTitle: 'الموسوعات والكتب',
                                             leftOnTap: () => _navigate(
                                               context,
@@ -530,8 +537,11 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             ),
                                             leftTitle:
                                                 'بوابة المصادر الجيومكانية',
-                                            leftOnTap: () => AboutDialogs
-                                                .showRemoteSensing(context),
+                                            leftOnTap: () => PdfViewerDialog.show(
+                                              context,
+                                              title: 'بوابة المصادر الجيومكانية',
+                                              assetPath: 'assets/books/general_books/geospatial_portal.pdf',
+                                            ),
                                             bgColor: _kRowGrey,
                                             height: rowH,
                                             fontSize: rowFontSize,
@@ -544,20 +554,10 @@ class FullscreenMenuScreen extends StatelessWidget {
                               ),
                             ),
 
-                            // 4. Bottom Navigation Row (2 Buttons)
+                            // 4. Bottom Navigation Row (صفحة البداية)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _buildBottomNavButton(
-                                  context: context,
-                                  title: 'نبذة تعريفية',
-                                  onTap: () =>
-                                      AboutDialogs.showIntroduction(context),
-                                  width: bottomBtnW,
-                                  height: bottomBtnH,
-                                  fontSize: bottomBtnFontSize,
-                                ),
-                                const SizedBox(width: 24),
                                 _buildBottomNavButton(
                                   context: context,
                                   title: 'صفحة البداية',
