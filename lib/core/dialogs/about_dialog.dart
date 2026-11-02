@@ -3,7 +3,6 @@ import '../theme/app_theme.dart';
 import '../constants/app_assets.dart';
 import '../widgets/map_view_platform.dart';
 import 'pdf_viewer_dialog.dart';
-import 'geospatial_sources_dialog.dart';
 
 class AboutDialogs {
   static Future<void> _showStyledDialog(BuildContext context, WidgetBuilder builder) async {
@@ -284,29 +283,6 @@ class AboutDialogs {
       context,
       title: 'بوابة المصادر الجيومكانية',
       assetPath: 'assets/books/general_books/geospatial_portal.pdf',
-      continuationWidget: Center(
-        child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFC59965),
-            foregroundColor: const Color(0xFF331C17),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            elevation: 3,
-          ),
-          onPressed: () => GeospatialSourcesDialog.show(context),
-          icon: const Icon(Icons.table_chart_rounded, size: 20, color: Color(0xFF331C17)),
-          label: const Text(
-            'فتح جدول ودليل المصادر الجيومكانية (53 مصدراً مع الروابط)',
-            style: TextStyle(
-              fontFamily: 'NotoKufi',
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
     );
   }
 
