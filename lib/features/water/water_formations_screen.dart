@@ -476,11 +476,21 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
         _mapController?.clearWebMarkers();
       } else {
         await _mapController?.pointAnnotationManager?.deleteAll();
+        _damAnnotationMap.clear();
+        _annotationDamMap.clear();
       }
       await _mapController?.setStyleFromAsset('assets/maps/saudi_geo/sahel.json');
       _mapController?.flyTo(latitude: 24.694291, longitude: 47.189224, zoom: 4.3);
 
       await Future.delayed(const Duration(milliseconds: 300));
+
+      if (kIsWeb) {
+        _mapController?.clearWebMarkers();
+      } else {
+        await _mapController?.pointAnnotationManager?.deleteAll();
+        _damAnnotationMap.clear();
+        _annotationDamMap.clear();
+      }
 
       if (kIsWeb && _mapController != null) {
         if (_cachedValleyBatchJson == null) {
@@ -528,6 +538,14 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
   Future<void> _selectValley(String valleyKey) async {
     final valley = _valleys[valleyKey];
     if (valley == null) return;
+
+    if (kIsWeb) {
+      _mapController?.clearWebMarkers();
+    } else {
+      await _mapController?.pointAnnotationManager?.deleteAll();
+      _damAnnotationMap.clear();
+      _annotationDamMap.clear();
+    }
 
     setState(() => _isLoading = true);
     try {
@@ -716,6 +734,13 @@ class _WaterFormationsScreenState extends State<WaterFormationsScreen> {
                   _damsExpanded = false;
                   _mainFormationsExpanded = false;
                   _subFormationsExpanded = false;
+                  if (kIsWeb) {
+                    _mapController?.clearWebMarkers();
+                  } else {
+                    _mapController?.pointAnnotationManager?.deleteAll();
+                    _damAnnotationMap.clear();
+                    _annotationDamMap.clear();
+                  }
                   _addAllValleyLines();
                 } else {
                   _clearValleyLines();

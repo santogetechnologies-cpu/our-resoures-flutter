@@ -987,10 +987,47 @@ window.mapboxGlobeSetStyleJSONWeb = function (viewId, styleJsonStr) {
 window.mapboxGlobeLastBatch = window.mapboxGlobeLastBatch || {};
 
 window.mapboxGlobeClearMarkersWeb = function (viewId) {
-  (window.mapboxGlobeMarkers[viewId] || []).forEach(m => { try { m.remove(); } catch (_) { } });
-  window.mapboxGlobeMarkers[viewId] = [];
+  if (viewId && window.mapboxGlobeMarkers && window.mapboxGlobeMarkers[viewId]) {
+    (window.mapboxGlobeMarkers[viewId] || []).forEach(m => { try { m.remove(); } catch (_) { } });
+    window.mapboxGlobeMarkers[viewId] = [];
+  } else {
+    Object.values(window.mapboxGlobeMarkers || {}).forEach(markerList => {
+      (markerList || []).forEach(m => { try { m.remove(); } catch (_) { } });
+    });
+    window.mapboxGlobeMarkers = {};
+  }
+
   // Also clear any pending queue
-  delete window.mapboxGlobePendingCbs[viewId];
+  if (viewId && window.mapboxGlobePendingCbs) {
+    delete window.mapboxGlobePendingCbs[viewId];
+  } else {
+    window.mapboxGlobePendingCbs = {};
+  }
+
+  // Clear saved batch so style reload won't resurrect markers
+  if (viewId && window.mapboxGlobeLastBatch) {
+    delete window.mapboxGlobeLastBatch[viewId];
+  } else {
+    window.mapboxGlobeLastBatch = {};
+  }
+
+  // Safety: remove marker DOM elements from map container
+  try {
+    const map = viewId ? window.mapboxGlobeInstances[viewId] : null;
+    const container = (map && map.getContainer) ? map.getContainer() : document;
+    if (container) {
+      const markers = container.querySelectorAll('.mapbox-custom-marker');
+      markers.forEach(el => {
+        try {
+          if (el.parentElement && el.parentElement.classList.contains('maplibregl-marker')) {
+            el.parentElement.remove();
+          } else {
+            el.remove();
+          }
+        } catch (_) {}
+      });
+    }
+  } catch (_) {}
 };
 
 // ---------------------------------------------------------------------------
@@ -1026,10 +1063,10 @@ window.mapboxGlobeAddMarkerWeb = function (viewId, lng, lat, iconUrl, markerId, 
 // Set markers in batch (clears existing markers and adds new markers)
 // ---------------------------------------------------------------------------
 window.mapboxGlobeSetMarkersBatchWeb = function (viewId, markersJsonStr, callbackName) {
+  window.mapboxGlobeClearMarkersWeb(viewId);
   if (markersJsonStr) {
     window.mapboxGlobeLastBatch[viewId] = { markersJsonStr, callbackName };
   }
-  window.mapboxGlobeClearMarkersWeb(viewId);
   if (!markersJsonStr) return;
 
   function _applyBatch(map) {
@@ -1062,6 +1099,7 @@ window.mapboxGlobeSetMarkersBatchWeb = function (viewId, markersJsonStr, callbac
 // Batch Valley line layers loader
 // ---------------------------------------------------------------------------
 window.mapboxGlobeLoadAllValleysWeb = function (viewId, valleysJsonStr, selectedValleyKey) {
+  window.mapboxGlobeClearMarkersWeb(viewId);
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) {
     if (!window.mapboxGlobePendingCbs[viewId]) {
