@@ -537,8 +537,11 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             ),
                                             leftTitle:
                                                 'بوابة المصادر الجيومكانية',
-                                            leftOnTap: () => AboutDialogs
-                                                .showRemoteSensing(context),
+                                            leftOnTap: () => PdfViewerDialog.show(
+                                              context,
+                                              title: 'بوابة المصادر الجيومكانية',
+                                              assetPath: 'assets/books/general_books/geospatial_portal.pdf',
+                                            ),
                                             bgColor: _kRowGrey,
                                             height: rowH,
                                             fontSize: rowFontSize,
