@@ -362,7 +362,6 @@ class FullscreenMenuScreen extends StatelessWidget {
                   final bottomBtnFontSize =
                       (bottomBtnH * 0.42).clamp(15.0, 19.0);
                   final vertPadding = (H * 0.012).clamp(6.0, 12.0);
-                  final gapSmall = (H * 0.009).clamp(3.0, 8.0);
                   final gapMedium = (H * 0.013).clamp(5.0, 10.0);
 
                   return SingleChildScrollView(
@@ -395,9 +394,21 @@ class FullscreenMenuScreen extends StatelessWidget {
                               ),
                             ),
 
-                            SizedBox(height: gapSmall),
+                            // 2. Circular Alamry Logo (Centered with equal top & bottom padding)
+                            Center(
+                              child: ClipOval(
+                                child: Image.asset(
+                                  AppAssets.alamryLogo,
+                                  width: logoSize,
+                                  height: logoSize,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (c, e, s) =>
+                                      const SizedBox.shrink(),
+                                ),
+                              ),
+                            ),
 
-                            // 2. Central Section (Logo, Badge, and Table Grid: maxWidth 1200px)
+                            // 3. Central Section (Badge and Table Grid: maxWidth 1200px)
                             Center(
                               child: ConstrainedBox(
                                 constraints:
@@ -407,22 +418,6 @@ class FullscreenMenuScreen extends StatelessWidget {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.center,
                                   children: [
-                                    // Circular Alamry Logo
-                                    Center(
-                                      child: ClipOval(
-                                        child: Image.asset(
-                                          AppAssets.alamryLogo,
-                                          width: logoSize,
-                                          height: logoSize,
-                                          fit: BoxFit.contain,
-                                          errorBuilder: (c, e, s) =>
-                                              const SizedBox.shrink(),
-                                        ),
-                                      ),
-                                    ),
-
-                                    SizedBox(height: gapSmall),
-
                                     // Beveled Badge: "نبذة تعريفية"
                                     _buildBadge(
                                       context: context,
@@ -549,9 +544,7 @@ class FullscreenMenuScreen extends StatelessWidget {
                               ),
                             ),
 
-                            SizedBox(height: gapMedium),
-
-                            // 5. Bottom Navigation Row (صفحة البداية)
+                            // 4. Bottom Navigation Row (صفحة البداية)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -574,8 +567,6 @@ class FullscreenMenuScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-
-                            const SizedBox(height: 2),
                           ],
                         ),
                       ),
