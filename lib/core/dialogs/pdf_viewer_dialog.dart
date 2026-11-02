@@ -8,12 +8,14 @@ class PdfViewerDialog extends StatefulWidget {
   final String title;
   final String assetPath;
   final Widget? continuationWidget;
+  final PdfPageLayoutMode pageLayoutMode;
 
   const PdfViewerDialog({
     super.key,
     required this.title,
     required this.assetPath,
     this.continuationWidget,
+    this.pageLayoutMode = PdfPageLayoutMode.continuous,
   });
 
   static Future<void> show(
@@ -21,6 +23,7 @@ class PdfViewerDialog extends StatefulWidget {
     required String title,
     required String assetPath,
     Widget? continuationWidget,
+    PdfPageLayoutMode pageLayoutMode = PdfPageLayoutMode.continuous,
   }) async {
     setModalOpenWeb(true);
     try {
@@ -31,6 +34,7 @@ class PdfViewerDialog extends StatefulWidget {
           title: title,
           assetPath: assetPath,
           continuationWidget: continuationWidget,
+          pageLayoutMode: pageLayoutMode,
         ),
       );
     } finally {
@@ -44,6 +48,7 @@ class PdfViewerDialog extends StatefulWidget {
 
 class _PdfViewerDialogState extends State<PdfViewerDialog> {
   late PdfViewerController _pdfViewerController;
+  late PdfPageLayoutMode _layoutMode;
   Uint8List? _pdfBytes;
   int _pageCount = 0;
   int _currentPage = 1;
@@ -54,6 +59,7 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   void initState() {
     super.initState();
     _pdfViewerController = PdfViewerController();
+    _layoutMode = widget.pageLayoutMode;
     _loadPdfData();
   }
 
@@ -172,23 +178,65 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Page indicator
-                    Text(
-                      _pageCount > 0
-                          ? 'الصفحة $_currentPage من $_pageCount'
-                          : (_isLoading ? 'جاري قراءة وتحميل المستند...' : 'المستند جاهز'),
-                      style: const TextStyle(
-                        fontFamily: 'NotoKufi',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.darkBrown,
-                      ),
-                    ),
-
-                    // Zoom Controls
+                    // Page indicator & navigation buttons
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_forward_ios, color: AppColors.solidBrown, size: 16),
+                          tooltip: 'الصفحة السابقة',
+                          visualDensity: VisualDensity.compact,
+                          onPressed: _currentPage > 1
+                              ? () => _pdfViewerController.previousPage()
+                              : null,
+                        ),
+                        Text(
+                          _pageCount > 0
+                              ? 'الصفحة $_currentPage من $_pageCount'
+                              : (_isLoading ? 'جاري قراءة وتحميل المستند...' : 'المستند جاهز'),
+                          style: const TextStyle(
+                            fontFamily: 'NotoKufi',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.darkBrown,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_ios, color: AppColors.solidBrown, size: 16),
+                          tooltip: 'الصفحة التالية',
+                          visualDensity: VisualDensity.compact,
+                          onPressed: _currentPage < _pageCount
+                              ? () => _pdfViewerController.nextPage()
+                              : null,
+                        ),
+                      ],
+                    ),
+
+                    // Controls: Layout Toggle (Scroll Down vs Single) + Zoom
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            _layoutMode == PdfPageLayoutMode.continuous
+                                ? Icons.view_agenda_outlined
+                                : Icons.view_carousel_outlined,
+                            color: AppColors.solidBrown,
+                            size: 22,
+                          ),
+                          tooltip: _layoutMode == PdfPageLayoutMode.continuous
+                              ? 'وضع التمرير لأسفل (مفعّل) - انقر لعرض صفحة واحدة'
+                              : 'وضع صفحة واحدة (مفعّل) - انقر للتمرير لأسفل',
+                          visualDensity: VisualDensity.compact,
+                          onPressed: () {
+                            setState(() {
+                              _layoutMode = _layoutMode == PdfPageLayoutMode.continuous
+                                  ? PdfPageLayoutMode.single
+                                  : PdfPageLayoutMode.continuous;
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 4),
                         IconButton(
                           icon: const Icon(Icons.zoom_in, color: AppColors.solidBrown, size: 22),
                           tooltip: 'تكبير',
@@ -332,9 +380,12 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
     return SfPdfViewer.memory(
       _pdfBytes!,
       controller: _pdfViewerController,
+      pageLayoutMode: _layoutMode,
+      scrollDirection: PdfScrollDirection.vertical,
       canShowScrollHead: true,
       canShowScrollStatus: true,
       enableDoubleTapZooming: true,
+      pageSpacing: 8.0,
       onDocumentLoaded: (PdfDocumentLoadedDetails details) {
         if (mounted) {
           setState(() {

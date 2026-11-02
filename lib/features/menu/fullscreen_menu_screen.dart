@@ -508,8 +508,11 @@ class FullscreenMenuScreen extends StatelessWidget {
                                             context: context,
                                             rightTitle:
                                                 'استراتيجية المخاطر الطبيعية',
-                                            rightOnTap: () => AboutDialogs
-                                                .showHazards(context),
+                                            rightOnTap: () => PdfViewerDialog.show(
+                                              context,
+                                              title: 'استراتيجية المخاطر الطبيعية',
+                                              assetPath: 'assets/books/general_books/hazards_strategy.pdf',
+                                            ),
                                             leftTitle: 'الموسوعات والكتب',
                                             leftOnTap: () => _navigate(
                                               context,
