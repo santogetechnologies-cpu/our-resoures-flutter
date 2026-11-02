@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/dialogs/about_dialog.dart';
+import '../../core/dialogs/pdf_viewer_dialog.dart';
 import '../start/start_screen.dart';
 import '../geology/geology_screen.dart';
 import '../materials/materials_screen.dart';
@@ -422,8 +423,11 @@ class FullscreenMenuScreen extends StatelessWidget {
                                     _buildBadge(
                                       context: context,
                                       title: 'نبذة تعريفية',
-                                      onTap: () => AboutDialogs
-                                          .showMineralLocations(context),
+                                      onTap: () => PdfViewerDialog.show(
+                                        context,
+                                        title: 'نبذة تعريفية',
+                                        assetPath: 'assets/books/general_books/about_platform.pdf',
+                                      ),
                                       verticalPadding: badgeVerticalPadding,
                                       fontSize: badgeFontSize,
                                     ),
