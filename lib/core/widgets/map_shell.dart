@@ -238,6 +238,11 @@ class _MapShellState extends State<MapShell> {
     _sidebarScrollController = ScrollController();
     registerSidebarScrollCallback((deltaY) {
       if (mounted && _sidebarScrollController.hasClients) {
+        // Do not scroll background sidebar if a modal dialog or popup is currently active
+        final route = ModalRoute.of(context);
+        if (route != null && !route.isCurrent) {
+          return;
+        }
         final double target = (_sidebarScrollController.offset + deltaY)
             .clamp(0.0, _sidebarScrollController.position.maxScrollExtent);
         _sidebarScrollController.jumpTo(target);

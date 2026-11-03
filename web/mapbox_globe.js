@@ -800,7 +800,27 @@ function _getPointerY(e) {
   return undefined;
 }
 
+window.flutterModalOpen = window.flutterModalOpen || false;
+
+function isModalActive() {
+  if (window.flutterModalOpen) return true;
+  if (document.body && document.body.classList.contains('flutter-modal-open')) return true;
+  if (document.documentElement && document.documentElement.classList.contains('flutter-modal-open')) return true;
+  if (document.querySelector('.flutter-modal, .geospatial-doc-viewer, [role="dialog"], flt-glass-pane [role="dialog"]')) return true;
+  return false;
+}
+
 function isPointerOverSidebar(e) {
+  // If a modal dialog is open or active, sidebar scrolling must be completely disabled
+  if (isModalActive()) {
+    return false;
+  }
+  // If the event target is inside any dialog, modal, platform view, or popup
+  if (e && e.target && typeof e.target.closest === 'function') {
+    if (e.target.closest('[role="dialog"], .flutter-modal, .geospatial-doc-viewer, .dialog, flt-glass-pane [role="dialog"], flt-platform-view')) {
+      return false;
+    }
+  }
   const w = window.innerWidth;
   const sidebarWidth = w < 600 ? Math.max(240, Math.min(w * 0.52, 350)) : 380;
   const x = _getPointerX(e);
@@ -809,8 +829,9 @@ function isPointerOverSidebar(e) {
 
 let _sidebarTouchStartY = null;
 
-// Global wheel listener: always forward wheel scroll over the sidebar to Flutter
+// Global wheel listener: always forward wheel scroll over the sidebar to Flutter (only when NO modal is open)
 window.addEventListener('wheel', (e) => {
+  if (isModalActive()) return;
   if (isPointerOverSidebar(e)) {
     let dy = e.deltaY;
     if (e.deltaMode === 1) dy *= 32;
@@ -821,8 +842,12 @@ window.addEventListener('wheel', (e) => {
   }
 }, { passive: true });
 
-// Global touch listeners: forward touch swiping over the sidebar to Flutter
+// Global touch listeners: forward touch swiping over the sidebar to Flutter (only when NO modal is open)
 window.addEventListener('touchstart', (e) => {
+  if (isModalActive()) {
+    _sidebarTouchStartY = null;
+    return;
+  }
   if (isPointerOverSidebar(e)) {
     _sidebarTouchStartY = _getPointerY(e);
   } else {
@@ -831,6 +856,10 @@ window.addEventListener('touchstart', (e) => {
 }, { passive: true });
 
 window.addEventListener('touchmove', (e) => {
+  if (isModalActive()) {
+    _sidebarTouchStartY = null;
+    return;
+  }
   if (_sidebarTouchStartY !== null && isPointerOverSidebar(e)) {
     const currentY = _getPointerY(e);
     if (currentY !== undefined) {

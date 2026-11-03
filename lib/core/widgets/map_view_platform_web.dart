@@ -115,7 +115,10 @@ void registerValleyLineCallback(void Function(String layerKey)? callback) {
   }
 }
 
+bool _isModalOpenWeb = false;
+
 void setModalOpenWeb(bool isOpen) {
+  _isModalOpenWeb = isOpen;
   if (js.context.hasProperty('setModalOpenWeb')) {
     js.context.callMethod('setModalOpenWeb', [isOpen]);
   }
@@ -126,6 +129,7 @@ void registerSidebarScrollCallback(void Function(double deltaY)? callback) {
     js.context['flutterSidebarScroll'] = null;
   } else {
     js.context['flutterSidebarScroll'] = (dynamic deltaY) {
+      if (_isModalOpenWeb) return;
       if (deltaY is num) {
         callback(deltaY.toDouble());
       }
