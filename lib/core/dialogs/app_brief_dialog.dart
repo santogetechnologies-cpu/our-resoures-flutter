@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../constants/app_assets.dart';
+
 
 import '../widgets/map_view_platform.dart';
 
@@ -52,7 +52,7 @@ class AppBriefDialog extends StatelessWidget {
       await showDialog(
         context: context,
       builder: (ctx) => Dialog(
-        backgroundColor: Colors.black.withOpacity(0.92),
+        backgroundColor: Colors.black.withValues(alpha: 0.92),
         insetPadding: const EdgeInsets.all(12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -114,12 +114,12 @@ class AppBriefDialog extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppColors.borderRadius),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.40),
+                color: Colors.black.withValues(alpha: 0.40),
                 blurRadius: 18,
                 offset: const Offset(0, 6),
               ),
             ],
-            border: Border.all(color: AppColors.borderBrown.withOpacity(0.5), width: 1),
+            border: Border.all(color: AppColors.borderBrown.withValues(alpha: 0.5), width: 1),
           ),
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -143,7 +143,7 @@ class AppBriefDialog extends StatelessWidget {
                     icon: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.2),
+                        color: Colors.grey.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.close, size: 22, color: AppColors.textDark),
@@ -196,12 +196,12 @@ class AppBriefDialog extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color: AppColors.borderBrown.withOpacity(0.5),
+                                    color: AppColors.borderBrown.withValues(alpha: 0.5),
                                     width: 1.5,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.12),
+                                      color: Colors.black.withValues(alpha: 0.12),
                                       blurRadius: 8,
                                       offset: const Offset(0, 3),
                                     ),
