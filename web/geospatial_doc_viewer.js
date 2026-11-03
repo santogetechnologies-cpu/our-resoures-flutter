@@ -20,8 +20,8 @@
       .replace(/'/g, '&#039;');
   }
 
-  function formatLinks(text) {
-    if (!text) return '';
+  function formatLinks(text, isMain) {
+    if (!text) return '<span style="color: #A0A0A0; font-size: 9px;">—</span>';
     const str = String(text).trim();
     const lines = str.split('\n');
     const result = [];
@@ -30,18 +30,31 @@
       line = line.trim();
       if (!line) continue;
       const colonIdx = line.indexOf('http');
+      let label = '';
+      let url = '';
       if (colonIdx > 0) {
-        const label = line.substring(0, colonIdx).replace(/[: ]+$/, '');
-        const url = line.substring(colonIdx).trim();
-        const labelHtml = label ? `<strong style="color: #70392F;">${escapeHtml(label)}:</strong> ` : '';
-        result.push(`${labelHtml}<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: #1A56DB; text-decoration: underline; word-break: break-all;">${escapeHtml(url)}</a>`);
+        label = line.substring(0, colonIdx).replace(/[: ]+$/, '').trim();
+        url = line.substring(colonIdx).trim();
       } else if (line.startsWith('http')) {
-        result.push(`<a href="${escapeHtml(line)}" target="_blank" rel="noopener noreferrer" style="color: #1A56DB; text-decoration: underline; word-break: break-all;">${escapeHtml(line)}</a>`);
+        url = line;
+      }
+
+      if (url) {
+        const btnText = label || (isMain ? 'الرئيسي' : 'رابط');
+        result.push(
+          `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(url)}" ` +
+          `style="display: block; width: 100%; box-sizing: border-box; background: #FAF6EE; color: #70392F; ` +
+          `border: 1px solid #C59965; border-radius: 3px; padding: 2.5px 2px; font-size: 9.5px; font-weight: bold; ` +
+          `text-decoration: none; margin: 2px 0; text-align: center; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; transition: 0.15s;" ` +
+          `onmouseover="this.style.background='#70392F';this.style.color='#FFF';" ` +
+          `onmouseout="this.style.background='#FAF6EE';this.style.color='#70392F';">` +
+          `${escapeHtml(btnText)} ↗</a>`
+        );
       } else {
-        result.push(escapeHtml(line));
+        result.push(`<span style="font-size: 9.5px; color: #555; display: block; overflow-wrap: break-word;">${escapeHtml(line)}</span>`);
       }
     }
-    return result.join('<br>');
+    return result.length > 0 ? result.join('') : '<span style="color: #A0A0A0; font-size: 9px;">—</span>';
   }
 
   // Global scroll helper callable from Flutter or JS
@@ -203,14 +216,14 @@
       // Sheet 1: المصادر
       const s1 = document.createElement('div');
       s1.id = 'sheet-1-target';
-      s1.style.cssText = 'background: #FFFFFF; border: 1.5px solid #C59965; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.06); padding: 16px 18px; margin-bottom: 24px;';
+      s1.style.cssText = 'background: #FFFFFF; border: 1.5px solid #C59965; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.06); padding: 10px 10px; margin-bottom: 24px; width: 100%; box-sizing: border-box;';
       s1.innerHTML = `
-        <div style="background: #70392F; color: #FFFFFF; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="background: #70392F; color: #FFFFFF; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
           <div>
-            <div style="font-size: 16px; font-weight: bold; color: #FEFCE8;">الورقة 1: المصادر الجيومكانية (53 مصدراً)</div>
-            <div style="font-size: 12px; color: #F0EAE1; margin-top: 3px;">تضم جميع الحقول والأعمدة الـ 15 كاملة ومتاحة للتمرير الأفقي والرأسي بروابط مباشرة</div>
+            <div style="font-size: 15px; font-weight: bold; color: #FEFCE8;">الورقة 1: المصادر الجيومكانية (53 مصدراً)</div>
+            <div style="font-size: 11.5px; color: #F0EAE1; margin-top: 2px;">تضم جميع الحقول والأعمدة الـ 15 كاملة متوافقة ومضبوطة بعرض الشاشة دون تمرير أفقي بروابط مباشرة</div>
           </div>
-          <div style="background: #C59965; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12.5px; font-weight: bold;">53 مصدراً</div>
+          <div style="background: #C59965; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">53 مصدراً</div>
         </div>
       `;
 
@@ -220,14 +233,34 @@
       if (rows1 && rows1.length > 0) {
         const headers = rows1[0];
         const tableWrapper = document.createElement('div');
-        tableWrapper.style.cssText = 'overflow-x: auto; max-width: 100%; border: 1.2px solid #E2D9CC; border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);';
+        tableWrapper.style.cssText = 'width: 100%; overflow-x: auto; border: 1.2px solid #E2D9CC; border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04); box-sizing: border-box;';
 
         const table = document.createElement('table');
-        table.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 12px; text-align: right; min-width: 1650px;';
+        table.style.cssText = 'width: 100%; border-collapse: collapse; font-size: 10px; text-align: right; table-layout: fixed;';
+
+        // Optimized column width percentages totaling exactly 100%
+        const colWidths = [
+          '2.5%',  // 0: الرقم
+          '6.5%',  // 1: القسم
+          '8.5%',  // 2: المصدر
+          '8.5%',  // 3: الاسم بالإنجليزية
+          '7.5%',  // 4: الجهة
+          '15.5%', // 5: ماذا يقدم
+          '6.0%',  // 6: الدقة أو المقياس
+          '4.5%',  // 7: التغطية
+          '5.5%',  // 8: الفترة الزمنية
+          '5.5%',  // 9: مستوى الدراسة الملائم
+          '7.0%',  // 10: الوصول
+          '6.5%',  // 11: الترخيص أو شروط الاستخدام
+          '6.5%',  // 12: الصيغ
+          '4.5%',  // 13: الرابط الرئيسي
+          '5.0%',  // 14: روابط أخرى
+        ];
 
         let theadHtml = '<thead><tr style="background: #70392F; color: #FFFFFF; font-weight: bold; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 3px rgba(0,0,0,0.15);">';
         headers.forEach((h, idx) => {
-          theadHtml += `<th style="padding: 9px 12px; border: 1px solid #8C4E42; white-space: nowrap; ${idx === 0 ? 'text-align: center;' : ''}">${escapeHtml(h || `عمود ${idx + 1}`)}</th>`;
+          const w = colWidths[idx] || '6%';
+          theadHtml += `<th style="width: ${w}; padding: 6px 2px; border: 1px solid #8C4E42; text-align: center; font-size: 10px; line-height: 1.2; vertical-align: middle; overflow-wrap: break-word; word-break: break-word; box-sizing: border-box;">${escapeHtml(h || `عمود ${idx + 1}`)}</th>`;
         });
         theadHtml += '</tr></thead>';
 
@@ -237,18 +270,21 @@
           tbodyHtml += `<tr style="background: ${rIdx % 2 === 0 ? '#FFFFFF' : '#FDFBF7'}; border-bottom: 1px solid #EAE3D8;">`;
           headers.forEach((_, cIdx) => {
             const val = row[cIdx];
+            const w = colWidths[cIdx] || '6%';
             if (cIdx === 0) {
-              tbodyHtml += `<td style="padding: 8px 12px; border: 1px solid #EAE3D8; text-align: center;"><span style="background: #70392F; color: white; font-weight: bold; padding: 2.5px 7px; border-radius: 4px; font-size: 11px;">${escapeHtml(val)}</span></td>`;
+              tbodyHtml += `<td style="width: ${w}; padding: 4px 2px; border: 1px solid #EAE3D8; text-align: center; vertical-align: middle; box-sizing: border-box;"><span style="background: #70392F; color: white; font-weight: bold; padding: 2px 4px; border-radius: 3px; font-size: 9.5px; display: inline-block;">${escapeHtml(val)}</span></td>`;
             } else if (cIdx === 2) {
-              tbodyHtml += `<td style="padding: 8px 12px; border: 1px solid #EAE3D8;"><strong style="color: #70392F; font-size: 12.5px;">${escapeHtml(val)}</strong></td>`;
+              tbodyHtml += `<td style="width: ${w}; padding: 4px 3px; border: 1px solid #EAE3D8; vertical-align: top; overflow-wrap: break-word; word-break: break-word; box-sizing: border-box;"><strong style="color: #70392F; font-size: 10.5px; line-height: 1.3; display: block;">${escapeHtml(val)}</strong></td>`;
             } else if (cIdx === 3) {
-              tbodyHtml += `<td style="padding: 8px 12px; border: 1px solid #EAE3D8;"><span style="color: #444444; font-size: 11px; direction: ltr; display: inline-block;">${escapeHtml(val)}</span></td>`;
+              tbodyHtml += `<td style="width: ${w}; padding: 4px 3px; border: 1px solid #EAE3D8; vertical-align: top; overflow-wrap: break-word; word-break: break-word; box-sizing: border-box;"><span style="color: #444444; font-size: 9px; direction: ltr; display: block; line-height: 1.25;">${escapeHtml(val)}</span></td>`;
             } else if (cIdx === 9 && val) {
-              tbodyHtml += `<td style="padding: 8px 12px; border: 1px solid #EAE3D8;"><span style="background: #F3ECE1; color: #70392F; font-weight: bold; padding: 2px 7px; border-radius: 4px; font-size: 11px; border: 0.5px solid #D9CBBA;">${escapeHtml(val)}</span></td>`;
-            } else if (cIdx === 13 || cIdx === 14) {
-              tbodyHtml += `<td style="padding: 8px 12px; border: 1px solid #EAE3D8;">${formatLinks(val)}</td>`;
+              tbodyHtml += `<td style="width: ${w}; padding: 4px 2px; border: 1px solid #EAE3D8; text-align: center; vertical-align: middle; box-sizing: border-box;"><span style="background: #F3ECE1; color: #70392F; font-weight: bold; padding: 2px 2px; border-radius: 3px; font-size: 8.5px; border: 0.5px solid #D9CBBA; display: inline-block; line-height: 1.2; width: 100%; box-sizing: border-box;">${escapeHtml(val)}</span></td>`;
+            } else if (cIdx === 13) {
+              tbodyHtml += `<td style="width: ${w}; padding: 4px 2px; border: 1px solid #EAE3D8; text-align: center; vertical-align: middle; box-sizing: border-box;">${formatLinks(val, true)}</td>`;
+            } else if (cIdx === 14) {
+              tbodyHtml += `<td style="width: ${w}; padding: 4px 2px; border: 1px solid #EAE3D8; text-align: center; vertical-align: middle; box-sizing: border-box;">${formatLinks(val, false)}</td>`;
             } else {
-              tbodyHtml += `<td style="padding: 8px 12px; border: 1px solid #EAE3D8; vertical-align: top; line-height: 1.45;">${escapeHtml(val)}</td>`;
+              tbodyHtml += `<td style="width: ${w}; padding: 4px 3px; border: 1px solid #EAE3D8; vertical-align: top; font-size: 9.5px; line-height: 1.35; overflow-wrap: break-word; word-break: break-word; box-sizing: border-box;">${escapeHtml(val)}</td>`;
             }
           });
           tbodyHtml += '</tr>';
