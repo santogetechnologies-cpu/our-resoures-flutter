@@ -10,7 +10,6 @@
 build/
 *.dill
 *.symbols
-lib/generated_plugin_registrant.dart
 
 # Widget Preview related
 .widget_preview/

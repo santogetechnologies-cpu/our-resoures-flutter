@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة المصادر الجيومكانية</title>
+
+  <!-- PDF.js 2.11.338 with CMap support for perfect Arabic font rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js";
+    }
+  </script>
+
+  <!-- SheetJS for dynamic XLSX parsing -->
+  <script src="xlsx.full.min.js"></script>
+
+  <!-- Unified Viewer Script -->
+  <script src="geospatial_doc_viewer.js?v=2.1"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #FAF6EE;
+      font-family: "NotoKufi", "Segoe UI", -apple-system, BlinkMacSystemFont, Tahoma, Arial, sans-serif;
+    }
+    #viewer-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer-container"></div>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      if (typeof window.initGeospatialDocViewer === 'function') {
+        window.initGeospatialDocViewer(
+          'viewer-container',
+          document.getElementById('viewer-container'),
+          'assets/books/general_books/geospatial_portal.pdf',
+          'assets/data/geospatial_am_my3.xlsx'
+        );
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+import '../widgets/geospatial_doc_viewer_platform.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../theme/app_theme.dart';
 import '../widgets/map_view_platform.dart';
@@ -97,12 +99,17 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final dialogWidth = widget.continuationWidget != null
-        ? (size.width * 0.92).clamp(520.0, 1180.0)
-        : (size.width * 0.85).clamp(480.0, 1100.0);
-    final dialogHeight = widget.continuationWidget != null
-        ? (size.height * 0.95).clamp(480.0, 980.0)
-        : (size.height * 0.92).clamp(400.0, 950.0);
+    final isGeospatial = widget.title.contains('الجيومكانية');
+    final dialogWidth = isGeospatial
+        ? (size.width * 0.95).clamp(650.0, 1350.0)
+        : (widget.continuationWidget != null
+            ? (size.width * 0.92).clamp(520.0, 1180.0)
+            : (size.width * 0.85).clamp(480.0, 1100.0));
+    final dialogHeight = isGeospatial
+        ? (size.height * 0.95).clamp(520.0, 1050.0)
+        : (widget.continuationWidget != null
+            ? (size.height * 0.95).clamp(480.0, 980.0)
+            : (size.height * 0.92).clamp(400.0, 950.0));
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -167,7 +174,8 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
               const SizedBox(height: 8),
 
               // Controls Bar (Zoom + Page count)
-              Container(
+              if (!widget.title.contains('الجيومكانية')) ...[
+                Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
@@ -261,6 +269,8 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
                 ),
               ),
 
+              ],
+
               // Main PDF Viewer Area
               Expanded(
                 child: Container(
@@ -318,6 +328,12 @@ class _PdfViewerDialogState extends State<PdfViewerDialog> {
   }
 
   Widget _buildViewerContent() {
+    if (widget.title.contains('الجيومكانية') && kIsWeb) {
+      return buildGeospatialDocViewerPlatform(
+        pdfAssetPath: 'assets/books/general_books/geospatial_portal.pdf',
+        xlsxAssetPath: 'assets/data/geospatial_am_my3.xlsx',
+      );
+    }
     if (_isLoading) {
       return const Center(
         child: Column(
