@@ -26,6 +26,12 @@ void registerFormationPolygonCallback(void Function(String layerKey)? callback) 
 
 void registerValleyLineCallback(void Function(String layerKey)? callback) {}
 
+void loadReservesWeb(String domId, String geoJsonString, String? selectedReserveId) {}
+void selectReserveWeb(String domId, String? selectedReserveId) {}
+void fitBoundsWeb(String domId, double minLng, double minLat, double maxLng, double maxLat, double padding) {}
+void registerReservePolygonCallback(void Function(String reserveId)? callback) {}
+
+
 void setModalOpenWeb(bool isOpen) {}
 
 void registerSidebarScrollCallback(void Function(double deltaY)? callback) {}

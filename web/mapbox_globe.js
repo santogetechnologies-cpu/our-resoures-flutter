@@ -1369,6 +1369,204 @@ window.mapboxGlobeClearGeoJsonLineLayers = function (viewId, layerIdsStr, source
 };
 
 // ---------------------------------------------------------------------------
+// Natural Reserves GeoJSON Layer & Interaction (SGS.geojson)
+// ---------------------------------------------------------------------------
+window.mapboxGlobeLoadReservesWeb = function (viewId, geoJsonString, selectedReserveId) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map) {
+    if (!window.mapboxGlobePendingCbs[viewId]) {
+      window.mapboxGlobePendingCbs[viewId] = [];
+    }
+    window.mapboxGlobePendingCbs[viewId].push(function () {
+      window.mapboxGlobeLoadReservesWeb(viewId, geoJsonString, selectedReserveId);
+    });
+    return;
+  }
+
+  function _loadReserves() {
+    let geoJson;
+    try {
+      geoJson = (typeof geoJsonString === 'string') ? JSON.parse(geoJsonString) : geoJsonString;
+    } catch (e) {
+      console.error('[Globe] loadReserves JSON parse error:', e);
+      return;
+    }
+
+    const sourceId = 'reserves-source';
+    const fillLayerId = 'reserves-fill';
+    const lineLayerId = 'reserves-line';
+
+    if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
+    if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
+    if (map.getSource(sourceId)) map.removeSource(sourceId);
+
+    if (geoJson && geoJson.features) {
+      geoJson.features.forEach(function (f, i) {
+        if (!f.properties) f.properties = {};
+        if (!f.properties.id) {
+          f.properties.id = 'reserve_' + i;
+        }
+        f.id = f.properties.id;
+      });
+    }
+
+    map.addSource(sourceId, {
+      type: 'geojson',
+      data: geoJson
+    });
+
+    const activeId = selectedReserveId || '';
+
+    map.addLayer({
+      id: fillLayerId,
+      type: 'fill',
+      source: sourceId,
+      paint: {
+        'fill-color': [
+          'case',
+          ['==', ['get', 'id'], activeId],
+          '#E65100', // Highlighted amber orange
+          '#1B5E20'  // Lush Saudi nature green
+        ],
+        'fill-opacity': [
+          'case',
+          ['==', ['get', 'id'], activeId],
+          0.65,
+          0.38
+        ]
+      }
+    });
+
+    map.addLayer({
+      id: lineLayerId,
+      type: 'line',
+      source: sourceId,
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round'
+      },
+      paint: {
+        'line-color': [
+          'case',
+          ['==', ['get', 'id'], activeId],
+          '#FFD54F', // Bright gold border when selected
+          '#81C784'  // Light emerald green border
+        ],
+        'line-width': [
+          'case',
+          ['==', ['get', 'id'], activeId],
+          3.8,
+          2.0
+        ]
+      }
+    });
+
+    map.on('click', fillLayerId, function (e) {
+      if (window.flutterModalOpen) return;
+      if (e.features && e.features.length > 0) {
+        const feat = e.features[0];
+        const reserveId = (feat.properties && feat.properties.id) ? feat.properties.id : feat.id;
+        if (reserveId !== undefined && typeof window.onReservePolygonClicked === 'function') {
+          window.onReservePolygonClicked(String(reserveId));
+        }
+      }
+    });
+
+    map.on('mouseenter', fillLayerId, function () {
+      if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', fillLayerId, function () {
+      map.getCanvas().style.cursor = '';
+    });
+  }
+
+  function _safeLoad() {
+    try {
+      _loadReserves();
+    } catch (e) {
+      console.warn('[Globe] _loadReserves retry in 150ms:', e);
+      setTimeout(function () {
+        try { _loadReserves(); } catch (err) { console.error('[Globe] _loadReserves retry failed:', err); }
+      }, 150);
+    }
+  }
+
+  if (map._styleIsLoading) {
+    let done = false;
+    const onReady = function () {
+      if (done) return;
+      done = true;
+      _safeLoad();
+    };
+    map.once('style.load', onReady);
+    setTimeout(onReady, 400);
+  } else {
+    _safeLoad();
+  }
+};
+
+window.mapboxGlobeSelectReserveWeb = function (viewId, selectedReserveId) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map) return;
+  const fillLayerId = 'reserves-fill';
+  const lineLayerId = 'reserves-line';
+  const activeId = selectedReserveId || '';
+  try {
+    if (map.getLayer(fillLayerId)) {
+      map.setPaintProperty(fillLayerId, 'fill-color', [
+        'case',
+        ['==', ['get', 'id'], activeId],
+        '#E65100',
+        '#1B5E20'
+      ]);
+      map.setPaintProperty(fillLayerId, 'fill-opacity', [
+        'case',
+        ['==', ['get', 'id'], activeId],
+        0.65,
+        0.38
+      ]);
+    }
+    if (map.getLayer(lineLayerId)) {
+      map.setPaintProperty(lineLayerId, 'line-color', [
+        'case',
+        ['==', ['get', 'id'], activeId],
+        '#FFD54F',
+        '#81C784'
+      ]);
+      map.setPaintProperty(lineLayerId, 'line-width', [
+        'case',
+        ['==', ['get', 'id'], activeId],
+        3.8,
+        2.0
+      ]);
+    }
+  } catch (e) {
+    console.warn('[Globe] selectReserve error:', e);
+  }
+};
+
+window.mapboxGlobeFitBoundsWeb = function (viewId, minLng, minLat, maxLng, maxLat, padding) {
+  const map = window.mapboxGlobeInstances[viewId];
+  if (!map) return;
+  try {
+    const pad = (padding !== undefined && padding !== null) ? padding : 80;
+    if (Math.abs(maxLng - minLng) < 0.001 && Math.abs(maxLat - minLat) < 0.001) {
+      map.flyTo({ center: [minLng, minLat], zoom: 9.0, duration: 1500, essential: true });
+    } else {
+      map.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
+        padding: pad,
+        duration: 1500,
+        essential: true
+      });
+    }
+  } catch (e) {
+    console.warn('[Globe] fitBounds error:', e);
+  }
+};
+
+
+
+// ---------------------------------------------------------------------------
 // Global Accessibility Safeguards: Prevent map & platform view descendants from
 // retaining focus when parent platform view has aria-hidden="true"
 // ---------------------------------------------------------------------------

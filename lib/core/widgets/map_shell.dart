@@ -98,6 +98,36 @@ class MapShellController {
     }
   }
 
+  void loadReserves({required String geoJsonString, String? selectedReserveId}) {
+    if (kIsWeb && webDomId != null) {
+      loadReservesWeb(webDomId!, geoJsonString, selectedReserveId);
+    }
+  }
+
+  void selectReserve(String? selectedReserveId) {
+    if (kIsWeb && webDomId != null) {
+      selectReserveWeb(webDomId!, selectedReserveId);
+    }
+  }
+
+  void fitBounds({
+    required double minLng,
+    required double minLat,
+    required double maxLng,
+    required double maxLat,
+    double padding = 80,
+  }) {
+    if (kIsWeb && webDomId != null) {
+      fitBoundsWeb(webDomId!, minLng, minLat, maxLng, maxLat, padding);
+    } else {
+      flyTo(
+        latitude: (minLat + maxLat) / 2,
+        longitude: (minLng + maxLng) / 2,
+        zoom: 7.0,
+      );
+    }
+  }
+
   /// Adds a GeoJSON line layer to the map (for valley lines).
   /// [sourceId] & [layerId] must be unique per valley.
   /// [geoJsonString] is the raw GeoJSON content.

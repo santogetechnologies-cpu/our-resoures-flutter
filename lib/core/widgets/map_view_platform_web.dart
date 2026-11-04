@@ -115,6 +115,38 @@ void registerValleyLineCallback(void Function(String layerKey)? callback) {
   }
 }
 
+
+void loadReservesWeb(String domId, String geoJsonString, String? selectedReserveId) {
+  if (js.context.hasProperty('mapboxGlobeLoadReservesWeb')) {
+    js.context.callMethod('mapboxGlobeLoadReservesWeb', [domId, geoJsonString, selectedReserveId]);
+  }
+}
+
+void selectReserveWeb(String domId, String? selectedReserveId) {
+  if (js.context.hasProperty('mapboxGlobeSelectReserveWeb')) {
+    js.context.callMethod('mapboxGlobeSelectReserveWeb', [domId, selectedReserveId]);
+  }
+}
+
+void fitBoundsWeb(String domId, double minLng, double minLat, double maxLng, double maxLat, double padding) {
+  if (js.context.hasProperty('mapboxGlobeFitBoundsWeb')) {
+    js.context.callMethod('mapboxGlobeFitBoundsWeb', [domId, minLng, minLat, maxLng, maxLat, padding]);
+  }
+}
+
+void registerReservePolygonCallback(void Function(String reserveId)? callback) {
+  if (callback == null) {
+    js.context['onReservePolygonClicked'] = null;
+  } else {
+    js.context['onReservePolygonClicked'] = (dynamic id) {
+      if (id != null) {
+        callback(id.toString());
+      }
+    };
+  }
+}
+
+
 bool _isModalOpenWeb = false;
 
 void setModalOpenWeb(bool isOpen) {

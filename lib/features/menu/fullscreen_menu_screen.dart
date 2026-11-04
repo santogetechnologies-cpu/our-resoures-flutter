@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_assets.dart';
-import '../../core/dialogs/about_dialog.dart';
 import '../../core/dialogs/pdf_viewer_dialog.dart';
 import '../start/start_screen.dart';
 import '../geology/geology_screen.dart';
@@ -10,6 +9,7 @@ import '../tourism/tourism_screen.dart';
 import '../earthquake/earthquake_screen.dart';
 import '../oil_gas/oil_gas_screen.dart';
 import '../books/books_screen.dart';
+import '../reserves/reserves_screen.dart';
 
 class FullscreenMenuScreen extends StatelessWidget {
   const FullscreenMenuScreen({super.key});
@@ -493,8 +493,10 @@ class FullscreenMenuScreen extends StatelessWidget {
                                               const TourismScreen(),
                                             ),
                                             leftTitle: 'المحميات، حكاية الأرض ومخاطر الطبيعة',
-                                            leftOnTap: () => AboutDialogs
-                                                .showNaturalReserves(context),
+                                            leftOnTap: () => _navigate(
+                                              context,
+                                              const ReservesScreen(),
+                                            ),
                                             bgColor: _kRowGrey,
                                             height: rowH,
                                             fontSize: rowFontSize,

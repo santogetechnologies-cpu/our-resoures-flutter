@@ -42,6 +42,8 @@ flutter:
     - assets/maps/water_formation/
     - assets/maps/materials/
     - assets/maps/earthquake/
+    - assets/maps/reserves/
+    - SGS/
     - assets/books/educational/
     - assets/books/specialized/
     - assets/books/general_books/
