@@ -274,7 +274,14 @@ class _ReservesScreenState extends State<ReservesScreen> {
     }
   }
 
+  bool _isPopupOpen = false;
+  DateTime _lastPopupDismissed = DateTime.fromMillisecondsSinceEpoch(0);
+
   void _onPolygonTapped(String reserveId) {
+    if (_isPopupOpen) return;
+    if (DateTime.now().difference(_lastPopupDismissed).inMilliseconds < 450) {
+      return;
+    }
     final matched = _allReserves.firstWhere(
       (r) => r.id == reserveId || 'reserve_${r.index}' == reserveId || r.nameAr == reserveId,
       orElse: () => _allReserves.first,
@@ -282,7 +289,10 @@ class _ReservesScreenState extends State<ReservesScreen> {
     _selectAndShowReserve(matched);
   }
 
-  void _selectAndShowReserve(ReserveItem reserve) {
+  Future<void> _selectAndShowReserve(ReserveItem reserve) async {
+    if (_isPopupOpen) return;
+    _isPopupOpen = true;
+
     setState(() {
       _selectedReserveId = reserve.id;
       _expandedCategory = reserve.category;
@@ -303,15 +313,20 @@ class _ReservesScreenState extends State<ReservesScreen> {
         ? 'المركز الوطني لتنمية الحياة الفطرية (NCW)'
         : 'المحميات الملكية والطبيعية بالمملكة';
 
-    AppPopupDialog.show(
-      context,
-      title: reserve.nameAr,
-      description: 'الاسم بالإنجليزية: ${reserve.nameEn}\n'
-          'التصنيف الإداري: $catLabel\n'
-          'النوع: منطقة محمية معتمدة (PA)\n'
-          'إحداثيات المركز: ${reserve.centerLat.toStringAsFixed(3)}°N, ${reserve.centerLng.toStringAsFixed(3)}°E\n\n'
-          'نبذة عن المحمية والأهداف البيئية:\n${reserve.description}',
-    );
+    try {
+      await AppPopupDialog.show(
+        context,
+        title: reserve.nameAr,
+        description: 'الاسم بالإنجليزية: ${reserve.nameEn}\n'
+            'التصنيف الإداري: $catLabel\n'
+            'النوع: منطقة محمية معتمدة (PA)\n'
+            'إحداثيات المركز: ${reserve.centerLat.toStringAsFixed(3)}°N, ${reserve.centerLng.toStringAsFixed(3)}°E\n\n'
+            'نبذة عن المحمية والأهداف البيئية:\n${reserve.description}',
+      );
+    } finally {
+      _lastPopupDismissed = DateTime.now();
+      _isPopupOpen = false;
+    }
   }
 
   void _showIntroBrief() {

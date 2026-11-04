@@ -891,9 +891,31 @@ window.addEventListener('touchend', () => {
   _sidebarTouchStartY = null;
 }, { passive: true });
 
+// Global Click Guard: swallow any lingering click events on map canvas during or immediately after modal dialog
+window.addEventListener('click', function (e) {
+  if (window.flutterModalOpen || (window._modalClosingUntil && Date.now() < window._modalClosingUntil) || isModalActive()) {
+    if (e.target && (e.target.tagName === 'CANVAS' || (typeof e.target.closest === 'function' && e.target.closest('.maplibregl-map, flt-platform-view')))) {
+      try {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      } catch (_) {}
+    }
+  }
+}, { capture: true });
+
 window.flutterModalOpen = false;
+window._modalClosingUntil = 0;
 window.setModalOpenWeb = function (isOpen) {
-  window.flutterModalOpen = !!isOpen;
+  if (isOpen) {
+    window.flutterModalOpen = true;
+    window._modalClosingUntil = 0;
+  } else {
+    window._modalClosingUntil = Date.now() + 500;
+    setTimeout(function () {
+      window.flutterModalOpen = false;
+    }, 450);
+  }
   if (isOpen) {
     if (document.activeElement && document.activeElement.closest &&
         document.activeElement.closest('.maplibregl-map, flt-platform-view')) {
@@ -1474,7 +1496,7 @@ window.mapboxGlobeLoadReservesWeb = function (viewId, geoJsonString, selectedRes
     });
 
     map.on('click', fillLayerId, function (e) {
-      if (window.flutterModalOpen) return;
+      if (window.flutterModalOpen || (window._modalClosingUntil && Date.now() < window._modalClosingUntil) || isModalActive()) return;
       if (e.features && e.features.length > 0) {
         const feat = e.features[0];
         const reserveId = (feat.properties && feat.properties.id) ? feat.properties.id : feat.id;

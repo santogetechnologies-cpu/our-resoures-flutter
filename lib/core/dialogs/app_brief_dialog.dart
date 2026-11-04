@@ -42,6 +42,7 @@ class AppBriefDialog extends StatelessWidget {
         ),
       );
     } finally {
+      await Future.delayed(const Duration(milliseconds: 350));
       setModalOpenWeb(false);
     }
   }

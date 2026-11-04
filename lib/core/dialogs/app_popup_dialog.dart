@@ -37,6 +37,8 @@ class AppPopupDialog extends StatelessWidget {
         ),
       );
     } finally {
+      // 350ms buffer to absorb any trailing click/pointer events in the browser
+      await Future.delayed(const Duration(milliseconds: 350));
       setModalOpenWeb(false);
     }
   }
