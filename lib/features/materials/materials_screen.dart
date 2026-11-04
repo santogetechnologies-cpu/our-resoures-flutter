@@ -469,6 +469,9 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
           _allLocations = list;
           _isLoading = false;
         });
+        if (_mapController != null) {
+          _onMetalSelected('Copper', showPopup: false);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -477,7 +480,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     }
   }
 
-  Future<void> _onMetalSelected(String metalEn) async {
+  Future<void> _onMetalSelected(String metalEn, {bool showPopup = true}) async {
     if (_allLocations.isEmpty) {
       await _loadExcelData();
     }
@@ -569,7 +572,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     }
 
     // Show specimen popup dialog matching Android popup_layout.xml (metalInfoPopUp)
-    if (info != null) {
+    if (showPopup && info != null) {
       AppPopupDialog.show(
         context,
         title: info.nameAr,
@@ -579,7 +582,7 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
     }
 
     // Fly 3D globe camera if locations exist
-    if (filtered.isNotEmpty && _mapController != null) {
+    if (showPopup && filtered.isNotEmpty && _mapController != null) {
       _mapController!.flyTo(
         latitude: filtered.first.latitude,
         longitude: filtered.first.longitude,
@@ -693,7 +696,12 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
       onBriefPressed: null,
       initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       isLoading: _isLoading,
-      onMapCreated: (controller) => _mapController = controller,
+      onMapCreated: (controller) {
+        _mapController = controller;
+        if (_allLocations.isNotEmpty) {
+          _onMetalSelected('Copper', showPopup: false);
+        }
+      },
       sidebarContent: Column(
         children: [
           // 1. Top 10 Mining PDF Section Buttons

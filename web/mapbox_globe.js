@@ -939,15 +939,13 @@ window.addEventListener('click', function (e) {
 window.flutterModalOpen = false;
 window._modalClosingUntil = 0;
 window.setModalOpenWeb = function (isOpen) {
+  window.flutterModalOpen = !!isOpen;
   if (isOpen) {
-    window.flutterModalOpen = true;
     window._modalClosingUntil = 0;
   } else {
     window._modalClosingUntil = Date.now() + 500;
-    setTimeout(function () {
-      window.flutterModalOpen = false;
-    }, 450);
   }
+
   if (isOpen) {
     if (document.activeElement && document.activeElement.closest &&
         document.activeElement.closest('.maplibregl-map, flt-platform-view')) {
@@ -959,17 +957,18 @@ window.setModalOpenWeb = function (isOpen) {
       }
     }
   }
+
   if (document.body) {
-    document.body.classList.toggle('flutter-modal-open', window.flutterModalOpen);
+    document.body.classList.toggle('flutter-modal-open', !!isOpen);
   }
   if (document.documentElement) {
-    document.documentElement.classList.toggle('flutter-modal-open', window.flutterModalOpen);
+    document.documentElement.classList.toggle('flutter-modal-open', !!isOpen);
   }
 
   // Hide or show all marker elements in DOM
   const markers = document.querySelectorAll('.mapbox-custom-marker, .maplibregl-marker, .mapboxgl-marker');
   markers.forEach(el => {
-    if (window.flutterModalOpen) {
+    if (isOpen) {
       el.style.setProperty('visibility', 'hidden', 'important');
       el.style.setProperty('opacity', '0', 'important');
       el.style.setProperty('pointer-events', 'none', 'important');
@@ -990,7 +989,7 @@ window.setModalOpenWeb = function (isOpen) {
         try {
           const mel = m && m.getElement && m.getElement();
           if (mel) {
-            if (window.flutterModalOpen) {
+            if (isOpen) {
               mel.style.setProperty('visibility', 'hidden', 'important');
               mel.style.setProperty('opacity', '0', 'important');
               mel.style.setProperty('pointer-events', 'none', 'important');
@@ -1012,7 +1011,7 @@ window.setModalOpenWeb = function (isOpen) {
   Object.values(window.mapboxGlobeInstances || {}).forEach(map => {
     if (map) {
       try {
-        if (window.flutterModalOpen) {
+        if (isOpen) {
           if (map.scrollZoom && map.scrollZoom.isEnabled()) map.scrollZoom.disable();
           if (map.dragPan && map.dragPan.isEnabled()) map.dragPan.disable();
           if (map.dragRotate && map.dragRotate.isEnabled()) map.dragRotate.disable();
