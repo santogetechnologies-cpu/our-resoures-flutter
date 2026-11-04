@@ -31,6 +31,22 @@
 window.mapboxGlobeInstances = window.mapboxGlobeInstances || {};
 window.mapboxGlobeMarkers = window.mapboxGlobeMarkers || {};
 window.mapboxGlobePendingCbs = window.mapboxGlobePendingCbs || {};   // queued marker calls
+window.mapboxGlobeLastReserves = window.mapboxGlobeLastReserves || {};
+
+window.destroyMapboxGlobeWeb = function (viewId) {
+  if (window.mapboxGlobeInstances && window.mapboxGlobeInstances[viewId]) {
+    try {
+      window.mapboxGlobeInstances[viewId].remove();
+    } catch (_) {}
+    delete window.mapboxGlobeInstances[viewId];
+  }
+  if (window.mapboxGlobeMarkers && window.mapboxGlobeMarkers[viewId]) {
+    delete window.mapboxGlobeMarkers[viewId];
+  }
+  if (window.mapboxGlobePendingCbs && window.mapboxGlobePendingCbs[viewId]) {
+    delete window.mapboxGlobePendingCbs[viewId];
+  }
+};
 
 // ---------------------------------------------------------------------------
 // RTL Text Plugin for MapLibre GL JS (Shapes and joins Arabic/RTL text)
@@ -539,6 +555,11 @@ function registerDefaultMarkerImages(map) {
 //   lng, lat, zoom – initial camera
 // ---------------------------------------------------------------------------
 window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLat, initialZoom, initialStyleJson) {
+  // Immediately clean up any previous instance for this viewId
+  if (window.mapboxGlobeInstances && window.mapboxGlobeInstances[viewId]) {
+    try { window.mapboxGlobeInstances[viewId].remove(); } catch (_) {}
+    delete window.mapboxGlobeInstances[viewId];
+  }
   let lng = initialLng, lat = initialLat, zoom = initialZoom;
   let targetContainer = null;
 
@@ -677,6 +698,11 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
           window.mapboxGlobeSetMarkersBatchWeb(viewId, lb.markersJsonStr, lb.callbackName);
         }
       }
+
+      if (window.mapboxGlobeLastReserves && window.mapboxGlobeLastReserves[viewId]) {
+        const lr = window.mapboxGlobeLastReserves[viewId];
+        window.mapboxGlobeLoadReservesWeb(viewId, lr.geoJsonString, lr.selectedReserveId);
+      }
     });
 
     setTimeout(() => {
@@ -692,6 +718,12 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
           if (curMarkers.length === 0) {
             const lb = window.mapboxGlobeLastBatch[viewId];
             window.mapboxGlobeSetMarkersBatchWeb(viewId, lb.markersJsonStr, lb.callbackName);
+          }
+        }
+        if (window.mapboxGlobeLastReserves && window.mapboxGlobeLastReserves[viewId]) {
+          if (!map.getSource('reserves-source')) {
+            const lr = window.mapboxGlobeLastReserves[viewId];
+            window.mapboxGlobeLoadReservesWeb(viewId, lr.geoJsonString, lr.selectedReserveId);
           }
         }
       }
@@ -1406,6 +1438,12 @@ window.mapboxGlobeClearGeoJsonLineLayers = function (viewId, layerIdsStr, source
 // Natural Reserves GeoJSON Layer & Interaction (SGS.geojson)
 // ---------------------------------------------------------------------------
 window.mapboxGlobeLoadReservesWeb = function (viewId, geoJsonString, selectedReserveId) {
+  window.mapboxGlobeLastReserves = window.mapboxGlobeLastReserves || {};
+  window.mapboxGlobeLastReserves[viewId] = {
+    geoJsonString: geoJsonString,
+    selectedReserveId: selectedReserveId
+  };
+
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) {
     if (!window.mapboxGlobePendingCbs[viewId]) {
@@ -1495,51 +1533,57 @@ window.mapboxGlobeLoadReservesWeb = function (viewId, geoJsonString, selectedRes
       }
     });
 
-    map.on('click', fillLayerId, function (e) {
-      if (window.flutterModalOpen || (window._modalClosingUntil && Date.now() < window._modalClosingUntil) || isModalActive()) return;
-      if (e.features && e.features.length > 0) {
-        const feat = e.features[0];
-        const reserveId = (feat.properties && feat.properties.id) ? feat.properties.id : feat.id;
-        if (reserveId !== undefined && typeof window.onReservePolygonClicked === 'function') {
-          window.onReservePolygonClicked(String(reserveId));
+    if (!map._reserveListenersAttached) {
+      map._reserveListenersAttached = true;
+      map.on('click', fillLayerId, function (e) {
+        if (window.flutterModalOpen || (window._modalClosingUntil && Date.now() < window._modalClosingUntil) || isModalActive()) return;
+        if (e.features && e.features.length > 0) {
+          const feat = e.features[0];
+          const reserveId = (feat.properties && feat.properties.id) ? feat.properties.id : feat.id;
+          if (reserveId !== undefined && typeof window.onReservePolygonClicked === 'function') {
+            window.onReservePolygonClicked(String(reserveId));
+          }
         }
-      }
-    });
+      });
 
-    map.on('mouseenter', fillLayerId, function () {
-      if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
-    });
-    map.on('mouseleave', fillLayerId, function () {
-      map.getCanvas().style.cursor = '';
-    });
-  }
-
-  function _safeLoad() {
-    try {
-      _loadReserves();
-    } catch (e) {
-      console.warn('[Globe] _loadReserves retry in 150ms:', e);
-      setTimeout(function () {
-        try { _loadReserves(); } catch (err) { console.error('[Globe] _loadReserves retry failed:', err); }
-      }, 150);
+      map.on('mouseenter', fillLayerId, function () {
+        if (!window.flutterModalOpen) map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', fillLayerId, function () {
+        map.getCanvas().style.cursor = '';
+      });
     }
   }
 
-  if (map._styleIsLoading) {
-    let done = false;
-    const onReady = function () {
-      if (done) return;
-      done = true;
-      _safeLoad();
-    };
-    map.once('style.load', onReady);
-    setTimeout(onReady, 400);
-  } else {
-    _safeLoad();
+  function tryApply(attempt) {
+    attempt = attempt || 0;
+    const currentMap = window.mapboxGlobeInstances[viewId];
+    if (!currentMap) return;
+    if (!currentMap.isStyleLoaded() || currentMap._styleIsLoading) {
+      if (attempt < 30) {
+        currentMap.once('style.load', function () { tryApply(attempt + 1); });
+        setTimeout(function () { tryApply(attempt + 1); }, 100);
+        return;
+      }
+    }
+    try {
+      _loadReserves();
+    } catch (e) {
+      if (attempt < 30) {
+        setTimeout(function () { tryApply(attempt + 1); }, 100);
+      } else {
+        console.error('[Globe] loadReserves retry failed:', e);
+      }
+    }
   }
+
+  tryApply(0);
 };
 
 window.mapboxGlobeSelectReserveWeb = function (viewId, selectedReserveId) {
+  if (window.mapboxGlobeLastReserves && window.mapboxGlobeLastReserves[viewId]) {
+    window.mapboxGlobeLastReserves[viewId].selectedReserveId = selectedReserveId;
+  }
   const map = window.mapboxGlobeInstances[viewId];
   if (!map) return;
   const fillLayerId = 'reserves-fill';

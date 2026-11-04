@@ -271,6 +271,14 @@ class _MapboxWebWidgetState extends State<_MapboxWebWidget> {
     });
   }
 
+  @override
+  void dispose() {
+    _registeredWebDivs.remove(widget.domId);
+    if (js.context.hasProperty('destroyMapboxGlobeWeb')) {
+      js.context.callMethod('destroyMapboxGlobeWeb', [widget.domId]);
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
