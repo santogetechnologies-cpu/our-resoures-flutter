@@ -747,45 +747,14 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
     );
     if (typeof ResizeObserver !== 'undefined') {
       new ResizeObserver(() => { try { map.resize(); } catch (_) { } })
-        .observe(targetContainer);
+                .observe(targetContainer);
     }
-
-    // ── Interaction Guard: Isolate Sidebar & Modals from Globe ───────────────
-    function setGlobeInteractions(enabled) {
-      if (!map) return;
-      if (window.flutterModalOpen) {
-        enabled = false;
-      }
-      try {
-        if (enabled) {
-          if (map.scrollZoom && !map.scrollZoom.isEnabled()) map.scrollZoom.enable();
-          if (map.dragPan && !map.dragPan.isEnabled()) map.dragPan.enable();
-          if (map.dragRotate && !map.dragRotate.isEnabled()) map.dragRotate.enable();
-          if (map.touchZoomRotate && !map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
-        } else {
-          if (map.scrollZoom && map.scrollZoom.isEnabled()) map.scrollZoom.disable();
-          if (map.dragPan && map.dragPan.isEnabled()) map.dragPan.disable();
-          if (map.dragRotate && map.dragRotate.isEnabled()) map.dragRotate.disable();
-          if (map.touchZoomRotate && map.touchZoomRotate.isEnabled()) map.touchZoomRotate.disable();
-          if (map.doubleClickZoom && map.doubleClickZoom.isEnabled()) map.doubleClickZoom.disable();
-        }
-      } catch (_) { }
-    }
-
-    const onPointerCheck = (e) => {
-      const overSidebar = isPointerOverSidebar(e);
-      setGlobeInteractions(!overSidebar);
-    };
-
-    window.addEventListener('mousemove', onPointerCheck, { passive: true });
-    window.addEventListener('pointermove', onPointerCheck, { passive: true });
-    window.addEventListener('wheel', onPointerCheck, { passive: true });
   }
 
   tryInit();
 };
 
-// ── Global Sidebar Wheel & Touch Bridge for Flutter Web ────────────────────
+// Global Sidebar Wheel & Touch Bridge for Flutter Web
 function _getPointerX(e) {
   if (e.clientX !== undefined) return e.clientX;
   if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
@@ -811,13 +780,11 @@ function isModalActive() {
 }
 
 function isPointerOverSidebar(e) {
-  // If a modal dialog is open or active, sidebar scrolling must be completely disabled
   if (isModalActive()) {
     return false;
   }
-  // If the event target is inside any dialog, modal, platform view, or popup
   if (e && e.target && typeof e.target.closest === 'function') {
-    if (e.target.closest('[role="dialog"], .flutter-modal, .geospatial-doc-viewer, .dialog, flt-glass-pane [role="dialog"], flt-platform-view')) {
+    if (e.target.closest('[role="dialog"], .flutter-modal, .geospatial-doc-viewer, .dialog, flt-glass-pane [role="dialog"]')) {
       return false;
     }
   }
@@ -827,33 +794,81 @@ function isPointerOverSidebar(e) {
   return x !== undefined && x >= (w - sidebarWidth);
 }
 
+function setAllGlobeInteractions(enabled) {
+  if (window.flutterModalOpen) {
+    enabled = false;
+  }
+  Object.values(window.mapboxGlobeInstances || {}).forEach(map => {
+    if (!map) return;
+    try {
+      if (enabled) {
+        if (map.scrollZoom && !map.scrollZoom.isEnabled()) map.scrollZoom.enable();
+        if (map.dragPan && !map.dragPan.isEnabled()) map.dragPan.enable();
+        if (map.dragRotate && !map.dragRotate.isEnabled()) map.dragRotate.enable();
+        if (map.touchZoomRotate && !map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
+      } else {
+        if (map.scrollZoom && map.scrollZoom.isEnabled()) map.scrollZoom.disable();
+        if (map.dragPan && map.dragPan.isEnabled()) map.dragPan.disable();
+        if (map.dragRotate && map.dragRotate.isEnabled()) map.dragRotate.disable();
+        if (map.touchZoomRotate && map.touchZoomRotate.isEnabled()) map.touchZoomRotate.disable();
+        if (map.doubleClickZoom && map.doubleClickZoom.isEnabled()) map.doubleClickZoom.disable();
+      }
+    } catch (_) { }
+  });
+}
+
+const onPointerCheckGlobal = (e) => {
+  if (isModalActive()) {
+    setAllGlobeInteractions(false);
+    return;
+  }
+  const overSidebar = isPointerOverSidebar(e);
+  setAllGlobeInteractions(!overSidebar);
+};
+
+window.addEventListener('mousemove', onPointerCheckGlobal, { capture: true, passive: true });
+window.addEventListener('pointermove', onPointerCheckGlobal, { capture: true, passive: true });
+
 let _sidebarTouchStartY = null;
 
-// Global wheel listener: always forward wheel scroll over the sidebar to Flutter (only when NO modal is open)
 window.addEventListener('wheel', (e) => {
-  if (isModalActive()) return;
+  if (isModalActive()) {
+    setAllGlobeInteractions(false);
+    return;
+  }
   if (isPointerOverSidebar(e)) {
+    setAllGlobeInteractions(false);
+    try {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    } catch (_) { }
+
     let dy = e.deltaY;
     if (e.deltaMode === 1) dy *= 32;
     else if (e.deltaMode === 2) dy *= 320;
     if (typeof window.flutterSidebarScroll === 'function') {
       window.flutterSidebarScroll(dy);
     }
+  } else {
+    setAllGlobeInteractions(true);
   }
-}, { passive: true });
+}, { capture: true, passive: false });
 
-// Global touch listeners: forward touch swiping over the sidebar to Flutter (only when NO modal is open)
 window.addEventListener('touchstart', (e) => {
   if (isModalActive()) {
     _sidebarTouchStartY = null;
+    setAllGlobeInteractions(false);
     return;
   }
   if (isPointerOverSidebar(e)) {
     _sidebarTouchStartY = _getPointerY(e);
+    setAllGlobeInteractions(false);
   } else {
     _sidebarTouchStartY = null;
+    setAllGlobeInteractions(true);
   }
-}, { passive: true });
+}, { capture: true, passive: true });
 
 window.addEventListener('touchmove', (e) => {
   if (isModalActive()) {
@@ -870,15 +885,12 @@ window.addEventListener('touchmove', (e) => {
       }
     }
   }
-}, { passive: true });
+}, { capture: true, passive: true });
 
 window.addEventListener('touchend', () => {
   _sidebarTouchStartY = null;
 }, { passive: true });
 
-// ---------------------------------------------------------------------------
-// Modal State Bridge: Freezes map controls while modal dialogs are open
-// ---------------------------------------------------------------------------
 window.flutterModalOpen = false;
 window.setModalOpenWeb = function (isOpen) {
   window.flutterModalOpen = !!isOpen;
