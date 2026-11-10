@@ -264,7 +264,7 @@ class _ReservesScreenState extends State<ReservesScreen> {
         children: [
           // Category 1: From 1 to 21 المحميات البرية
           CustomButton(
-            text: 'nالمحميات البرية',
+            text: 'المحميات البرية',
             height: 76,
             fontSize: 22,
             styleType: ButtonStyleType.mainMenu,
@@ -313,7 +313,7 @@ class _ReservesScreenState extends State<ReservesScreen> {
 
           // Category 2: From 22 to 26 المحميات البحرية
           CustomButton(
-            text: 'nالمحميات البحرية',
+            text: 'المحميات البحرية',
             height: 76,
             fontSize: 22,
             styleType: ButtonStyleType.mainMenu,
