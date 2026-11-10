@@ -76,7 +76,8 @@ class _ReservesScreenState extends State<ReservesScreen> {
     try {
       String jsonStr;
       try {
-        jsonStr = await rootBundle.loadString('assets/maps/reserves/SGS.geojson');
+        jsonStr =
+            await rootBundle.loadString('assets/maps/reserves/SGS.geojson');
       } catch (_) {
         jsonStr = await rootBundle.loadString('SGS/SGS.geojson');
       }
@@ -105,6 +106,7 @@ class _ReservesScreenState extends State<ReservesScreen> {
             }
           }
         }
+
         extract(coords);
 
         double minLng = 0, maxLng = 0, minLat = 0, maxLat = 0;
@@ -123,9 +125,12 @@ class _ReservesScreenState extends State<ReservesScreen> {
             ? (props['num'] as int)
             : int.tryParse(props['num']?.toString() ?? '') ?? (i + 1);
 
-        final nameAr = (props['Name'] ?? props['arabic_nam'] ?? 'محمية $numVal').toString().trim();
+        final nameAr = (props['Name'] ?? props['arabic_nam'] ?? 'محمية $numVal')
+            .toString()
+            .trim();
         final nameEn = props['english_na']?.toString() ?? '';
-        final category = props['category']?.toString() ?? ((numVal <= 21) ? 'terrestrial' : 'marine');
+        final category = props['category']?.toString() ??
+            ((numVal <= 21) ? 'terrestrial' : 'marine');
         final id = props['id']?.toString() ?? 'reserve_$numVal';
         final pdfAsset = props['pdfAsset']?.toString() ??
             'assets/books/reserves/reserve_${numVal.toString().padLeft(2, '0')}.pdf';
@@ -259,7 +264,7 @@ class _ReservesScreenState extends State<ReservesScreen> {
         children: [
           // Category 1: From 1 to 21 المحميات البرية
           CustomButton(
-            text: 'From 1 to 21\nالمحميات البرية',
+            text: 'nالمحميات البرية',
             height: 76,
             fontSize: 22,
             styleType: ButtonStyleType.mainMenu,
@@ -278,13 +283,15 @@ class _ReservesScreenState extends State<ReservesScreen> {
             ...terrestrialReserves.map((reserve) {
               final isSelected = reserve.id == _selectedReserveId;
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 21, vertical: 3.5),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 21, vertical: 3.5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppColors.borderRadius),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: const Color(0xFFE65100).withValues(alpha: 0.45),
+                            color:
+                                const Color(0xFFE65100).withValues(alpha: 0.45),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           )
@@ -306,7 +313,7 @@ class _ReservesScreenState extends State<ReservesScreen> {
 
           // Category 2: From 22 to 26 المحميات البحرية
           CustomButton(
-            text: 'From 22 to 26\nالمحميات البحرية',
+            text: 'nالمحميات البحرية',
             height: 76,
             fontSize: 22,
             styleType: ButtonStyleType.mainMenu,
@@ -325,13 +332,15 @@ class _ReservesScreenState extends State<ReservesScreen> {
             ...marineReserves.map((reserve) {
               final isSelected = reserve.id == _selectedReserveId;
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 21, vertical: 3.5),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 21, vertical: 3.5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppColors.borderRadius),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: const Color(0xFFE65100).withValues(alpha: 0.45),
+                            color:
+                                const Color(0xFFE65100).withValues(alpha: 0.45),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           )
