@@ -36,10 +36,57 @@ class TourismScreen extends StatefulWidget {
 }
 
 class _TourismScreenState extends State<TourismScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _dropdownAnimationController;
   late Animation<double> _dropdownAnimation;
   bool _isFourthButtonExpanded = false;
+
+  late AnimationController _marketsAnimationController;
+  late Animation<double> _marketsAnimation;
+  bool _isMarketsExpanded = false;
+
+  static const List<Map<String, String>> _historicalMarkets = [
+    {
+      'title': 'سوق عكاظ التاريخي – الطائف',
+      'assetPath': 'assets/books/tourism/markets/market_01_okaz.pdf',
+    },
+    {
+      'title': 'سوق مجنّة التاريخي – الجموم',
+      'assetPath': 'assets/books/tourism/markets/market_02_majna.pdf',
+    },
+    {
+      'title': 'سوق ذي المجاز التاريخي – مكة',
+      'assetPath': 'assets/books/tourism/markets/market_03_dhul_majaz.pdf',
+    },
+    {
+      'title': 'سوق دومة الجندل التاريخي',
+      'assetPath': 'assets/books/tourism/markets/market_04_dumat_aljandal.pdf',
+    },
+    {
+      'title': 'سوق المناخة التاريخي – المدينة المنورة',
+      'assetPath': 'assets/books/tourism/markets/market_05_manakha.pdf',
+    },
+    {
+      'title': 'سوق حُباشة التاريخي – وادي قنونا',
+      'assetPath': 'assets/books/tourism/markets/market_06_hubasha.pdf',
+    },
+    {
+      'title': 'سوق المشقّر التاريخي – الأحساء',
+      'assetPath': 'assets/books/tourism/markets/market_07_mushaqqar.pdf',
+    },
+    {
+      'title': 'سوق حجر اليمامة التاريخي – الرياض',
+      'assetPath': 'assets/books/tourism/markets/market_08_hajar_alyamama.pdf',
+    },
+    {
+      'title': 'سوق نجران القديم – موقع الأخدود',
+      'assetPath': 'assets/books/tourism/markets/market_09_najran.pdf',
+    },
+    {
+      'title': 'سوق تيماء التاريخي',
+      'assetPath': 'assets/books/tourism/markets/market_10_tayma.pdf',
+    },
+  ];
 
   final List<TourismLandmark> _landmarks = const [
     TourismLandmark(
@@ -478,11 +525,21 @@ class _TourismScreenState extends State<TourismScreen>
       parent: _dropdownAnimationController,
       curve: Curves.easeInOutCubic,
     );
+
+    _marketsAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _marketsAnimation = CurvedAnimation(
+      parent: _marketsAnimationController,
+      curve: Curves.easeInOutCubic,
+    );
   }
 
   @override
   void dispose() {
     _dropdownAnimationController.dispose();
+    _marketsAnimationController.dispose();
     super.dispose();
   }
 
@@ -495,10 +552,40 @@ class _TourismScreenState extends State<TourismScreen>
     }
   }
 
+  void _toggleMarketsDropdown() {
+    setState(() {
+      _isMarketsExpanded = !_isMarketsExpanded;
+      if (_isMarketsExpanded) {
+        _marketsAnimationController.forward();
+        _collapseFourthButtonIfOpen();
+      } else {
+        _marketsAnimationController.reverse();
+      }
+    });
+  }
+
+  void _collapseMarketsIfOpen() {
+    if (_isMarketsExpanded) {
+      setState(() {
+        _isMarketsExpanded = false;
+      });
+      _marketsAnimationController.reverse();
+    }
+  }
+
+  void _openMarketPdf(String title, String assetPath) {
+    PdfViewerDialog.show(
+      context,
+      title: title,
+      assetPath: assetPath,
+    );
+  }
+
   void _toggleFourthButton() {
     setState(() {
       _isFourthButtonExpanded = !_isFourthButtonExpanded;
       if (_isFourthButtonExpanded) {
+        _collapseMarketsIfOpen();
         _dropdownAnimationController.forward();
         if (_mapController != null) {
           _loadMarkers(_mapController!);
@@ -611,6 +698,7 @@ class _TourismScreenState extends State<TourismScreen>
 
   void _showIntroBrief() {
     _collapseFourthButtonIfOpen();
+    _collapseMarketsIfOpen();
     PdfViewerDialog.show(
       context,
       title: 'ملخص التراث',
@@ -618,27 +706,9 @@ class _TourismScreenState extends State<TourismScreen>
     );
   }
 
-  void _showHistoricalMarkets() {
-    _collapseFourthButtonIfOpen();
-    AppBriefDialog.show(
-      context,
-      title: 'أسواق تاريخية قديمة',
-      description:
-          'تحتضن المملكة العربية السعودية إرثاً غنياً من الأسواق التاريخية والتراثية القديمة التي شكلت عبر العصور محطات تجارية وثقافية كبرى على طرق القوافل والحج والتجارة في شبه الجزيرة العربية.\n\n'
-          'من أشهر الأسواق التاريخية في المملكة:\n'
-          '• سوق عكاظ التاريخي (الطائف): ملتقى الشعراء والفرسان والتجار في شبه الجزيرة العربية.\n'
-          '• سوق القيصرية (الأحساء): أحد أعرق وأقدم الأسواق التراثية المغطاة في شرق الجزيرة العربية.\n'
-          '• سوق حباشة التاريخي (العرضيات/مكة المكرمة): من أضخم أسواق تهامة القديمة في الجاهلية وصدر الإسلام.\n'
-          '• سوق الزل والديرة (الرياض): مركز بيع المشالح والمقتنيات التراثية والتحف في قلب الرياض التاريخي.\n'
-          '• سوق الثلاثاء الشعبي (أبها): من أقدم وأشهر الأسواق الأسبوعية في منطقة عسير.\n'
-          '• سوق دومة الجندل التاريخي (الجوف): واحة تجارية تاريخية بجوار قلعة مارد ومسجد عمر بن الخطاب.\n'
-          '• سوق نجران التاريخي (سوق الجنابي والفخار): رمز الحرف والصناعات التقليدية العريقة.\n\n'
-          'تمثل هذه الأسواق شواهد حية على ازدهار النشاط الاقتصادي والتفاعل الاجتماعي والثقافي للأجداد، وتُعد اليوم وجهات سياحية وتراثية رائدة ضمن مبادرات رؤية السعودية 2030.',
-    );
-  }
-
   void _showVillagesAndForts() {
     _collapseFourthButtonIfOpen();
+    _collapseMarketsIfOpen();
     AppBriefDialog.show(
       context,
       title: '300 قرية وحصن تراثي',
@@ -681,7 +751,27 @@ class _TourismScreenState extends State<TourismScreen>
           CustomButton(
             text: 'أسواق تاريخية قديمة',
             styleType: ButtonStyleType.mainMenu,
-            onPressed: _showHistoricalMarkets,
+            onPressed: _toggleMarketsDropdown,
+          ),
+          // Dropdown submenu for the 2nd button (10 historical markets)
+          SizeTransition(
+            sizeFactor: _marketsAnimation,
+            alignment: Alignment.topCenter,
+            child: FadeTransition(
+              opacity: _marketsAnimation,
+              child: Column(
+                children: _historicalMarkets.map((market) {
+                  return CustomButton(
+                    text: market['title']!,
+                    styleType: ButtonStyleType.subMenu,
+                    onPressed: () => _openMarketPdf(
+                      market['title']!,
+                      market['assetPath']!,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
           // Order 3: 300 قرية وحصن تراثي
           CustomButton(
@@ -698,7 +788,7 @@ class _TourismScreenState extends State<TourismScreen>
           // Dropdown submenu for the 4th button with smooth expand/collapse animation
           SizeTransition(
             sizeFactor: _dropdownAnimation,
-            axisAlignment: -1.0,
+            alignment: Alignment.topCenter,
             child: FadeTransition(
               opacity: _dropdownAnimation,
               child: Column(
