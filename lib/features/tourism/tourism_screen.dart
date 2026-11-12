@@ -6,7 +6,6 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/widgets/map_shell.dart';
 import '../../core/widgets/custom_button.dart';
-import '../../core/dialogs/app_brief_dialog.dart';
 import '../../core/dialogs/app_popup_dialog.dart';
 import '../../core/dialogs/pdf_viewer_dialog.dart';
 
@@ -44,6 +43,53 @@ class HistoricalMarket {
   });
 }
 
+class HeritageVillage {
+  final int id;
+  final int numberInRegion;
+  final String name;
+  final String subtitle;
+  final String description;
+  final String region;
+  final int regionId;
+  final String governorate;
+  final double latitude;
+  final double longitude;
+  final int? page;
+  final String pdfFile;
+
+  const HeritageVillage({
+    required this.id,
+    required this.numberInRegion,
+    required this.name,
+    required this.subtitle,
+    required this.description,
+    required this.region,
+    required this.regionId,
+    required this.governorate,
+    required this.latitude,
+    required this.longitude,
+    this.page,
+    required this.pdfFile,
+  });
+
+  factory HeritageVillage.fromJson(Map<String, dynamic> json) {
+    return HeritageVillage(
+      id: json['id'] as int? ?? 0,
+      numberInRegion: json['numberInRegion'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+      subtitle: json['subtitle'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      region: json['region'] as String? ?? '',
+      regionId: json['regionId'] as int? ?? 0,
+      governorate: json['governorate'] as String? ?? '',
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      page: json['page'] as int?,
+      pdfFile: json['pdfFile'] as String? ?? '',
+    );
+  }
+}
+
 class TourismScreen extends StatefulWidget {
   const TourismScreen({super.key});
 
@@ -60,6 +106,10 @@ class _TourismScreenState extends State<TourismScreen>
   late AnimationController _marketsAnimationController;
   late Animation<double> _marketsAnimation;
   bool _isMarketsExpanded = false;
+
+  late AnimationController _villagesAnimationController;
+  late Animation<double> _villagesAnimation;
+  bool _isVillagesExpanded = false;
 
   static const List<HistoricalMarket> _historicalMarkets = [
     HistoricalMarket(
@@ -556,10 +606,29 @@ class _TourismScreenState extends State<TourismScreen>
     'منطقة نجران',
   ];
 
+  static const List<String> _villageRegionNames = [
+    'منطقة عسير',
+    'منطقة الرياض',
+    'منطقة الباحة',
+    'منطقة مكة المكرمة',
+    'منطقة جازان',
+    'المنطقة الشرقية',
+    'منطقة نجران',
+    'منطقة القصيم',
+    'منطقة حائل',
+    'منطقة المدينة المنورة',
+    'منطقة تبوك',
+    'منطقة الجوف',
+    'منطقة الحدود الشمالية',
+  ];
+
   MapShellController? _mapController;
   String? _expandedRegion;
+  String? _expandedVillageRegion;
+  List<HeritageVillage> _heritageVillages = [];
   final Map<String, TourismLandmark> _annotationLandmarkMap = {};
   final Map<String, HistoricalMarket> _annotationMarketMap = {};
+  final Map<String, HeritageVillage> _annotationVillageMap = {};
 
   @override
   void initState() {
@@ -581,12 +650,24 @@ class _TourismScreenState extends State<TourismScreen>
       parent: _marketsAnimationController,
       curve: Curves.easeInOutCubic,
     );
+
+    _villagesAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _villagesAnimation = CurvedAnimation(
+      parent: _villagesAnimationController,
+      curve: Curves.easeInOutCubic,
+    );
+
+    _loadHeritageVillagesData();
   }
 
   @override
   void dispose() {
     _dropdownAnimationController.dispose();
     _marketsAnimationController.dispose();
+    _villagesAnimationController.dispose();
     super.dispose();
   }
 
@@ -597,6 +678,27 @@ class _TourismScreenState extends State<TourismScreen>
       _mapController?.pointAnnotationManager?.deleteAll();
       _annotationLandmarkMap.clear();
       _annotationMarketMap.clear();
+      _annotationVillageMap.clear();
+    }
+  }
+
+  Future<void> _loadHeritageVillagesData() async {
+    try {
+      final jsonStr =
+          await rootBundle.loadString('assets/data/heritage_villages.json');
+      final list = jsonDecode(jsonStr) as List<dynamic>;
+      final villages = list
+          .map((item) => HeritageVillage.fromJson(item as Map<String, dynamic>))
+          .toList();
+      if (mounted) {
+        setState(() {
+          _heritageVillages = villages;
+        });
+      } else {
+        _heritageVillages = villages;
+      }
+    } catch (e) {
+      debugPrint('Error loading heritage villages: $e');
     }
   }
 
@@ -604,6 +706,7 @@ class _TourismScreenState extends State<TourismScreen>
     setState(() {
       _isMarketsExpanded = !_isMarketsExpanded;
       if (_isMarketsExpanded) {
+        _collapseVillagesIfOpen();
         _collapseFourthButtonIfOpen();
         _marketsAnimationController.forward();
         if (_mapController != null) {
@@ -717,6 +820,7 @@ class _TourismScreenState extends State<TourismScreen>
       _isFourthButtonExpanded = !_isFourthButtonExpanded;
       if (_isFourthButtonExpanded) {
         _collapseMarketsIfOpen();
+        _collapseVillagesIfOpen();
         _dropdownAnimationController.forward();
         if (_mapController != null) {
           _loadMarkers(_mapController!);
@@ -830,6 +934,7 @@ class _TourismScreenState extends State<TourismScreen>
   void _showIntroBrief() {
     _collapseFourthButtonIfOpen();
     _collapseMarketsIfOpen();
+    _collapseVillagesIfOpen();
     PdfViewerDialog.show(
       context,
       title: 'ملخص التراث',
@@ -837,29 +942,138 @@ class _TourismScreenState extends State<TourismScreen>
     );
   }
 
-  void _showVillagesAndForts() {
-    _collapseFourthButtonIfOpen();
-    _collapseMarketsIfOpen();
-    AppBriefDialog.show(
+  void _toggleVillagesDropdown() {
+    setState(() {
+      _isVillagesExpanded = !_isVillagesExpanded;
+      if (_isVillagesExpanded) {
+        _collapseMarketsIfOpen();
+        _collapseFourthButtonIfOpen();
+        _villagesAnimationController.forward();
+        if (_mapController != null) {
+          _loadVillageMarkers(_mapController!);
+        }
+      } else {
+        _villagesAnimationController.reverse();
+        _expandedVillageRegion = null;
+        _clearMarkers();
+      }
+    });
+  }
+
+  void _collapseVillagesIfOpen() {
+    if (_isVillagesExpanded) {
+      setState(() {
+        _isVillagesExpanded = false;
+        _expandedVillageRegion = null;
+      });
+      _villagesAnimationController.reverse();
+      _clearMarkers();
+    }
+  }
+
+  Future<void> _loadVillageMarkers(MapShellController controller) async {
+    if (_heritageVillages.isEmpty) {
+      await _loadHeritageVillagesData();
+    }
+    final validVillages = _heritageVillages
+        .where((v) => v.latitude > 0.0 && v.longitude > 0.0)
+        .toList();
+
+    if (kIsWeb) {
+      final webUrl = 'assets/${AppAssets.villageMarker}';
+      final batchList = validVillages
+          .map((village) => {
+                'id': 'village_${village.id}',
+                'lat': village.latitude,
+                'lng': village.longitude,
+                'iconUrl': webUrl,
+              })
+          .toList();
+
+      final villageMap = {
+        for (final village in validVillages) 'village_${village.id}': village
+      };
+
+      controller.setWebMarkersBatch(jsonEncode(batchList), (markerId) {
+        final village = villageMap[markerId];
+        if (village != null) {
+          _showVillagePopup(village);
+        }
+      });
+      return;
+    }
+
+    final manager = controller.pointAnnotationManager;
+    if (manager == null) return;
+
+    try {
+      final ByteData byteData = await rootBundle.load(AppAssets.villageMarker);
+      final Uint8List imageBytes = byteData.buffer.asUint8List();
+
+      final optionsList = validVillages.map((village) {
+        return PointAnnotationOptions(
+          geometry: Point(
+              coordinates: Position(village.longitude, village.latitude)),
+          image: imageBytes,
+          iconSize: 0.25,
+        );
+      }).toList();
+
+      final annotations = await manager.createMulti(optionsList);
+      for (int i = 0;
+          i < annotations.length && i < validVillages.length;
+          i++) {
+        final ann = annotations[i];
+        if (ann != null) {
+          _annotationVillageMap[ann.id] = validVillages[i];
+        }
+      }
+
+      manager.addOnPointAnnotationClickListener(
+        AppPointAnnotationClickListener((annotation) {
+          final village = _annotationVillageMap[annotation.id];
+          if (village != null) {
+            _showVillagePopup(village);
+          }
+        }),
+      );
+    } catch (e) {
+      debugPrint('Error creating village annotations: $e');
+    }
+  }
+
+  void _showVillagePopup(HeritageVillage village) {
+    if (village.latitude > 0.0 &&
+        village.longitude > 0.0 &&
+        _mapController != null) {
+      _mapController!.flyTo(
+        latitude: village.latitude,
+        longitude: village.longitude,
+        zoom: 11.0,
+      );
+    }
+
+    final buffer = StringBuffer();
+    if (village.subtitle.trim().isNotEmpty) {
+      buffer.writeln(village.subtitle.trim());
+      buffer.writeln();
+    }
+    buffer.writeln('• المنطقة: ${village.region}');
+    if (village.governorate.trim().isNotEmpty) {
+      buffer.writeln('• المحافظة / المركز: ${village.governorate.trim()}');
+    }
+    buffer.writeln(
+        '• الإحداثيات: ${village.latitude.toStringAsFixed(6)}° شمالاً، ${village.longitude.toStringAsFixed(6)}° شرقاً');
+    if (village.description.trim().isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln(village.description.trim());
+    }
+
+    AppPopupDialog.show(
       context,
-      title: '300 قرية وحصن تراثي',
-      description:
-          'تحتضن المملكة العربية السعودية أكثر من 300 قرية تراثية وحصناً تاريخياً موزعة على مناطق المملكة الثلاث عشرة، تجسد تنوعاً عمرانياً وحضارياً فريداً وتاريخاً ممتداً عبر العصور.\n\n'
-          'توزيع المواقع التراثية والحصون على مناطق المملكة (300 موقعاً عبر 13 منطقة إدارية):\n'
-          '• منطقة عسير (77 موقعاً): جرش القديمة، رجال ألمع، قري تبالة، آل عليان، والحصون والقرى الجبلية.\n'
-          '• منطقة الرياض (35 موقعاً): قرية الفاو الأثرية، الدرعية التاريخية، حوطة سدير، وبلدات نجد التراثية.\n'
-          '• منطقة الباحة (33 موقعاً): قرية ذي عين التراثية، الأطاولة، الخلف والخليف، والحصون الحجرية.\n'
-          '• منطقة مكة المكرمة (26 موقعاً): مكة التاريخية، جدة التاريخية (البلد)، الطائف، والقرى الجبلية.\n'
-          '• منطقة جازان (25 موقعاً): جزر فرسان، القرى الجبلية، والموانئ والمواقع التراثية.\n'
-          '• المنطقة الشرقية (22 موقعاً): تاروت، دارين، وواحات وقرى الأحساء التاريخية.\n'
-          '• منطقة نجران (17 موقعاً): الأخدود، حمى، والقرى والقلاع الطينية التاريخية.\n'
-          '• منطقة القصيم (14 موقعاً): عيون الجواء، الخبراء التراثية، المذنب، وبلدات نجد.\n'
-          '• منطقة حائل (14 موقعاً): جبة، الشويمس، بلدة فيد التاريخية، والحصون التراثية.\n'
-          '• منطقة المدينة المنورة (13 موقعاً): العلا، دادان، الحجر، خيبر، والمدينة التاريخية.\n'
-          '• منطقة تبوك (10 مواقع): واحة تيماء القديمة، البدع (مغائر شعيب)، والموانئ والقلاع التاريخية.\n'
-          '• منطقة الجوف (9 مواقع): دومة الجندل، كاف، القريات، والقلاع والواحات.\n'
-          '• منطقة الحدود الشمالية (5 مواقع): لينة، زبالا، لوقة، ومحطات درب زبيدة التاريخية.\n\n'
-          'تتميز هذه القرى والحصون بتناغمها التام مع البيئة الطبيعية واستخدام المواد المحلية كالأحجار وخشب العرعر والطين، وتمثل اليوم ركيزة أساسية للسياحة الثقافية والتراثية في المملكة.',
+      title: village.name,
+      description: buffer.toString(),
+      imageAsset: AppAssets.villageMarker,
     );
   }
 
@@ -876,6 +1090,8 @@ class _TourismScreenState extends State<TourismScreen>
           _loadMarkers(c);
         } else if (_isMarketsExpanded) {
           _loadMarketMarkers(c);
+        } else if (_isVillagesExpanded) {
+          _loadVillageMarkers(c);
         }
       },
       sidebarContent: Column(
@@ -903,11 +1119,71 @@ class _TourismScreenState extends State<TourismScreen>
               ),
             ),
           ),
-          // Order 3: 300 قرية وحصن تراثي
+          // Order 3: 300 قرية وحصن تراثي (Expandable Dropdown)
           CustomButton(
             text: '300 قرية وحصن تراثي',
             styleType: ButtonStyleType.mainMenu,
-            onPressed: _showVillagesAndForts,
+            onPressed: _toggleVillagesDropdown,
+          ),
+          // Dropdown submenu for the 3rd button (13 regions and 300 villages)
+          SizeTransition(
+            sizeFactor: _villagesAnimation,
+            alignment: Alignment.topCenter,
+            child: FadeTransition(
+              opacity: _villagesAnimation,
+              child: Column(
+                children: _villageRegionNames.map((regionName) {
+                  final isExpanded = _expandedVillageRegion == regionName;
+                  final regionVillages = _heritageVillages
+                      .where((v) => v.region == regionName)
+                      .toList();
+
+                  return Column(
+                    children: [
+                      CustomButton(
+                        text: '$regionName (${regionVillages.length})',
+                        styleType: ButtonStyleType.mainMenu,
+                        onPressed: () {
+                          setState(() {
+                            if (_expandedVillageRegion == regionName) {
+                              _expandedVillageRegion = null;
+                            } else {
+                              _expandedVillageRegion = regionName;
+                              if (regionVillages.isNotEmpty &&
+                                  _mapController != null) {
+                                final firstValid = regionVillages.firstWhere(
+                                  (v) => v.latitude > 0.0 && v.longitude > 0.0,
+                                  orElse: () => regionVillages.first,
+                                );
+                                if (firstValid.latitude > 0.0 &&
+                                    firstValid.longitude > 0.0) {
+                                  _mapController!.flyTo(
+                                    latitude: firstValid.latitude,
+                                    longitude: firstValid.longitude,
+                                    zoom: 7.5,
+                                  );
+                                }
+                              }
+                            }
+                          });
+                          if (_mapController != null && _isVillagesExpanded) {
+                            _loadVillageMarkers(_mapController!);
+                          }
+                        },
+                      ),
+                      if (isExpanded)
+                        ...regionVillages.map(
+                          (village) => CustomButton(
+                            text: village.name,
+                            styleType: ButtonStyleType.subMenu,
+                            onPressed: () => _showVillagePopup(village),
+                          ),
+                        ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
           ),
           // Order 4: موقع أثري (Expandable Dropdown)
           CustomButton(
