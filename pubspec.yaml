@@ -55,6 +55,7 @@ flutter:
     - assets/books/hazards/
     - assets/books/geospatial/
     - assets/books/reserves/
+    - assets/books/tourism/
 
   fonts:
     - family: NotoKufi
