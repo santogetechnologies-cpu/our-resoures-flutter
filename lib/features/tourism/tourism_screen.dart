@@ -28,6 +28,22 @@ class TourismLandmark {
   });
 }
 
+class HistoricalMarket {
+  final String title;
+  final String region;
+  final double latitude;
+  final double longitude;
+  final String assetPath;
+
+  const HistoricalMarket({
+    required this.title,
+    required this.region,
+    required this.latitude,
+    required this.longitude,
+    required this.assetPath,
+  });
+}
+
 class TourismScreen extends StatefulWidget {
   const TourismScreen({super.key});
 
@@ -45,47 +61,77 @@ class _TourismScreenState extends State<TourismScreen>
   late Animation<double> _marketsAnimation;
   bool _isMarketsExpanded = false;
 
-  static const List<Map<String, String>> _historicalMarkets = [
-    {
-      'title': 'سوق عكاظ التاريخي – الطائف',
-      'assetPath': 'assets/books/tourism/markets/market_01_okaz.pdf',
-    },
-    {
-      'title': 'سوق مجنّة التاريخي – الجموم',
-      'assetPath': 'assets/books/tourism/markets/market_02_majna.pdf',
-    },
-    {
-      'title': 'سوق ذي المجاز التاريخي – مكة',
-      'assetPath': 'assets/books/tourism/markets/market_03_dhul_majaz.pdf',
-    },
-    {
-      'title': 'سوق دومة الجندل التاريخي',
-      'assetPath': 'assets/books/tourism/markets/market_04_dumat_aljandal.pdf',
-    },
-    {
-      'title': 'سوق المناخة التاريخي – المدينة المنورة',
-      'assetPath': 'assets/books/tourism/markets/market_05_manakha.pdf',
-    },
-    {
-      'title': 'سوق حُباشة التاريخي – وادي قنونا',
-      'assetPath': 'assets/books/tourism/markets/market_06_hubasha.pdf',
-    },
-    {
-      'title': 'سوق المشقّر التاريخي – الأحساء',
-      'assetPath': 'assets/books/tourism/markets/market_07_mushaqqar.pdf',
-    },
-    {
-      'title': 'سوق حجر اليمامة التاريخي – الرياض',
-      'assetPath': 'assets/books/tourism/markets/market_08_hajar_alyamama.pdf',
-    },
-    {
-      'title': 'سوق نجران القديم – موقع الأخدود',
-      'assetPath': 'assets/books/tourism/markets/market_09_najran.pdf',
-    },
-    {
-      'title': 'سوق تيماء التاريخي',
-      'assetPath': 'assets/books/tourism/markets/market_10_tayma.pdf',
-    },
+  static const List<HistoricalMarket> _historicalMarkets = [
+    HistoricalMarket(
+      title: 'سوق عكاظ التاريخي – الطائف',
+      region: 'مكة المكرمة',
+      latitude: 21.473333,
+      longitude: 40.533333,
+      assetPath: 'assets/books/tourism/markets/market_01_okaz.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق مجنّة التاريخي – الجموم',
+      region: 'مكة المكرمة',
+      latitude: 21.665556,
+      longitude: 39.737500,
+      assetPath: 'assets/books/tourism/markets/market_02_majna.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق ذي المجاز التاريخي – مكة',
+      region: 'مكة المكرمة',
+      latitude: 21.360000,
+      longitude: 40.020000,
+      assetPath: 'assets/books/tourism/markets/market_03_dhul_majaz.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق دومة الجندل التاريخي',
+      region: 'الجوف',
+      latitude: 29.811150,
+      longitude: 39.867170,
+      assetPath: 'assets/books/tourism/markets/market_04_dumat_aljandal.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق المناخة التاريخي – المدينة المنورة',
+      region: 'المدينة المنورة',
+      latitude: 24.466000,
+      longitude: 39.606000,
+      assetPath: 'assets/books/tourism/markets/market_05_manakha.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق حُباشة التاريخي – وادي قنونا',
+      region: 'مكة المكرمة',
+      latitude: 19.250000,
+      longitude: 41.150000,
+      assetPath: 'assets/books/tourism/markets/market_06_hubasha.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق المشقّر التاريخي – الأحساء',
+      region: 'المنطقة الشرقية',
+      latitude: 25.410000,
+      longitude: 49.680000,
+      assetPath: 'assets/books/tourism/markets/market_07_mushaqqar.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق حجر اليمامة التاريخي – الرياض',
+      region: 'الرياض',
+      latitude: 24.630000,
+      longitude: 46.715000,
+      assetPath: 'assets/books/tourism/markets/market_08_hajar_alyamama.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق نجران القديم – موقع الأخدود',
+      region: 'نجران',
+      latitude: 17.478070,
+      longitude: 44.181140,
+      assetPath: 'assets/books/tourism/markets/market_09_najran.pdf',
+    ),
+    HistoricalMarket(
+      title: 'سوق تيماء التاريخي',
+      region: 'تبوك',
+      latitude: 27.627411,
+      longitude: 38.549847,
+      assetPath: 'assets/books/tourism/markets/market_10_tayma.pdf',
+    ),
   ];
 
   final List<TourismLandmark> _landmarks = const [
@@ -513,6 +559,7 @@ class _TourismScreenState extends State<TourismScreen>
   MapShellController? _mapController;
   String? _expandedRegion;
   final Map<String, TourismLandmark> _annotationLandmarkMap = {};
+  final Map<String, HistoricalMarket> _annotationMarketMap = {};
 
   @override
   void initState() {
@@ -549,6 +596,7 @@ class _TourismScreenState extends State<TourismScreen>
     } else {
       _mapController?.pointAnnotationManager?.deleteAll();
       _annotationLandmarkMap.clear();
+      _annotationMarketMap.clear();
     }
   }
 
@@ -556,10 +604,14 @@ class _TourismScreenState extends State<TourismScreen>
     setState(() {
       _isMarketsExpanded = !_isMarketsExpanded;
       if (_isMarketsExpanded) {
-        _marketsAnimationController.forward();
         _collapseFourthButtonIfOpen();
+        _marketsAnimationController.forward();
+        if (_mapController != null) {
+          _loadMarketMarkers(_mapController!);
+        }
       } else {
         _marketsAnimationController.reverse();
+        _clearMarkers();
       }
     });
   }
@@ -570,15 +622,94 @@ class _TourismScreenState extends State<TourismScreen>
         _isMarketsExpanded = false;
       });
       _marketsAnimationController.reverse();
+      _clearMarkers();
     }
   }
 
-  void _openMarketPdf(String title, String assetPath) {
+  void _openMarketPdf(HistoricalMarket market) {
+    if (market.latitude > 0.0 &&
+        market.longitude > 0.0 &&
+        _mapController != null) {
+      _mapController!.flyTo(
+        latitude: market.latitude,
+        longitude: market.longitude,
+        zoom: 9.0,
+      );
+    }
     PdfViewerDialog.show(
       context,
-      title: title,
-      assetPath: assetPath,
+      title: market.title,
+      assetPath: market.assetPath,
     );
+  }
+
+  Future<void> _loadMarketMarkers(MapShellController controller) async {
+    final validMarkets = _historicalMarkets
+        .where((m) => m.latitude > 0.0 && m.longitude > 0.0)
+        .toList();
+
+    if (kIsWeb) {
+      final webUrl = 'assets/${AppAssets.marketMarker}';
+      final batchList = validMarkets
+          .map((market) => {
+                'id': 'market_${market.latitude}_${market.longitude}',
+                'lat': market.latitude,
+                'lng': market.longitude,
+                'iconUrl': webUrl,
+              })
+          .toList();
+
+      final marketMap = {
+        for (final market in validMarkets)
+          'market_${market.latitude}_${market.longitude}': market
+      };
+
+      controller.setWebMarkersBatch(jsonEncode(batchList), (markerId) {
+        final market = marketMap[markerId];
+        if (market != null) {
+          _openMarketPdf(market);
+        }
+      });
+      return;
+    }
+
+    final manager = controller.pointAnnotationManager;
+    if (manager == null) return;
+
+    try {
+      final ByteData byteData = await rootBundle.load(AppAssets.marketMarker);
+      final Uint8List imageBytes = byteData.buffer.asUint8List();
+
+      final optionsList = validMarkets.map((market) {
+        return PointAnnotationOptions(
+          geometry: Point(
+              coordinates: Position(market.longitude, market.latitude)),
+          image: imageBytes,
+          iconSize: 0.25,
+        );
+      }).toList();
+
+      final annotations = await manager.createMulti(optionsList);
+      for (int i = 0;
+          i < annotations.length && i < validMarkets.length;
+          i++) {
+        final ann = annotations[i];
+        if (ann != null) {
+          _annotationMarketMap[ann.id] = validMarkets[i];
+        }
+      }
+
+      manager.addOnPointAnnotationClickListener(
+        AppPointAnnotationClickListener((annotation) {
+          final market = _annotationMarketMap[annotation.id];
+          if (market != null) {
+            _openMarketPdf(market);
+          }
+        }),
+      );
+    } catch (e) {
+      debugPrint('Error creating market annotations: $e');
+    }
   }
 
   void _toggleFourthButton() {
@@ -743,6 +874,8 @@ class _TourismScreenState extends State<TourismScreen>
         _mapController = c;
         if (_isFourthButtonExpanded) {
           _loadMarkers(c);
+        } else if (_isMarketsExpanded) {
+          _loadMarketMarkers(c);
         }
       },
       sidebarContent: Column(
@@ -762,12 +895,9 @@ class _TourismScreenState extends State<TourismScreen>
               child: Column(
                 children: _historicalMarkets.map((market) {
                   return CustomButton(
-                    text: market['title']!,
+                    text: market.title,
                     styleType: ButtonStyleType.subMenu,
-                    onPressed: () => _openMarketPdf(
-                      market['title']!,
-                      market['assetPath']!,
-                    ),
+                    onPressed: () => _openMarketPdf(market),
                   );
                 }).toList(),
               ),
