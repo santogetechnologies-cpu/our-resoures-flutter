@@ -35,7 +35,12 @@ class TourismScreen extends StatefulWidget {
   State<TourismScreen> createState() => _TourismScreenState();
 }
 
-class _TourismScreenState extends State<TourismScreen> {
+class _TourismScreenState extends State<TourismScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _dropdownAnimationController;
+  late Animation<double> _dropdownAnimation;
+  bool _isFourthButtonExpanded = false;
+
   final List<TourismLandmark> _landmarks = const [
     TourismLandmark(
       title: 'جبل الفيل',
@@ -462,6 +467,61 @@ class _TourismScreenState extends State<TourismScreen> {
   String? _expandedRegion;
   final Map<String, TourismLandmark> _annotationLandmarkMap = {};
 
+  @override
+  void initState() {
+    super.initState();
+    _dropdownAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _dropdownAnimation = CurvedAnimation(
+      parent: _dropdownAnimationController,
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    _dropdownAnimationController.dispose();
+    super.dispose();
+  }
+
+  void _clearMarkers() {
+    if (kIsWeb) {
+      _mapController?.clearWebMarkers();
+    } else {
+      _mapController?.pointAnnotationManager?.deleteAll();
+      _annotationLandmarkMap.clear();
+    }
+  }
+
+  void _toggleFourthButton() {
+    setState(() {
+      _isFourthButtonExpanded = !_isFourthButtonExpanded;
+      if (_isFourthButtonExpanded) {
+        _dropdownAnimationController.forward();
+        if (_mapController != null) {
+          _loadMarkers(_mapController!);
+        }
+      } else {
+        _dropdownAnimationController.reverse();
+        _expandedRegion = null;
+        _clearMarkers();
+      }
+    });
+  }
+
+  void _collapseFourthButtonIfOpen() {
+    if (_isFourthButtonExpanded) {
+      setState(() {
+        _isFourthButtonExpanded = false;
+        _expandedRegion = null;
+      });
+      _dropdownAnimationController.reverse();
+      _clearMarkers();
+    }
+  }
+
   Future<void> _loadMarkers(MapShellController controller) async {
     final validLandmarks = _landmarks
         .where((l) => l.latitude > 0.0 && l.longitude > 0.0)
@@ -550,6 +610,7 @@ class _TourismScreenState extends State<TourismScreen> {
   }
 
   void _showIntroBrief() {
+    _collapseFourthButtonIfOpen();
     PdfViewerDialog.show(
       context,
       title: 'ملخص التراث',
@@ -558,6 +619,7 @@ class _TourismScreenState extends State<TourismScreen> {
   }
 
   void _showHistoricalMarkets() {
+    _collapseFourthButtonIfOpen();
     AppBriefDialog.show(
       context,
       title: 'أسواق تاريخية قديمة',
@@ -576,6 +638,7 @@ class _TourismScreenState extends State<TourismScreen> {
   }
 
   void _showVillagesAndForts() {
+    _collapseFourthButtonIfOpen();
     AppBriefDialog.show(
       context,
       title: '300 قرية وحصن تراثي',
@@ -599,27 +662,6 @@ class _TourismScreenState extends State<TourismScreen> {
     );
   }
 
-  void _showArchaeologicalSites() {
-    AppBriefDialog.show(
-      context,
-      title: 'موقع أثري',
-      description:
-          'تحتضن المملكة العربية السعودية سجلاً أثرياً ثرياً يضم أكثر من 45 موقعاً أثرياً رئيسياً وشاهداً حضارياً عالمياً يمتد من عصور ما قبل التاريخ حتى العصور الإسلامية والحديثة:\n\n'
-          'أبرز الشواهد والمواقع الأثرية في المملكة:\n'
-          '• الفنون الصخرية وعصور ما قبل التاريخ: مواقع جبة والشويمس بمنطقة حائل، ومنطقة بئر حِمى بنجران (مواقع مدرجة بقائمة التراث العالمي لليونسكو).\n'
-          '• عواصم ومراكز الممالك العربية القديمة:\n'
-          '  - موقع الحجر الأثري (مدائن صالح) ومملكة دادان ولحيان في محافظة العلا.\n'
-          '  - قرية الفاو الأثرية بوادي الدواسر: عاصمة مملكة كندة الأولى وملتقى القوافل التجارية.\n'
-          '  - واحة تيماء التاريخية: شواهد قصر الحمراء، بئر هداج، والنفوذ البابلي والآشوري.\n'
-          '  - دومة الجندل: عاصمة مملكة قيدار وقلعة مارد الأثرية الشامخة.\n'
-          '  - موقع ثاج والجرهاء وجزيرة تاروت بالمنطقة الشرقية: مراكز الحضارات الخليجية القديمة كدلمون والعبيد.\n'
-          '  - موقع الأخدود الأثري بنجران: شواهد حضارتي سبأ وحِمْيَر القديمة.\n'
-          '  - مدينة جرش الأثرية بمنطقة عسير: ملتقى التجارة والصناعة العريق قبل الإسلام وصدره.\n'
-          '• محطات طرق القوافل والحج التاريخية: درب زبيدة بمحطاته وبركه الشهيرة، ودرب البخور، وطرق الحج القديمة الشامية والمصرية واليمنية.\n\n'
-          'تجسد هذه المواقع عمق التاريخ الإنساني في الجزيرة العربية وأصالة هويتها الحضارية، وتستمر أعمال التنقيب والبحث الأثري لإبراز هذا الإرث العظيم للعالم.',
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return MapShell(
@@ -629,7 +671,9 @@ class _TourismScreenState extends State<TourismScreen> {
       initialStyleAsset: 'assets/maps/saudi_geo/sahel.json',
       onMapCreated: (c) {
         _mapController = c;
-        _loadMarkers(c);
+        if (_isFourthButtonExpanded) {
+          _loadMarkers(c);
+        }
       },
       sidebarContent: Column(
         children: [
@@ -645,63 +689,73 @@ class _TourismScreenState extends State<TourismScreen> {
             styleType: ButtonStyleType.mainMenu,
             onPressed: _showVillagesAndForts,
           ),
-          // Order 4: موقع أثري
+          // Order 4: موقع أثري (Expandable Dropdown)
           CustomButton(
             text: 'موقع أثري',
             styleType: ButtonStyleType.mainMenu,
-            onPressed: _showArchaeologicalSites,
+            onPressed: _toggleFourthButton,
           ),
-          ..._regionNames.map((regionName) {
-          final isExpanded = _expandedRegion == regionName;
-          final regionLandmarks =
-              _landmarks.where((l) => l.region == regionName).toList();
+          // Dropdown submenu for the 4th button with smooth expand/collapse animation
+          SizeTransition(
+            sizeFactor: _dropdownAnimation,
+            axisAlignment: -1.0,
+            child: FadeTransition(
+              opacity: _dropdownAnimation,
+              child: Column(
+                children: _regionNames.map((regionName) {
+                  final isExpanded = _expandedRegion == regionName;
+                  final regionLandmarks =
+                      _landmarks.where((l) => l.region == regionName).toList();
 
-          return Column(
-            children: [
-              CustomButton(
-                text: regionName,
-                styleType: ButtonStyleType.mainMenu,
-                onPressed: () {
-                  setState(() {
-                    if (_expandedRegion == regionName) {
-                      _expandedRegion = null;
-                    } else {
-                      _expandedRegion = regionName;
-                      if (regionLandmarks.isNotEmpty &&
-                          _mapController != null) {
-                        final firstValid = regionLandmarks.firstWhere(
-                          (l) => l.latitude > 0.0 && l.longitude > 0.0,
-                          orElse: () => regionLandmarks.first,
-                        );
-                        if (firstValid.latitude > 0.0 &&
-                            firstValid.longitude > 0.0) {
-                          _mapController!.flyTo(
-                            latitude: firstValid.latitude,
-                            longitude: firstValid.longitude,
-                            zoom: 7.0,
-                          );
-                        }
-                      }
-                    }
-                  });
-                  if (_mapController != null) {
-                    _loadMarkers(_mapController!);
-                  }
-                },
+                  return Column(
+                    children: [
+                      CustomButton(
+                        text: regionName,
+                        styleType: ButtonStyleType.mainMenu,
+                        onPressed: () {
+                          setState(() {
+                            if (_expandedRegion == regionName) {
+                              _expandedRegion = null;
+                            } else {
+                              _expandedRegion = regionName;
+                              if (regionLandmarks.isNotEmpty &&
+                                  _mapController != null) {
+                                final firstValid = regionLandmarks.firstWhere(
+                                  (l) => l.latitude > 0.0 && l.longitude > 0.0,
+                                  orElse: () => regionLandmarks.first,
+                                );
+                                if (firstValid.latitude > 0.0 &&
+                                    firstValid.longitude > 0.0) {
+                                  _mapController!.flyTo(
+                                    latitude: firstValid.latitude,
+                                    longitude: firstValid.longitude,
+                                    zoom: 7.0,
+                                  );
+                                }
+                              }
+                            }
+                          });
+                          if (_mapController != null && _isFourthButtonExpanded) {
+                            _loadMarkers(_mapController!);
+                          }
+                        },
+                      ),
+                      if (isExpanded)
+                        ...regionLandmarks.map(
+                          (landmark) => CustomButton(
+                            text: landmark.title,
+                            styleType: ButtonStyleType.subMenu,
+                            onPressed: () => _showLandmark(landmark),
+                          ),
+                        ),
+                    ],
+                  );
+                }).toList(),
               ),
-              if (isExpanded)
-                ...regionLandmarks.map(
-                  (landmark) => CustomButton(
-                    text: landmark.title,
-                    styleType: ButtonStyleType.subMenu,
-                    onPressed: () => _showLandmark(landmark),
-                  ),
-                ),
-            ],
-          );
-        }),
-      ],
-    ),
-  );
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
