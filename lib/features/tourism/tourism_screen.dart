@@ -557,6 +557,24 @@ class _TourismScreenState extends State<TourismScreen> {
     );
   }
 
+  void _showHistoricalMarkets() {
+    AppBriefDialog.show(
+      context,
+      title: 'أسواق تاريخية قديمة',
+      description:
+          'تحتضن المملكة العربية السعودية إرثاً غنياً من الأسواق التاريخية والتراثية القديمة التي شكلت عبر العصور محطات تجارية وثقافية كبرى على طرق القوافل والحج والتجارة في شبه الجزيرة العربية.\n\n'
+          'من أشهر الأسواق التاريخية في المملكة:\n'
+          '• سوق عكاظ التاريخي (الطائف): ملتقى الشعراء والفرسان والتجار في شبه الجزيرة العربية.\n'
+          '• سوق القيصرية (الأحساء): أحد أعرق وأقدم الأسواق التراثية المغطاة في شرق الجزيرة العربية.\n'
+          '• سوق حباشة التاريخي (العرضيات/مكة المكرمة): من أضخم أسواق تهامة القديمة في الجاهلية وصدر الإسلام.\n'
+          '• سوق الزل والديرة (الرياض): مركز بيع المشالح والمقتنيات التراثية والتحف في قلب الرياض التاريخي.\n'
+          '• سوق الثلاثاء الشعبي (أبها): من أقدم وأشهر الأسواق الأسبوعية في منطقة عسير.\n'
+          '• سوق دومة الجندل التاريخي (الجوف): واحة تجارية تاريخية بجوار قلعة مارد ومسجد عمر بن الخطاب.\n'
+          '• سوق نجران التاريخي (سوق الجنابي والفخار): رمز الحرف والصناعات التقليدية العريقة.\n\n'
+          'تمثل هذه الأسواق شواهد حية على ازدهار النشاط الاقتصادي والتفاعل الاجتماعي والثقافي للأجداد، وتُعد اليوم وجهات سياحية وتراثية رائدة ضمن مبادرات رؤية السعودية 2030.',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MapShell(
@@ -569,7 +587,14 @@ class _TourismScreenState extends State<TourismScreen> {
         _loadMarkers(c);
       },
       sidebarContent: Column(
-        children: _regionNames.map((regionName) {
+        children: [
+          // Order 2: أسواق تاريخية قديمة
+          CustomButton(
+            text: 'أسواق تاريخية قديمة',
+            styleType: ButtonStyleType.mainMenu,
+            onPressed: _showHistoricalMarkets,
+          ),
+          ..._regionNames.map((regionName) {
           final isExpanded = _expandedRegion == regionName;
           final regionLandmarks =
               _landmarks.where((l) => l.region == regionName).toList();
@@ -617,8 +642,9 @@ class _TourismScreenState extends State<TourismScreen> {
                 ),
             ],
           );
-        }).toList(),
-      ),
-    );
+        }),
+      ],
+    ),
+  );
   }
 }
