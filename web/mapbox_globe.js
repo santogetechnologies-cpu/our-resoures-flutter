@@ -1509,8 +1509,8 @@ window.mapboxGlobeLoadReservesWeb = function (viewId, geoJsonString, selectedRes
         'fill-opacity': [
           'case',
           ['==', ['get', 'id'], activeId],
-          0.65,
-          0.38
+          0.85,
+          0.72
         ]
       }
     });
@@ -1528,13 +1528,13 @@ window.mapboxGlobeLoadReservesWeb = function (viewId, geoJsonString, selectedRes
           'case',
           ['==', ['get', 'id'], activeId],
           '#FFD54F', // Bright gold border when selected
-          '#81C784'  // Light emerald green border
+          '#4CAF50'  // Crisp vibrant green border
         ],
         'line-width': [
           'case',
           ['==', ['get', 'id'], activeId],
-          3.8,
-          2.0
+          4.0,
+          2.6
         ]
       }
     });
@@ -1606,8 +1606,8 @@ window.mapboxGlobeSelectReserveWeb = function (viewId, selectedReserveId) {
       map.setPaintProperty(fillLayerId, 'fill-opacity', [
         'case',
         ['==', ['get', 'id'], activeId],
-        0.65,
-        0.38
+        0.85,
+        0.72
       ]);
     }
     if (map.getLayer(lineLayerId)) {
@@ -1615,13 +1615,13 @@ window.mapboxGlobeSelectReserveWeb = function (viewId, selectedReserveId) {
         'case',
         ['==', ['get', 'id'], activeId],
         '#FFD54F',
-        '#81C784'
+        '#4CAF50'
       ]);
       map.setPaintProperty(lineLayerId, 'line-width', [
         'case',
         ['==', ['get', 'id'], activeId],
-        3.8,
-        2.0
+        4.0,
+        2.6
       ]);
     }
   } catch (e) {
