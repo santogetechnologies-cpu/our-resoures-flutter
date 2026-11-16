@@ -101,6 +101,7 @@ class HeritageRegionCategory {
   final double centerLng;
   final double zoom;
   final String pdfFile;
+  final String assetPath;
 
   const HeritageRegionCategory({
     required this.id,
@@ -110,6 +111,7 @@ class HeritageRegionCategory {
     required this.centerLng,
     required this.zoom,
     required this.pdfFile,
+    required this.assetPath,
   });
 }
 
@@ -146,6 +148,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 42.4093,
       zoom: 7.8,
       pdfFile: 'عسير 1.pdf',
+      assetPath: 'assets/books/tourism/villages/village_01_asir.pdf',
     ),
     HeritageRegionCategory(
       id: 2,
@@ -155,6 +158,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 45.8413,
       zoom: 6.2,
       pdfFile: 'الرياض 2.pdf',
+      assetPath: 'assets/books/tourism/villages/village_02_riyadh.pdf',
     ),
     HeritageRegionCategory(
       id: 3,
@@ -164,6 +168,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 41.5182,
       zoom: 8.5,
       pdfFile: 'الباحة 3.pdf',
+      assetPath: 'assets/books/tourism/villages/village_03_albaha.pdf',
     ),
     HeritageRegionCategory(
       id: 4,
@@ -173,6 +178,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 40.7840,
       zoom: 7.0,
       pdfFile: 'مكة المكرمة 4.pdf',
+      assetPath: 'assets/books/tourism/villages/village_04_makkah.pdf',
     ),
     HeritageRegionCategory(
       id: 5,
@@ -182,6 +188,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 42.7840,
       zoom: 7.8,
       pdfFile: 'جازان 5.pdf',
+      assetPath: 'assets/books/tourism/villages/village_05_jazan.pdf',
     ),
     HeritageRegionCategory(
       id: 6,
@@ -191,6 +198,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 49.7191,
       zoom: 7.8,
       pdfFile: 'المنطقة الشرقية 6.pdf',
+      assetPath: 'assets/books/tourism/villages/village_06_eastern.pdf',
     ),
     HeritageRegionCategory(
       id: 7,
@@ -200,6 +208,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 44.0521,
       zoom: 8.5,
       pdfFile: 'نجران 7.pdf',
+      assetPath: 'assets/books/tourism/villages/village_07_najran.pdf',
     ),
     HeritageRegionCategory(
       id: 8,
@@ -209,6 +218,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 43.8135,
       zoom: 8.5,
       pdfFile: 'القصيم 8.pdf',
+      assetPath: 'assets/books/tourism/villages/village_08_qassim.pdf',
     ),
     HeritageRegionCategory(
       id: 9,
@@ -218,6 +228,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 41.5419,
       zoom: 7.8,
       pdfFile: 'حائل 9.pdf',
+      assetPath: 'assets/books/tourism/villages/village_09_hail.pdf',
     ),
     HeritageRegionCategory(
       id: 10,
@@ -227,6 +238,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 39.2929,
       zoom: 7.0,
       pdfFile: 'المدينة المنورة 10.pdf',
+      assetPath: 'assets/books/tourism/villages/village_10_madinah.pdf',
     ),
     HeritageRegionCategory(
       id: 11,
@@ -236,6 +248,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 36.1346,
       zoom: 7.0,
       pdfFile: 'تبوك 11.pdf',
+      assetPath: 'assets/books/tourism/villages/village_11_tabuk.pdf',
     ),
     HeritageRegionCategory(
       id: 12,
@@ -245,6 +258,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 39.0001,
       zoom: 7.0,
       pdfFile: 'الجوف 12.pdf',
+      assetPath: 'assets/books/tourism/villages/village_12_aljouf.pdf',
     ),
     HeritageRegionCategory(
       id: 13,
@@ -254,6 +268,7 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 42.7899,
       zoom: 7.8,
       pdfFile: 'الحدود الشمالية 13.pdf',
+      assetPath: 'assets/books/tourism/villages/village_13_northern_borders.pdf',
     ),
   ];
 
@@ -1108,6 +1123,15 @@ class _TourismScreenState extends State<TourismScreen>
     if (_mapController != null) {
       _loadCategoryMarkers(category);
     }
+    _openRegionVillagePdf(category);
+  }
+
+  void _openRegionVillagePdf(HeritageRegionCategory category) {
+    PdfViewerDialog.show(
+      context,
+      title: category.name,
+      assetPath: category.assetPath,
+    );
   }
 
   Future<void> _loadCategoryMarkers(HeritageRegionCategory category) async {
