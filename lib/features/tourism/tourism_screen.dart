@@ -874,7 +874,7 @@ class _TourismScreenState extends State<TourismScreen>
         .toList();
 
     if (kIsWeb) {
-      final webUrl = 'assets/${AppAssets.marketMarker}';
+      final webUrl = 'assets/${AppAssets.marketMarker}?v=pink_20261116';
       final batchList = validMarkets
           .map((market) => {
                 'id': 'market_${market.latitude}_${market.longitude}',
@@ -1149,7 +1149,7 @@ class _TourismScreenState extends State<TourismScreen>
     );
 
     if (kIsWeb) {
-      final webUrl = 'assets/${AppAssets.villageMarker}';
+      final webUrl = 'assets/${AppAssets.villageMarker}?v=blue_20261116';
       final batchList = categoryVillages
           .map((village) => {
                 'id': 'village_${village.id}',

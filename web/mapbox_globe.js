@@ -250,9 +250,15 @@ function resolveAssetUrl(url) {
   if (!url) return '';
   if (/^(https?:|data:|blob:)/.test(url)) return url;
   let clean = url.replace(/^\.?\//, '');
-  if (clean.startsWith('assets/assets/')) return clean;
-  if (clean.startsWith('assets/')) return 'assets/' + clean;
-  return 'assets/assets/' + clean;
+  let finalUrl;
+  if (clean.startsWith('assets/assets/')) finalUrl = clean;
+  else if (clean.startsWith('assets/')) finalUrl = 'assets/' + clean;
+  else finalUrl = 'assets/assets/' + clean;
+  // Automatically bust browser cache for updated pins
+  if ((finalUrl.indexOf('village_marker') !== -1 || finalUrl.indexOf('market_marker') !== -1) && finalUrl.indexOf('?') === -1) {
+    finalUrl += '?v=20261116_v4';
+  }
+  return finalUrl;
 }
 
 // ---------------------------------------------------------------------------
