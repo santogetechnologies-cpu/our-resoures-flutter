@@ -807,6 +807,7 @@ class _TourismScreenState extends State<TourismScreen>
 
   @override
   void dispose() {
+    _clearMarkers();
     _dropdownAnimationController.dispose();
     _marketsAnimationController.dispose();
     _villagesAnimationController.dispose();
@@ -1269,6 +1270,8 @@ class _TourismScreenState extends State<TourismScreen>
           _loadMarketMarkers(c);
         } else if (_isVillagesExpanded && _selectedRegionCategory != null) {
           _loadCategoryMarkers(_selectedRegionCategory!);
+        } else {
+          _clearMarkers();
         }
       },
       sidebarContent: Column(

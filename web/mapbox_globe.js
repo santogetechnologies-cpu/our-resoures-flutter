@@ -619,7 +619,8 @@ window.initMapboxGlobeWeb = function (viewId, containerEl, initialLng, initialLa
       overflow: 'hidden', backgroundColor: '#0b0b19'
     });
 
-    // Destroy existing instance
+    // Destroy existing instance & clear any previous markers or queued batches
+    window.mapboxGlobeClearMarkersWeb(viewId);
     if (window.mapboxGlobeInstances[viewId]) {
       try { window.mapboxGlobeInstances[viewId].remove(); } catch (_) { }
       delete window.mapboxGlobeInstances[viewId];

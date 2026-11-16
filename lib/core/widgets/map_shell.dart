@@ -282,6 +282,7 @@ class _MapShellState extends State<MapShell> {
 
   @override
   void dispose() {
+    _controller?.clearWebMarkers();
     registerSidebarScrollCallback(null);
     _sidebarScrollController.dispose();
     super.dispose();
