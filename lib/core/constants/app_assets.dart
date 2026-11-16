@@ -22,8 +22,8 @@ class AppAssets {
 
   // Map Markers
   static const String markerIcon = '$basePath/marker_icon.png';
-  static const String marketMarker = '$basePath/market_marker.png';
-  static const String villageMarker = '$basePath/village_marker.png';
+  static const String marketMarker = '$basePath/market_marker_pink.png';
+  static const String villageMarker = '$basePath/village_marker_blue.png';
   static const String oilMarker = '$basePath/oil_marker.png';
   static const String gasMarker = '$basePath/gas_marker.png';
   static const String droplet = '$basePath/droplet.png';
