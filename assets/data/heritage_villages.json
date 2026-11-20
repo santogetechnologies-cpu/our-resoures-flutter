@@ -564,7 +564,7 @@
     "region": "منطقة عسير",
     "regionId": 1,
     "governorate": "طریب",
-    "latitude": 18.0,
+    "latitude": 18,
     "longitude": 43.17,
     "page": null,
     "pdfFile": "عسير 1.pdf"
@@ -700,7 +700,7 @@
     "regionId": 1,
     "governorate": "تثلیث",
     "latitude": 19.2,
-    "longitude": 44.0,
+    "longitude": 44,
     "page": null,
     "pdfFile": "عسير 1.pdf"
   },
@@ -1644,7 +1644,7 @@
     "region": "منطقة الرياض",
     "regionId": 2,
     "governorate": "الخرج",
-    "latitude": 24.0,
+    "latitude": 24,
     "longitude": 47.16,
     "page": 200,
     "pdfFile": "الرياض 2.pdf"
@@ -1839,7 +1839,7 @@
     "region": "منطقة الباحة",
     "regionId": 3,
     "governorate": "الباحة – رغدان",
-    "latitude": 20.0,
+    "latitude": 20,
     "longitude": 41.47,
     "page": 74,
     "pdfFile": "الباحة 3.pdf"
@@ -3281,7 +3281,7 @@
     "governorate": "مدینة نجران",
     "latitude": 17.5427,
     "longitude": 44.2488,
-    "page": 5,
+    "page": 15,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3296,7 +3296,7 @@
     "governorate": "نجران – وادي نجران",
     "latitude": 17.49,
     "longitude": 44.145,
-    "page": 12,
+    "page": 22,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3311,7 +3311,7 @@
     "governorate": "نجران – وادي نجران",
     "latitude": 17.489,
     "longitude": 44.135,
-    "page": null,
+    "page": 30,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3326,7 +3326,7 @@
     "governorate": "جنوب غرب مدینة نجران",
     "latitude": 17.472,
     "longitude": 44.1,
-    "page": 25,
+    "page": 37,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3341,7 +3341,7 @@
     "governorate": "مدینة نجران",
     "latitude": 17.505,
     "longitude": 44.18,
-    "page": 32,
+    "page": 45,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3356,7 +3356,7 @@
     "governorate": "نجران – الجربة",
     "latitude": 17.488,
     "longitude": 44.125,
-    "page": null,
+    "page": 53,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3371,7 +3371,7 @@
     "governorate": "نجران – جبل العان",
     "latitude": 17.4803,
     "longitude": 44.096,
-    "page": 73,
+    "page": 101,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3386,7 +3386,7 @@
     "governorate": "غرب نجران – قرب سد نجران",
     "latitude": 17.436,
     "longitude": 44.0604,
-    "page": 78,
+    "page": 106,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3401,7 +3401,7 @@
     "governorate": "نجران – رجلاء",
     "latitude": 17.4984,
     "longitude": 44.2501,
-    "page": 85,
+    "page": 113,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3416,7 +3416,7 @@
     "governorate": "نجران – أبا السعود",
     "latitude": 17.495,
     "longitude": 44.11,
-    "page": 93,
+    "page": 117,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3431,7 +3431,7 @@
     "governorate": "بدر الجنوب",
     "latitude": 17.8844,
     "longitude": 43.7149,
-    "page": 56,
+    "page": 70,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3446,7 +3446,7 @@
     "governorate": "حبونا – الحرشف",
     "latitude": 17.6717,
     "longitude": 43.8854,
-    "page": 48,
+    "page": 61,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3461,7 +3461,7 @@
     "governorate": "بدر الجنوب",
     "latitude": 17.8825,
     "longitude": 43.7165,
-    "page": 64,
+    "page": 78,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3476,22 +3476,22 @@
     "governorate": "بدر الجنوب – جبل القھرة",
     "latitude": 17.886,
     "longitude": 43.712,
-    "page": 68,
+    "page": 85,
     "pdfFile": "نجران 7.pdf"
   },
   {
     "id": 233,
     "numberInRegion": 15,
-    "name": "قریة الحامیة التراثیة",
+    "name": "مدينة الأخدود الأثرية",
     "fortName": "",
-    "subtitle": "موقع تراثي تاريخي في منطقة نجران بمحافظة/مركز مدینة نجران",
-    "description": "يُعد قریة الحامیة التراثیة من المعالم التراثية والتاريخية البارزة في منطقة نجران بمحافظة/مركز مدینة نجران، ويجسد أصالة العمارة التقليدية والتاريخ العريق للمنطقة عبر العصور.",
+    "subtitle": "عاصمة القوافل وحضارة الأخدود القديمة",
+    "description": "في جنوب المملكة العربية السعودية، حيث تتلاقى المرتفعات الجبلية مع الأودية والسهول التي احتضنت أقدم مراكز الاستقرار البشري في الجزيرة العربية، تقف مدينة الأخدود الأثرية واحدة من أبرز الشواهد التاريخية على التاريخ الحضاري والديني لبلادنا. فعلى الضفة الجنوبية لوادي نجران، تحتفظ الأرض ببقايا مدينة أثرية محصنة يعود تاريخها إلى عصور ما قبل الميلاد، وازدهرت كمركز رئيسي على طريق تجارة القوافل القديم.",
     "region": "منطقة نجران",
     "regionId": 7,
-    "governorate": "مدینة نجران",
-    "latitude": 17.505,
-    "longitude": 44.17,
-    "page": null,
+    "governorate": "مدينة نجران – الضفة الجنوبية لوادي نجران",
+    "latitude": 17.464,
+    "longitude": 44.132,
+    "page": 92,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3506,7 +3506,7 @@
     "governorate": "منطقة نجران",
     "latitude": 17.51,
     "longitude": 44.15,
-    "page": 105,
+    "page": 129,
     "pdfFile": "نجران 7.pdf"
   },
   {
@@ -3521,7 +3521,7 @@
     "governorate": "مدینة نجران",
     "latitude": 17.4691,
     "longitude": 44.0874,
-    "page": 101,
+    "page": 124,
     "pdfFile": "نجران 7.pdf"
   },
   {
