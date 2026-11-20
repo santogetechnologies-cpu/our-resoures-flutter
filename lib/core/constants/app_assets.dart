@@ -8,7 +8,7 @@ class AppAssets {
   static const String infoback = '$basePath/infoback.png';
 
   // Logos
-  static const String alamryLogo = '$basePath/alamry_logo.png';
+  static const String alamryLogo = '$basePath/alamry_logo_v2.png';
   static const String saudiVision = '$basePath/saudi_vision.png';
   static const String saudiVisionOriginal =
       '$basePath/saudi_vision_original.png';

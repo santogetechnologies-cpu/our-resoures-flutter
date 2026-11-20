@@ -27,6 +27,11 @@
         for (let r of regs) { r.unregister(); }
       });
     }
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (let name of names) { caches.delete(name); }
+      });
+    }
   </script>
 
   <!-- MapLibre GL JS v5 with 3D Globe Projection (Token-free, 100% stable) -->
