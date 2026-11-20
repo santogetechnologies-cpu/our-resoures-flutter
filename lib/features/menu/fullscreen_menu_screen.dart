@@ -364,6 +364,8 @@ class FullscreenMenuScreen extends StatelessWidget {
                       (bottomBtnH * 0.42).clamp(15.0, 19.0);
                   final vertPadding = (H * 0.012).clamp(6.0, 12.0);
                   final gapMedium = (H * 0.013).clamp(5.0, 10.0);
+                  final gapLogoToBadge = (H * 0.012).clamp(6.0, 12.0);
+                  final gapTableToBottom = (H * 0.018).clamp(14.0, 20.0);
 
                   return SingleChildScrollView(
                     physics: const BouncingScrollPhysics(
@@ -372,214 +374,229 @@ class FullscreenMenuScreen extends StatelessWidget {
                     child: ConstrainedBox(
                       constraints:
                           BoxConstraints(minHeight: constraints.maxHeight),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: vertPadding,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // 1. Top Beveled Banner (Wider Navbar: expands up to 1550px)
-                            Center(
-                              child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 1550),
-                                child: _buildTopBanner(
-                                  title:
-                                      'منصة العمري التفاعلية لعلوم الأرض والطبيعة',
-                                  height: headerH,
-                                  fontSize: headerFontSize,
+                      child: IntrinsicHeight(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: vertPadding,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // 1. Top Beveled Banner (Wider Navbar: expands up to 1550px)
+                              Center(
+                                child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 1550),
+                                  child: _buildTopBanner(
+                                    title:
+                                        'منصة العمري التفاعلية لعلوم الأرض والطبيعة',
+                                    height: headerH,
+                                    fontSize: headerFontSize,
+                                  ),
                                 ),
                               ),
-                            ),
 
-                            // 2. Circular Alamry Logo (Centered with equal top & bottom padding)
-                            Center(
-                              child: ClipOval(
-                                child: Image.asset(
-                                  AppAssets.alamryLogo,
-                                  width: logoSize,
-                                  height: logoSize,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (c, e, s) =>
-                                      const SizedBox.shrink(),
-                                ),
-                              ),
-                            ),
+                              // 2. Main Content Section (Logo + Badge + Table + Home Page Button)
+                              // Responsively grouped and centered within the remaining viewport height,
+                              // ensuring the Home button remains directly below the table with consistent
+                              // spacing across all browser zoom levels (100%, 90%, 80%, 75%).
+                              Expanded(
+                                child: Center(
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 1200),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        // Circular Alamry Logo
+                                        ClipOval(
+                                          child: Image.asset(
+                                            AppAssets.alamryLogo,
+                                            width: logoSize,
+                                            height: logoSize,
+                                            fit: BoxFit.contain,
+                                            errorBuilder: (c, e, s) =>
+                                                const SizedBox.shrink(),
+                                          ),
+                                        ),
 
-                            // 3. Central Section (Badge and Table Grid: maxWidth 1200px)
-                            Center(
-                              child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 1200),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
-                                  children: [
-                                    // Beveled Badge: "نبذة تعريفية"
-                                    _buildBadge(
-                                      context: context,
-                                      title: 'نبذة تعريفية',
-                                      onTap: () => PdfViewerDialog.show(
-                                        context,
-                                        title: 'نبذة تعريفية',
-                                        assetPath: 'assets/books/general_books/about_platform.pdf',
-                                      ),
-                                      verticalPadding: badgeVerticalPadding,
-                                      fontSize: badgeFontSize,
+                                        SizedBox(height: gapLogoToBadge),
+
+                                        // Beveled Badge: "نبذة تعريفية"
+                                        _buildBadge(
+                                          context: context,
+                                          title: 'نبذة تعريفية',
+                                          onTap: () => PdfViewerDialog.show(
+                                            context,
+                                            title: 'نبذة تعريفية',
+                                            assetPath:
+                                                'assets/books/general_books/about_platform.pdf',
+                                          ),
+                                          verticalPadding: badgeVerticalPadding,
+                                          fontSize: badgeFontSize,
+                                        ),
+
+                                        SizedBox(height: gapMedium),
+
+                                        // The 10 Buttons Unified Table / Grid (Exact design from mockup: open perimeter, double central line)
+                                        Container(
+                                          color: Colors.transparent,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              // Row 1 (Grey)
+                                              _buildGridRow(
+                                                context: context,
+                                                rightTitle:
+                                                    'جيولوجية و جيومورفولوجية المملكة',
+                                                rightOnTap: () => _navigate(
+                                                  context,
+                                                  const GeologyScreen(),
+                                                ),
+                                                leftTitle:
+                                                    'المعادن والثروات التعدينية',
+                                                leftOnTap: () => _navigate(
+                                                  context,
+                                                  const MaterialsScreen(),
+                                                ),
+                                                bgColor: _kRowGrey,
+                                                height: rowH,
+                                                fontSize: rowFontSize,
+                                              ),
+                                              _buildRowDivider(
+                                                thickness: dividerThick,
+                                              ),
+
+                                              // Row 2 (Cream)
+                                              _buildGridRow(
+                                                context: context,
+                                                rightTitle:
+                                                    'البترول والغاز والطاقة المتجددة',
+                                                rightOnTap: () => _navigate(
+                                                  context,
+                                                  const OilGasScreen(),
+                                                ),
+                                                leftTitle:
+                                                    'الموارد المائية والأودية والسدود',
+                                                leftOnTap: () => _navigate(
+                                                  context,
+                                                  const WaterFormationsScreen(),
+                                                ),
+                                                bgColor: _kRowCream,
+                                                height: rowH,
+                                                fontSize: rowFontSize,
+                                              ),
+                                              _buildRowDivider(
+                                                thickness: dividerThick,
+                                              ),
+
+                                              // Row 3 (Grey)
+                                              _buildGridRow(
+                                                context: context,
+                                                rightTitle:
+                                                    'القرى التراثية والمواقع الاثرية',
+                                                rightOnTap: () => _navigate(
+                                                  context,
+                                                  const TourismScreen(),
+                                                ),
+                                                leftTitle:
+                                                    'المحميات، حكاية الأرض ومخاطر الطبيعة',
+                                                leftOnTap: () => _navigate(
+                                                  context,
+                                                  const ReservesScreen(),
+                                                ),
+                                                bgColor: _kRowGrey,
+                                                height: rowH,
+                                                fontSize: rowFontSize,
+                                              ),
+                                              _buildRowDivider(
+                                                thickness: dividerThick,
+                                              ),
+
+                                              // Row 4 (Cream)
+                                              _buildGridRow(
+                                                context: context,
+                                                rightTitle:
+                                                    'استراتيجية المخاطر الطبيعية',
+                                                rightOnTap: () =>
+                                                    PdfViewerDialog.show(
+                                                  context,
+                                                  title:
+                                                      'استراتيجية المخاطر الطبيعية',
+                                                  assetPath:
+                                                      'assets/books/general_books/hazards_strategy.pdf',
+                                                ),
+                                                leftTitle:
+                                                    'الموسوعات والكتب',
+                                                leftOnTap: () => _navigate(
+                                                  context,
+                                                  const BooksScreen(),
+                                                ),
+                                                bgColor: _kRowCream,
+                                                height: rowH,
+                                                fontSize: rowFontSize,
+                                              ),
+                                              _buildRowDivider(
+                                                thickness: dividerThick,
+                                              ),
+
+                                              // Row 5 (Grey)
+                                              _buildGridRow(
+                                                context: context,
+                                                rightTitle:
+                                                    'قاعدة البيانات الزلزالية',
+                                                rightOnTap: () => _navigate(
+                                                  context,
+                                                  const EarthquakeScreen(),
+                                                ),
+                                                leftTitle:
+                                                    'بوابة المصادر الجيومكانية',
+                                                leftOnTap: () =>
+                                                    PdfViewerDialog.show(
+                                                  context,
+                                                  title:
+                                                      'بوابة المصادر الجيومكانية',
+                                                  assetPath:
+                                                      'assets/books/general_books/geospatial_portal.pdf',
+                                                ),
+                                                bgColor: _kRowGrey,
+                                                height: rowH,
+                                                fontSize: rowFontSize,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        SizedBox(height: gapTableToBottom),
+
+                                        // Home Page Navigation Button: "صفحة البداية"
+                                        _buildBottomNavButton(
+                                          context: context,
+                                          title: 'صفحة البداية',
+                                          onTap: () {
+                                            if (Navigator.of(context).canPop()) {
+                                              Navigator.of(context).pop();
+                                            } else {
+                                              _navigate(
+                                                context,
+                                                const StartScreen(),
+                                              );
+                                            }
+                                          },
+                                          width: bottomBtnW,
+                                          height: bottomBtnH,
+                                          fontSize: bottomBtnFontSize,
+                                        ),
+                                      ],
                                     ),
-
-                                    SizedBox(height: gapMedium),
-
-                                    // 4. The 10 Buttons Unified Table / Grid (Exact design from mockup: open perimeter, double central line)
-                                    Container(
-                                      color: Colors.transparent,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          // Row 1 (Grey)
-                                          _buildGridRow(
-                                            context: context,
-                                            rightTitle:
-                                                'جيولوجية و جيومورفولوجية المملكة',
-                                            rightOnTap: () => _navigate(
-                                              context,
-                                              const GeologyScreen(),
-                                            ),
-                                            leftTitle:
-                                                'المعادن والثروات التعدينية',
-                                            leftOnTap: () => _navigate(
-                                              context,
-                                              const MaterialsScreen(),
-                                            ),
-                                            bgColor: _kRowGrey,
-                                            height: rowH,
-                                            fontSize: rowFontSize,
-                                          ),
-                                          _buildRowDivider(
-                                            thickness: dividerThick,
-                                          ),
-
-                                          // Row 2 (Cream)
-                                          _buildGridRow(
-                                            context: context,
-                                            rightTitle: 'البترول والغاز والطاقة المتجددة',
-                                            rightOnTap: () => _navigate(
-                                              context,
-                                              const OilGasScreen(),
-                                            ),
-                                            leftTitle: 'الموارد المائية والأودية والسدود',
-                                            leftOnTap: () => _navigate(
-                                              context,
-                                              const WaterFormationsScreen(),
-                                            ),
-                                            bgColor: _kRowCream,
-                                            height: rowH,
-                                            fontSize: rowFontSize,
-                                          ),
-                                          _buildRowDivider(
-                                            thickness: dividerThick,
-                                          ),
-
-                                          // Row 3 (Grey)
-                                          _buildGridRow(
-                                            context: context,
-                                            rightTitle: 'القرى التراثية والمواقع الاثرية',
-                                            rightOnTap: () => _navigate(
-                                              context,
-                                              const TourismScreen(),
-                                            ),
-                                            leftTitle: 'المحميات، حكاية الأرض ومخاطر الطبيعة',
-                                            leftOnTap: () => _navigate(
-                                              context,
-                                              const ReservesScreen(),
-                                            ),
-                                            bgColor: _kRowGrey,
-                                            height: rowH,
-                                            fontSize: rowFontSize,
-                                          ),
-                                          _buildRowDivider(
-                                            thickness: dividerThick,
-                                          ),
-
-                                          // Row 4 (Cream)
-                                          _buildGridRow(
-                                            context: context,
-                                            rightTitle:
-                                                'استراتيجية المخاطر الطبيعية',
-                                            rightOnTap: () => PdfViewerDialog.show(
-                                              context,
-                                              title: 'استراتيجية المخاطر الطبيعية',
-                                              assetPath: 'assets/books/general_books/hazards_strategy.pdf',
-                                            ),
-                                            leftTitle: 'الموسوعات والكتب',
-                                            leftOnTap: () => _navigate(
-                                              context,
-                                              const BooksScreen(),
-                                            ),
-                                            bgColor: _kRowCream,
-                                            height: rowH,
-                                            fontSize: rowFontSize,
-                                          ),
-                                          _buildRowDivider(
-                                            thickness: dividerThick,
-                                          ),
-
-                                          // Row 5 (Grey)
-                                          _buildGridRow(
-                                            context: context,
-                                            rightTitle:
-                                                'قاعدة البيانات الزلزالية',
-                                            rightOnTap: () => _navigate(
-                                              context,
-                                              const EarthquakeScreen(),
-                                            ),
-                                            leftTitle:
-                                                'بوابة المصادر الجيومكانية',
-                                            leftOnTap: () => PdfViewerDialog.show(
-                                              context,
-                                              title: 'بوابة المصادر الجيومكانية',
-                                              assetPath: 'assets/books/general_books/geospatial_portal.pdf',
-                                            ),
-                                            bgColor: _kRowGrey,
-                                            height: rowH,
-                                            fontSize: rowFontSize,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ),
-
-                            // 4. Bottom Navigation Row (صفحة البداية)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildBottomNavButton(
-                                  context: context,
-                                  title: 'صفحة البداية',
-                                  onTap: () {
-                                    if (Navigator.of(context).canPop()) {
-                                      Navigator.of(context).pop();
-                                    } else {
-                                      _navigate(
-                                        context,
-                                        const StartScreen(),
-                                      );
-                                    }
-                                  },
-                                  width: bottomBtnW,
-                                  height: bottomBtnH,
-                                  fontSize: bottomBtnFontSize,
-                                ),
-                              ],
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
