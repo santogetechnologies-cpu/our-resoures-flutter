@@ -268,7 +268,8 @@ class _TourismScreenState extends State<TourismScreen>
       centerLng: 42.7899,
       zoom: 7.8,
       pdfFile: 'الحدود الشمالية 13.pdf',
-      assetPath: 'assets/books/tourism/villages/village_13_northern_borders.pdf',
+      assetPath:
+          'assets/books/tourism/villages/village_13_northern_borders.pdf',
     ),
   ];
 
@@ -908,17 +909,15 @@ class _TourismScreenState extends State<TourismScreen>
 
       final optionsList = validMarkets.map((market) {
         return PointAnnotationOptions(
-          geometry: Point(
-              coordinates: Position(market.longitude, market.latitude)),
+          geometry:
+              Point(coordinates: Position(market.longitude, market.latitude)),
           image: imageBytes,
           iconSize: 0.25,
         );
       }).toList();
 
       final annotations = await manager.createMulti(optionsList);
-      for (int i = 0;
-          i < annotations.length && i < validMarkets.length;
-          i++) {
+      for (int i = 0; i < annotations.length && i < validMarkets.length; i++) {
         final ann = annotations[i];
         if (ann != null) {
           _annotationMarketMap[ann.id] = validMarkets[i];
@@ -968,9 +967,8 @@ class _TourismScreenState extends State<TourismScreen>
   }
 
   Future<void> _loadMarkers(MapShellController controller) async {
-    final validLandmarks = _landmarks
-        .where((l) => l.latitude > 0.0 && l.longitude > 0.0)
-        .toList();
+    final validLandmarks =
+        _landmarks.where((l) => l.latitude > 0.0 && l.longitude > 0.0).toList();
 
     if (kIsWeb) {
       final webUrl = 'assets/${AppAssets.markerIcon}';
@@ -1082,8 +1080,7 @@ class _TourismScreenState extends State<TourismScreen>
           await rootBundle.loadString('assets/data/heritage_villages.json');
       final List<dynamic> jsonList = jsonDecode(jsonString) as List<dynamic>;
       final villages = jsonList
-          .map((item) =>
-              HeritageVillage.fromJson(item as Map<String, dynamic>))
+          .map((item) => HeritageVillage.fromJson(item as Map<String, dynamic>))
           .toList();
       if (mounted) {
         setState(() {
@@ -1143,22 +1140,33 @@ class _TourismScreenState extends State<TourismScreen>
             v.region == category.name && v.latitude > 0.0 && v.longitude > 0.0)
         .toList();
 
+    // Ensure markers are strictly sorted in number order (1, 2, 3... 35)
+    categoryVillages.sort((a, b) => a.numberInRegion.compareTo(b.numberInRegion));
+
     _mapController!.flyTo(
       latitude: category.centerLat,
       longitude: category.centerLng,
       zoom: category.zoom,
     );
 
+    final isRiyadh = category.name == 'منطقة الرياض' || category.id == 2;
+
     if (kIsWeb) {
-      final webUrl = 'assets/${AppAssets.villageMarker}?v=blue_20261116';
-      final batchList = categoryVillages
-          .map((village) => {
-                'id': 'village_${village.id}',
-                'lat': village.latitude,
-                'lng': village.longitude,
-                'iconUrl': webUrl,
-              })
-          .toList();
+      final batchList = categoryVillages.map((village) {
+        final iconUrl = isRiyadh &&
+                village.numberInRegion >= 1 &&
+                village.numberInRegion <= 35
+            ? 'assets/images/village_marker_riyadh_${village.numberInRegion}.png?v=riyadh_20261124'
+            : 'assets/${AppAssets.villageMarker}?v=blue_20261116';
+        return {
+          'id': 'village_${village.id}',
+          'lat': village.latitude,
+          'lng': village.longitude,
+          'iconUrl': iconUrl,
+          'number': isRiyadh ? village.numberInRegion : null,
+          'size': isRiyadh ? 42 : 38,
+        };
+      }).toList();
 
       final villageMap = {
         for (final village in categoryVillages) 'village_${village.id}': village
@@ -1180,17 +1188,33 @@ class _TourismScreenState extends State<TourismScreen>
       await manager.deleteAll();
       _annotationVillageMap.clear();
 
-      final ByteData byteData = await rootBundle.load(AppAssets.villageMarker);
-      final Uint8List imageBytes = byteData.buffer.asUint8List();
+      final ByteData defaultByteData =
+          await rootBundle.load(AppAssets.villageMarker);
+      final Uint8List defaultImageBytes = defaultByteData.buffer.asUint8List();
 
-      final optionsList = categoryVillages.map((village) {
-        return PointAnnotationOptions(
-          geometry: Point(
-              coordinates: Position(village.longitude, village.latitude)),
-          image: imageBytes,
-          iconSize: 0.25,
+      final optionsList = <PointAnnotationOptions>[];
+      for (final village in categoryVillages) {
+        Uint8List imageBytes = defaultImageBytes;
+        if (isRiyadh &&
+            village.numberInRegion >= 1 &&
+            village.numberInRegion <= 35) {
+          try {
+            final ByteData byteData = await rootBundle.load(
+                'assets/images/village_marker_riyadh_${village.numberInRegion}.png');
+            imageBytes = byteData.buffer.asUint8List();
+          } catch (_) {
+            imageBytes = defaultImageBytes;
+          }
+        }
+        optionsList.add(
+          PointAnnotationOptions(
+            geometry: Point(
+                coordinates: Position(village.longitude, village.latitude)),
+            image: imageBytes,
+            iconSize: isRiyadh ? 0.28 : 0.25,
+          ),
         );
-      }).toList();
+      }
 
       final annotations = await manager.createMulti(optionsList);
       for (int i = 0;
@@ -1247,11 +1271,21 @@ class _TourismScreenState extends State<TourismScreen>
       buffer.writeln(village.description);
     }
 
+    final isRiyadh = village.region == 'منطقة الرياض' || village.regionId == 2;
+    final dialogTitle = (isRiyadh && village.numberInRegion > 0)
+        ? '${village.numberInRegion}. ${village.name}'
+        : village.name;
+    final dialogImage = (isRiyadh &&
+            village.numberInRegion >= 1 &&
+            village.numberInRegion <= 35)
+        ? 'assets/images/village_marker_riyadh_${village.numberInRegion}.png'
+        : AppAssets.villageMarker;
+
     AppPopupDialog.show(
       context,
-      title: village.name,
+      title: dialogTitle,
       description: buffer.toString().trim(),
-      imageAsset: AppAssets.villageMarker,
+      imageAsset: dialogImage,
     );
   }
 
@@ -1368,7 +1402,8 @@ class _TourismScreenState extends State<TourismScreen>
                               }
                             }
                           });
-                          if (_mapController != null && _isFourthButtonExpanded) {
+                          if (_mapController != null &&
+                              _isFourthButtonExpanded) {
                             _loadMarkers(_mapController!);
                           }
                         },
